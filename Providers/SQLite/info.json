@@ -1,0 +1,4 @@
+{
+    "url": "https://www.nuget.org/packages/System.Data.SQLite.Core/"
+    , "files": ["Libraries\\System.Data.SQLite.dll","Libraries\\x64\\SQLite.Interop.dll","Libraries\\x86\\SQLite.Interop.dll"]
+}

@@ -1,0 +1,16 @@
+Open-SqlConnection
+    -ConnectionName
+    -CommandTimeout
+    -ProviderName
+    -ConnectionString OR -ConnectionOptions
+
+        ConnectionOptions = hashtable of options specific to the type of provider
+
+New-SqlProviderOptions
+    -ProviderName
+
+    returns hashtable with default options for a given provider
+
+Providers are loaded during psm1
+    structure of the providers folder needs to handle loading up any libraries
+    AND needs to add the default hashtable to the providerHashArray
