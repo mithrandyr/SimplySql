@@ -13,4 +13,26 @@ New-SqlProviderOptions
 
 Providers are loaded during psm1
     structure of the providers folder needs to handle loading up any libraries
-    AND needs to add the default hashtable to the providerHashArray
+    AND needs to add the default hashtable to the providerHashArray 
+    (script:Providers)
+
+Dynamic create Function in order to put provider Param on open-SqlConnection
+    Then use DyanmicParam to add remaining parameters tied to that provider
+
+Structure of a Provider
+    Foldername = providerName to be reference by New-SqlProviderOptions and Open-SqlConnection
+    Foldername\foldername.ps1 = file to be invoked for Provider Creation
+        New
+            Implementation of ProviderBase
+            Output Array of Dynamic Parameters
+            Help Information for Parameters
+            Create Instance of ProviderBase with Connection Object
+
+            
+            
+            provider file will output a list of dynamic parameters to be used with Open-SqlConnection
+            New cmd "Help-SqlProvider" -- will display help for each provider
+            Help Hashtable providing
+
+
+        
