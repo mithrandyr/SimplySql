@@ -1,13 +1,14 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
-
 $Script:Connections = @{}
 $Script:Providers = @{}
 
-#Load up base code
-ForEach($f in Get-ChildItem "$PSScriptRoot\Code" -File) {
-    . $f.FullName
-}
+#Load up base Classes
+"SqlMap","SqlMessage","ProviderConfig","ProviderBase" |
+    ForEach-Object { . (Join-Path -Path "$PSScriptRoot\Classes" -ChildPath "$_.ps1") }
+
+#Load Up Internal Functions
+Get-ChildItem "$PSScriptRoot\Functions" -File | ForEach-Object { . $_.FullName }
 
 #Load up providers
 ForEach($f in Get-ChildItem "$PSScriptRoot\Providers\" -Directory) {
@@ -24,8 +25,9 @@ ForEach($f in Get-ChildItem "$PSScriptRoot\Providers\" -Directory) {
 }
 
 If($Script:Providers.Keys.Count -eq 0) { Write-Warning "No Providers were loaded!" }
-
-#Load Cmdlets
-ForEach($f in Get-ChildItem "$PSScriptRoot\Cmdlets" -File) {
-    . $f.FullName
+Else {
+    #Load Cmdlets
+    Get-ChildItem "$PSScriptRoot\Cmdlets" -File | ForEach-Object { . $_.FullName }
 }
+
+Remove-Variable f, fname, file

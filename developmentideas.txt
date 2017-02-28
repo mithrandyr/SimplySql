@@ -2,14 +2,9 @@ Open-SqlConnection
     -ConnectionName
     -CommandTimeout
     -ProviderName
-    -ConnectionString OR -ConnectionOptions
+    -ConnectionString 
 
-        ConnectionOptions = hashtable of options specific to the type of provider
-
-New-SqlProviderOptions
-    -ProviderName
-
-    returns hashtable with default options for a given provider
+    Using dynamic parameters now...
 
 Providers are loaded during psm1
     structure of the providers folder needs to handle loading up any libraries
@@ -31,8 +26,4 @@ Structure of a Provider
             
             
             provider file will output a list of dynamic parameters to be used with Open-SqlConnection
-            New cmd "Help-SqlProvider" -- will display help for each provider
-            Help Hashtable providing
-
-
-        
+            New cmd "Get-SqlProviderHelp" -- will display help for each provider

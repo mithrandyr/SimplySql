@@ -1,20 +1,3 @@
-Class SqlMap {
-    [int]$Ordinal
-    [string]$Name
-    [bool]$AllowNull
-    [type]$DataType
-    [string]$MappedName
-}
-
-Class SqlMessage { [datetime]$Generated; [string]$Message }
-
-Class ProviderConfig {
-    [string]$ShortDescription
-    [string]$HelpText
-    [scriptblock]$CreateProvider
-    [System.Management.Automation.RuntimeDefinedParameterDictionary]$Parameters = (New-Object System.Management.Automation.RuntimeDefinedParameterDictionary)
-}
-
 Class ProviderBase {
     [string]$ConnectionName
     [int]$CommandTimeout = 30
