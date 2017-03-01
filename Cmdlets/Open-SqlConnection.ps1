@@ -52,13 +52,9 @@ Function Open-SqlConnection {
         }
         Else {
             $PSBoundParameters.ParameterSetName = $PSCmdlet.ParameterSetName
+            $PSBoundParameters = $PSBoundParameters | AddDynamicParameterDefaults
             
-            #Write-Host "BEFORE"
-            #Write-Output $PSBoundParameters.keys
-            #Write-Host "AFTER"
-            #Write-Output ($PSBoundParameters | AddDynamicParameterDefaults).Keys
-            Write-Output $PSBoundParameters | AddDynamicParameterDefaults
-            
+            $Script:Connections.$ConnectionName = $Script:Providers.$pName.CreateProvider.Invoke($PSBoundParameters)
         }
     }
 }

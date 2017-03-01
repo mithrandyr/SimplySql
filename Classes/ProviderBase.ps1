@@ -5,12 +5,7 @@ Class ProviderBase {
     #[string]$ProviderName
     [System.Collections.Generic.Queue[SqlMessage]]$Messages = (New-Object 'System.Collections.Generic.Queue[SqlMessage]')
 
-    ProviderBase([string]$ConnectionName, [int]$CommandTimeout, [System.Data.IDbConnection]$Connection) {
-        If($this.GetType().Name -eq "Parent") { Throw [System.InvalidOperationException]::new("ProviderBase must be inherited!") }
-        $this.ConnectionName = $ConnectionName
-        $this.CommandTimeout = $CommandTimeout
-        $this.Connection = $Connection
-    }
+    ProviderBase() { If($this.GetType().Name -eq "ProviderBase") { Throw [System.InvalidOperationException]::new("ProviderBase must be inherited!") } }
     
     [PSCustomObject] ConnectionInfo() { Throw [System.NotImplementedException]::new("ProviderBase.ConnectionInfo must be overloaded!") }
 

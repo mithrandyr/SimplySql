@@ -2,6 +2,7 @@ Function CreateParameter {
     Param([string]$Name
         , [type]$Type
         , [System.Management.Automation.ParameterAttribute[]]$Parameters = @()
+        , [hashtable[]]$ParameterHashes = @()
         , [string[]]$ValidateSet = @()
         , [string[]]$Alias = @()
         , [object]$DefaultValue)
@@ -9,6 +10,7 @@ Function CreateParameter {
     $AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
     
     $Parameters | ForEach-Object { $AttributeCollection.Add($_) }
+    $ParameterHashes | ForEach-Object { $AttributeCollection.Add((CreateParameterAttribute @_)) }
 
     If($ValidateSet.Count -gt 0) { $AttributeCollection.Add([System.Management.Automation.ValidateSetAttribute]::new($ValidateSet)) }
     If($Alias.Count -gt 0) { $AttributeCollection.Add([System.Management.Automation.AliasAttribute]::new($Alias)) }

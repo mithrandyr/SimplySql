@@ -2,16 +2,60 @@ TOPIC
     about_SimplySql_Providers
 
 SHORT DESCRIPTION
-    A short, one-line description of the topic contents.
+    SimpleSql Providers Documentation
 
 LONG DESCRIPTION
-    A detailed, full description of the subject or purpose of the module.
+    To create a new provider, you need to add a folder under the "Providers"
+    directory.  The name of this folder will be the name of the Provider,
+    including capitalization.  This folder will contain all the files
+    necessary for the provider to work.
+    
+    There are two required files: a config file and an initialization file.
+    For example, if your provider is "Acme", then the config file would be
+    "acme.ps1" and the initialization file would be "acmeProvider.ps1".
+    During module loading, the config file is invoked to create the provider
+    Configuration object.  The initialization file is dotsourced and should
+    define a class (named like the file without .ps1) that derives from
+    [ProviderBase].  This file should also include any initialization logic
+    such as adding types necessary for the provider.
+
+    The config file, at the most basic, must create a new object of type 
+    [ProviderConfig] and then output this object (Write-Output).  This object
+    has 4 properties that need to be populated: ShortDescription, HelpText,
+    Parameters, CreateProvider.
+        
+        ShortDescription <string> = is a single line description of the provider
+        
+        HelpText <string> = is a here string (@''@) that contains any help
+            information that you want to provide for your module.  The
+            included information will be added to the output of
+            Get-SqlProviderHelp.
+        
+        Parameters <System.Management.Automation.RuntimeDefinedParameterDictionary>
+            = is a dictionary of RuntimeDefinedParameters.  These are the
+            dynamic parameters that will be added to Open-SqlConnection when
+            the provider is used.
+        
+        CreateProvider <scriptblock> = This is the scriptblock that will be
+            invoked by Open-SqlConnection in order to create the connection 
+            provider.  It must return an instantiated class derived from 
+            [ProviderBase].
+
+    When creating the [ProviderConfig] object, there are two options.  The
+    first is to create an empty object and then populate its parameters, ie
+    [ProviderConfig]::new().  The second option is to use the constructor of
+    [ProviderConfig] to create an object.
+
+    If you use the second option, then you will pass an array of hashtables for
+    the ParameterHashes value of [ProviderConfig]::new(ShortDescription,
+    HelpText, ParameterHashes, CreateProvider).
 
 EXAMPLES
-    Examples of how to use the module or how the subject feature works in practice.
+    See the existing providers.
 
 KEYWORDS
-    Terms or titles on which you might expect your users to search for the information in this topic.
 
 SEE ALSO
-    Text-only references for further reading. Hyperlinks cannot work in the Windows PowerShell console. 
+    about_SimplySql
+    about_SimplySql_ProviderConfig
+    about_SimplySql_ProviderBase
