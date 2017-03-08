@@ -27,5 +27,5 @@ Filter Show-SqlConnection {
     }
     
 }
-
-Export-ModuleMember -Function Show-SqlConnection
+Set-Alias -Name ssc -Value Show-SqlConnection
+Export-ModuleMember -Function Show-SqlConnection -Alias ssc

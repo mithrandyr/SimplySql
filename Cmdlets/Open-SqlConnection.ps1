@@ -52,6 +52,8 @@ Function Open-SqlConnection {
         }
         Else {
             $PSBoundParameters.ParameterSetName = $PSCmdlet.ParameterSetName
+            $PSBoundParameters.ConnectionName = $ConnectionName
+            $PSBoundParameters.CommandTimeout = $CommandTimeout
             $PSBoundParameters = $PSBoundParameters | AddDynamicParameterDefaults
             
             $Script:Connections.$ConnectionName = $Script:Providers.$pName.CreateProvider.Invoke($PSBoundParameters)
@@ -73,5 +75,6 @@ $desc = $desc -join "`n        "
 $val = $val.Replace("<<<DESCRIPTION>>>", $desc).Replace("<<<LIST>>>", $list)
 
 Invoke-Expression $val
-Export-ModuleMember -Function Open-SqlConnection
+Set-Alias -Name osc -Value Open-SqlConnection
+Export-ModuleMember -Function Open-SqlConnection -Alias osc
 Remove-Variable list, val, desc

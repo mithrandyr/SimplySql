@@ -17,6 +17,12 @@ Microsoft SQL Server (System.Data.SqlClient)
                     ValueFromPipelineByPropertyName = $true
                     Position = 1
                     HelpMessage = "The datasource for the connection."
+                },
+                @{
+                    ParameterSetName = "cred"
+                    ValueFromPipelineByPropertyName = $true
+                    Position = 1
+                    HelpMessage = "The datasource for the connection."
                 }
             )
             Alias = "SqlInstance"
@@ -35,7 +41,13 @@ Microsoft SQL Server (System.Data.SqlClient)
                     ValueFromPipelineByPropertyName = $true
                     Position = 2
                     HelpMessage = "Database catalog to connect to."
-                }            
+                },
+                @{
+                    ParameterSetName = "cred"
+                    ValueFromPipelineByPropertyName = $true
+                    Position = 2
+                    HelpMessage = "Database catalog to connect to."
+                }
             )
             Alias = "SqlDatabase"
             DefaultValue = "master"
@@ -61,10 +73,25 @@ Microsoft SQL Server (System.Data.SqlClient)
                     HelpMessage = "Password for the user connecting as."
                 }
             )
+        },
+        @{Name = "Credential"
+            Type = [pscredential]
+            ParameterHashes = @(
+                @{
+                    ParameterSetName = "cred"
+                    Mandatory = $true
+                    ValueFromPipelineByPropertyName = $true
+                    HelpMessage = "Credential object containing the SQL user/pass."
+                },
+                @{
+                    ParameterSetName = "Conn"
+                    ValueFromPipelineByPropertyName = $true
+                    HelpMessage = "Credential object containing the SQL user/pass."
+                }
+            )
         }
     ),
-    {
-    Param([hashtable]$ht)
-
-    return [SQLProvider]::New()
-}))
+    { Param([hashtable]$ht)
+        return [SQLProvider]::New($ht.ConnectionName, $ht.CommandTimeout, [System.Data.SqlClient.SqlConnection]::CreateConnection($ht))
+    }
+))
