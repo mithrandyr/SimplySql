@@ -1,3 +1,4 @@
+#dont' think this is needed anymore in PowerShell V3+
 Function ProcessHashTable([parameter(Mandatory)][hashtable]$ht) {
     If($ht) {
         ForEach($key in $ht.keys){

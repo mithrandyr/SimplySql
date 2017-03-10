@@ -9,22 +9,40 @@ Class ProviderBase {
     
     [PSCustomObject] ConnectionInfo() { Throw [System.NotImplementedException]::new("ProviderBase.ConnectionInfo must be overloaded!") }
 
-    [System.Data.IDbCommand] GetCommand([string]$Query, [int]$cmdTimeout, [hashtable]$Parameters = @{}) {
+    [void] ChangeDatabase([string]$DatabaseName) { Throw [System.NotImplementedException]::new("ProviderBase.ChangeDatabase must be overloaded!") }
+
+    [string] ProviderType() { Throw [System.NotImplementedException]::new("ProviderBase.ProviderType must be overloaded!") }
+
+    [System.Data.IDbCommand] GetCommand([string]$Query, [int]$cmdTimeout, [hashtable]$Parameters) {
         If($cmdTimeout -lt 0) { $cmdTimeout = $this.CommandTimeout }
         $cmd = $this.Connection.CreateCommand()
         $cmd.CommandText = $Query
         $cmd.CommandTimeout = $cmdTimeout
+        
         ForEach($de in $Parameters.GetEnumerator()) {
-            $cmd.Parameters.Add($this.CreateParameter($de.Key, $de.Value))
+            If($de.Value) { $cmd.Parameters.Add($cmd.CreateParameter($de.Name, $de.Value)) }
+            Else { $cmd.Parameters.Add($cmd.CreateParameter($de.Name, [System.DBNull]::Value)) }
         }
+        
         Return $cmd
     }
 
-    [System.Data.IDbCommand] GetCommand([string]$Query, [hashtable]$Parameters = @{}) {
-        Return $this.GetCommand($Query, $this.CommandTimeout, $Parameters)
+    [System.Object] GetScalar([string]$Query, [int]$cmdTimeout, [hashtable]$Parameters) {
+        $cmd = $this.GetCommand($Query, $cmdTimeout, $Parameters)
+        Try { return $cmd.ExecuteScalar() }
+        Finally { $cmd.Dispose() }
     }
 
-    [System.Data.IDataParameter] CreateParameter([String]$Name, $Value) { Throw [System.NotImplementedException]::new("ProviderBase.CreateParameter must be overloaded!") }
+    [System.Data.IDataReader] GetReader([string]$Query, [int]$cmdTimeout, [hashtable]$Parameters) {
+        Return $this.GetCommand($Query, $cmdTimeout, $Parameters).ExecuteReader()
+    }
+
+    [long] Update([string]$Query, [int]$cmdTimeout, [hashtable]$Parameters) {
+        $cmd = $this.GetCommand($Query, $cmdTimeout, $Parameters)
+        Try { return $cmd.ExecuteNonQuery() }
+        Finally { $cmd.Dispose() }
+    }
+    
     [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd) { Throw [System.NotImplementedException]::new("ProviderBase.GetDataSet must be overloaded!") }
     
     [long] BulkLoad([System.Data.IDataReader]$DataReader
@@ -39,6 +57,7 @@ Class ProviderBase {
     [SqlMessage] GetMessage() { Return $this.Messages.Dequeue() }
     [Void] ClearMessages() { $this.Messages.Clear() }
     [bool] HasMessages() { Return $this.Messages.Count -gt 0 }
+    [bool] HasTransaction() { Return $this.Transaction -ne $null }
 
     [void] BeginTransaction() { 
         If($this.Transaction) { Throw [System.InvalidOperationException]::new("Cannot BEGIN a transaction when one is already in progress.") }
@@ -51,7 +70,7 @@ Class ProviderBase {
             $this.Transaction.Dispose()
             $this.Transaction = $null
         }
-        Else { Throw [System.InvalidOperationException]::new("Cannot ROLLBACK when there is no transaction in progress." }
+        Else { Throw [System.InvalidOperationException]::new("Cannot ROLLBACK when there is no transaction in progress.") }
     }
 
     [void] CommitTransaction() {
@@ -60,7 +79,7 @@ Class ProviderBase {
             $this.Transaction.Dispose()
             $this.Transaction = $null
         }
-        Else { Throw [System.InvalidOperationException]::new("Cannot COMMIT when there is no transaction in progress." }
+        Else { Throw [System.InvalidOperationException]::new("Cannot COMMIT when there is no transaction in progress.") }
     }
 
     [void] AttachCommand([System.Data.IDbCommand]$Command) {

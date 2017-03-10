@@ -56,7 +56,8 @@ Function Open-SqlConnection {
             $PSBoundParameters.CommandTimeout = $CommandTimeout
             $PSBoundParameters = $PSBoundParameters | AddDynamicParameterDefaults
             
-            $Script:Connections.$ConnectionName = $Script:Providers.$pName.CreateProvider.Invoke($PSBoundParameters)
+            #Select First Object, otherwise you get a collection
+            $Script:Connections.$ConnectionName = $Script:Providers.$pName.CreateProvider.Invoke($PSBoundParameters) | Select-Object -First 1
         }
     }
 }

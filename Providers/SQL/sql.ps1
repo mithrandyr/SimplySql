@@ -9,19 +9,16 @@ Microsoft SQL Server (System.Data.SqlClient)
             ParameterHashes = @(
                 @{
                     ValueFromPipelineByPropertyName = $true
-                    Position = 1
                     HelpMessage = "The datasource for the connection."
                 },
                 @{
                     ParameterSetName = "user"
                     ValueFromPipelineByPropertyName = $true
-                    Position = 1
                     HelpMessage = "The datasource for the connection."
                 },
                 @{
                     ParameterSetName = "cred"
                     ValueFromPipelineByPropertyName = $true
-                    Position = 1
                     HelpMessage = "The datasource for the connection."
                 }
             )
@@ -33,19 +30,16 @@ Microsoft SQL Server (System.Data.SqlClient)
             ParameterHashes = @(
                 @{
                     ValueFromPipelineByPropertyName = $true
-                    Position = 2
                     HelpMessage = "Database catalog to connect to."
                 },
                 @{
                     ParameterSetName = "user"
                     ValueFromPipelineByPropertyName = $true
-                    Position = 2
                     HelpMessage = "Database catalog to connect to."
                 },
                 @{
                     ParameterSetName = "cred"
                     ValueFromPipelineByPropertyName = $true
-                    Position = 2
                     HelpMessage = "Database catalog to connect to."
                 }
             )
@@ -91,7 +85,5 @@ Microsoft SQL Server (System.Data.SqlClient)
             )
         }
     ),
-    { Param([hashtable]$ht)
-        return [SQLProvider]::New($ht.ConnectionName, $ht.CommandTimeout, [System.Data.SqlClient.SqlConnection]::CreateConnection($ht))
-    }
+    { Param([hashtable]$ht) return [SQLProvider]::New($ht.ConnectionName, $ht.CommandTimeout, [SQLProvider]::CreateConnection($ht)) }
 ))

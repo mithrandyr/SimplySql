@@ -1,1 +1,1 @@
-Class SqlMessage { [datetime]$Generated; [string]$Message }
+Class SqlMessage { [datetime]$Received; [string]$Message }
