@@ -3,8 +3,12 @@ $ErrorActionPreference = "Stop"
 $Script:Connections = @{}
 $Script:Providers = @{}
 
+#Add Type for translating DataReader to PSObject
+#Repo for source code is at https://github.com/mithrandyr/DataReaderToPSObject
+Add-Type -Path "$PSScriptRoot\DataReaderToPSObject.dll"
+
 #Load up base Classes
-"SqlMap","SqlMessage","ProviderConfig","ProviderBase" |
+"SqlMessage","ProviderConfig","ProviderBase" |
     ForEach-Object { . (Join-Path -Path "$PSScriptRoot\Classes" -ChildPath "$_.ps1") }
 
 #Load Up Internal Functions

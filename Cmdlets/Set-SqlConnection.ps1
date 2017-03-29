@@ -27,7 +27,7 @@ Function Set-SqlConnection {
             $Script:Connections.$ConnectionName.CommandTimeout = $CommandTimeout
         }        
         If($Database) {
-            Try { $Script:Connections.$ConnectionName.Connection.ChangeDatabase($Database) }
+            Try { $Script:Connections.$ConnectionName.ChangeDatabase($Database) }
             Catch [System.NotImplementedException], [System.NotSupportedException] {
                 Write-Warning ("Changing the databse is not available for this provider: {0}" -f $Script:Connections[$ConnectionName].ProviderType())
             }

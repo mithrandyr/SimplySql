@@ -32,9 +32,7 @@ Class SQLProvider : ProviderBase {
         }
     }
 
-    [void] ChangeDatabase([string]$DatabaseName) { 
-
-    }
+    [void] ChangeDatabase([string]$DatabaseName) { $this.Connection.ChangeDatabase($DatabaseName) }
 
     [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd) {
         $ds = [System.Data.DataSet]::new()
