@@ -15,5 +15,5 @@ Else {
 
     Show-SqlConnection
 
-        
+    isq "select @a" -Parameters @{a=1}
 }

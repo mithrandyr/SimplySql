@@ -46,7 +46,7 @@ Class SQLProvider : ProviderBase {
 
     [long] BulkLoad([System.Data.IDataReader]$DataReader
                     , [string]$DestinationTable
-                    , [hashtable]$ColumnMap
+                    , [hashtable]$ColumnMap = @{}
                     , [int]$BatchSize
                     , [int]$BatchTimeout
                     , [ScriptBlock]$Notify) {

@@ -20,8 +20,11 @@ Class ProviderBase {
         $cmd.CommandTimeout = $cmdTimeout
         
         ForEach($de in $Parameters.GetEnumerator()) {
-            If($de.Value) { $cmd.Parameters.Add($cmd.CreateParameter($de.Name, $de.Value)) }
-            Else { $cmd.Parameters.Add($cmd.CreateParameter($de.Name, [System.DBNull]::Value)) }
+            $param = $cmd.CreateParameter()
+            $param.ParameterName = $de.Name
+            If($de.Value) { $param.Value = $de.Value }
+            Else { $param.Value = [System.DBNull]::Value }
+            $cmd.Parameters.Add($param)
         }
         
         Return $cmd
@@ -47,11 +50,64 @@ Class ProviderBase {
     
     [long] BulkLoad([System.Data.IDataReader]$DataReader
                     , [string]$DestinationTable
-                    , [hashtable]$ColumnMap
+                    , [hashtable]$ColumnMap = @{}
                     , [int]$BatchSize
                     , [int]$BatchTimeout
                     , [ScriptBlock]$Notify) {
         Throw [System.NotImplementedException]::new("ProviderBase.BulkLoad must be overloaded!")
+
+        $SchemaMap = @()
+        [long]$batchIteration = 0
+        
+        $DataReader.GetSchemaTable().Rows | ForEach-Object { $SchemaMap += [PSCustomObject]@{Ordinal = $_["ColumnOrdinal"]; SrcName = $_["ColumnName"]; DestName = $_["ColumnName"]}}
+
+        If(-not $ColumnMap -or $ColumnMap.Count -eq 0) {
+            $SchemaMap = $SchemaMap |
+                Where-Object SrcName -In $ColumnMap.Keys |
+                ForEach-Object { $_.DestName = $ColumnMap[$_.SrcName]; $_ }
+        }
+
+        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES (@{2})" -f $DestinationTable, ($SchemaMap.DestName -join ", "), ($SchemaMap.DestName -join ", @")
+
+        Try {
+            $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
+            $bulkCmd.Transaction = $this.Connection.BeginTransaction()
+            $sw = [System.Diagnostics.Stopwatch]::StartNew()
+            [bool]$hasPrepared = $false
+            While($DataReader.Read()) {
+                If(-not $hasPrepared) {
+                    ForEach($sm in $SchemaMap) {
+                        $param = $bulkCmd.CreateParameter()
+                        $param.ParameterName = $sm.DestName
+                        $param.Value = $DataReader.GetValue($sm.Ordinal)
+                        $bulkCmd.Parameters.Add($param) | Out-Null
+                    }
+                    $bulkCmd.Prepare()
+                }
+                Else { $SchemaMap | ForEach-Object { $bulkCmd.Parameters[$_.Ordinal] = $DataReader.GetValue($_.Ordinal) } }
+                
+                $bulkCmd.ExecuteNonQuery() | Out-Null
+                
+                If($sw.Elapsed.TotalSeconds -gt $BatchTimeout) { Throw [System.TimeoutException]::new(("Batch took longer than {0} seconds to complete." -f $BatchTimeout)) }
+                If($batchIteration % $BatchSize -eq 0) {
+                    $bulkCmd.Transaction.Commit()
+                    $bulkCmd.Transaction.Dispose()
+                    If($Notify) { $Notify.Invoke($batchIteration) }
+                    $bulkCmd.Transaction = $this.Connection.BeginTransaction()
+                    $sw.Restart()
+                }
+            }
+        }
+        Finally {
+            If($bulkCmd.Transaction) { 
+                $bulkCmd.Transaction.Rollback()
+                $bulkcmd.Transaction.Dispose()
+            }
+            $bulkCmd.Dispose()
+            $DataReader.Close()
+            $DataReader.Dispose()
+        }
+        Return $batchIteration
     }
 
     [SqlMessage] GetMessage() { Return $this.Messages.Dequeue() }
