@@ -97,6 +97,8 @@ Class ProviderBase {
                     $sw.Restart()
                 }
             }
+            $bulkCmd.Transaction.Commit()
+            $bulkCmd.Transaction.Dispose()
         }
         Finally {
             If($bulkCmd.Transaction) { 

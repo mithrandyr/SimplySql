@@ -8,7 +8,7 @@ Class SQLProvider : ProviderBase {
         $this.CommandTimeout = $CommandTimeout
         $this.Connection = $Connection
         
-        $messages = $this.Messages
+        #$messages = $this.Messages
         $handler = {Param($sender, [System.Data.SqlClient.SqlInfoMessageEventArgs]$e)
             $Messages.Enqueue(([SqlMessage]@{Generated=(Get-Date); Message=$e.Message}))
         }.GetNewClosure()
@@ -117,7 +117,11 @@ Class SQLProvider : ProviderBase {
         }
         Else { $conn = [System.Data.SqlClient.SqlConnection]::new($sb.ConnectionString) }
 
-        $conn.Open()
+        Try { $conn.Open() }
+        Catch {
+            $conn.Dispose()
+            Throw $_
+        }
         return $conn
     }    
 }
