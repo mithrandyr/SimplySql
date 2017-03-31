@@ -1,7 +1,10 @@
 Write-Output ([ProviderConfig]::new(
     "SQLite (System.Data.SQLite)",
     @"
-SQLite (System.Data.SQLite)
+    SQLite (System.Data.SQLite)
+    
+    SQLite Development Team @ https://sqlite.org/
+    .NET Provider @ http://system.data.sqlite.org/    
 "@,
     @(
         @{Name = "DataSource"

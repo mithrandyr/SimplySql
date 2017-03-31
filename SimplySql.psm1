@@ -17,11 +17,13 @@ Get-ChildItem "$PSScriptRoot\Functions" -File | ForEach-Object { . $_.FullName }
 #Load up providers
 ForEach($f in Get-ChildItem "$PSScriptRoot\Providers\" -Directory) {
     $Configfile = (Join-Path $f.FullName ("{0}.ps1" -f $f.name))
-    $InitFile = (Join-Path $f.FullName ("{0}Provider.ps1" -f $f.name))
+    $ProviderFile = (Join-Path $f.FullName ("{0}Provider.ps1" -f $f.name))
+    $InitFile = (Join-Path $f.FullName ("Init.ps1" -f $f.name))
 
-    If((Test-Path $ConfigFile) -and (Test-Path $InitFile)) {
+    If((Test-Path $ConfigFile) -and (Test-Path $ProviderFile)) {
         Try {
-            . $InitFile
+            If(Test-Path $InitFile) { . $InitFile }
+            . $ProviderFile
             $Script:Providers[$f.name] = &$ConfigFile
         }
         Catch {

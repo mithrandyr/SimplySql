@@ -1,6 +1,3 @@
-#Load Up SQLite libraries
-Add-Type -Path "$PSScriptRoot\System.Data.SQLite.dll"
-
 Class SQLiteProvider : ProviderBase {
     
     SQLiteProvider([string]$ConnectionName
@@ -37,7 +34,7 @@ Class SQLiteProvider : ProviderBase {
         Finally { $da.dispose() }
     }
 
-    [SqlMessage] GetMessage() { Write-Warning "SQLiteProvider does not support SqlMessages." }
+    [Void] GetMessage() { Write-Warning "SQLiteProvider does not support SqlMessages." }
     [Void] ClearMessages() { Write-Warning "SQLiteProvider does not support SqlMessages." }
 
     static [System.Data.IDbConnection] CreateConnection([hashtable]$ht) {

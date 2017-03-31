@@ -1,7 +1,9 @@
 Write-Output ([ProviderConfig]::new(
     "Microsoft SQL Server (System.Data.SqlClient)",
     @"
-Microsoft SQL Server (System.Data.SqlClient)
+    Microsoft SQL Server (System.Data.SqlClient)
+
+    MSDN Library @ https://msdn.microsoft.com/en-us/library/system.data.sqlclient.aspx
 "@,
     @(
         @{Name = "DataSource"

@@ -38,7 +38,7 @@ Function Open-SqlConnection {
         If(-not $PSBoundParameters.ContainsKey("Provider") -and $Script:Providers.ContainsKey("SQL")) { $PSBoundParameters["Provider"] = "SQL" }
 
         $pName = $PSBoundParameters["Provider"]
-        If($Script:Providers.$pName.Parameters.Count -gt 0) { Return $Script:Providers.$pName.Parameters }
+        If($Script:Providers.$pName.GenerateParameters().Count -gt 0) { Return $Script:Providers.$pName.GenerateParameters() }
     }
     
     End {

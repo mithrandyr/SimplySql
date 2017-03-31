@@ -19,7 +19,8 @@ Filter Show-SqlConnection {
         , [parameter(ParameterSetName="all", Mandatory)][switch]$All)
     
     If($All.IsPresent) {
-        $Script:Connections.Keys | Write-Output
+        [string[]]$keys = $Script:Connections.Keys | ForEach-Object { $_ }
+        $keys | Write-Output
     }
     Else {
         If(-not (TestConnectionName $ConnectionName)) { return }

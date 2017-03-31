@@ -30,7 +30,7 @@ Function Get-SqlProviderHelp {
 
     Write-Output ""
     Write-Output "PARAMETERS"
-    ForEach($kvp in $Script:Providers.$Provider.Parameters.GetEnumerator()) {
+    ForEach($kvp in $Script:Providers.$Provider.GenerateParameters().GetEnumerator()) {
         If($kvp.Value.IsSet) { $value = " = {0}" -f $kvp.Value.Value.ToString() } Else { $value = "" }
         Write-Output ("    -{0} <{1}>{2}" -f $kvp.Key, $kvp.Value.ParameterType.Name, $value)
         
