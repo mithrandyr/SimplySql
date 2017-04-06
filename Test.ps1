@@ -1,16 +1,18 @@
 [cmdletBinding()]
 Param([switch]$Load)
-
+Write-Host "PID: $pid"
 If($Load) {
     $cmd = "{0}" -f $PSCmdlet.MyInvocation.MyCommand.Source
     PowerShell -noprofile -noexit -command $cmd
 }
 Else {
-    Clear-Host
+    #Clear-Host
     Write-Host "In New PowerShell Session, [exit] to resume."
     $PSModuleAutoLoadingPreference = "none"
     Import-Module $PSScriptRoot -Force
-    Get-Module SimplySql | Format-List
+
+    Invoke-Pester -Script $PSScriptRoot
+    <#Get-Module SimplySql | Format-List
 
     Get-SqlProviderHelp -Provider SQL
     Get-SqlProviderHelp -Provider SQLite
@@ -22,4 +24,6 @@ Else {
     isq "select @a" -Parameters @{a=1}
 
     Get-SqlProviderHelp -Provider SQL
+
+    #>
 }
