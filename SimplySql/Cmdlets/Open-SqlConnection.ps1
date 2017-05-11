@@ -42,23 +42,15 @@ Function Open-SqlConnection {
     }
     
     End {
-        If($Script:Connections.ContainsKey($ConnectionName)) {
-            [string]$errorMessage = "Connection is already opened!  Please close it by running Close-SqlConnection."
-            If($ConnectionName -ne "default") {
-                $errorMessage = "Connection '{0}' is already opened!  Please close it by running Close-SqlConnection -ConnectionName {0}" -f $ConnectionName
-            }
-
-            Write-Error -Exception [System.Data.DuplicateNameException]::New($errorMessage), $null, [System.Management.Automation.ErrorCategory]::InvalidArgument, $null -ErrorAction Stop
-        }
-        Else {
-            $PSBoundParameters.ParameterSetName = $PSCmdlet.ParameterSetName
-            $PSBoundParameters.ConnectionName = $ConnectionName
-            $PSBoundParameters.CommandTimeout = $CommandTimeout
-            $PSBoundParameters = $PSBoundParameters | AddDynamicParameterDefaults
-            
-            #Select First Object, otherwise you get a collection
-            $Script:Connections.$ConnectionName = $Script:Providers.$pName.CreateProvider.Invoke($PSBoundParameters) | Select-Object -First 1
-        }
+        If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
+        
+        $PSBoundParameters.ParameterSetName = $PSCmdlet.ParameterSetName
+        $PSBoundParameters.ConnectionName = $ConnectionName
+        $PSBoundParameters.CommandTimeout = $CommandTimeout
+        $PSBoundParameters = $PSBoundParameters | AddDynamicParameterDefaults
+        
+        #Select First Object, otherwise you get a collection
+        $Script:Connections.$ConnectionName = $Script:Providers.$pName.CreateProvider.Invoke($PSBoundParameters) | Select-Object -First 1
     }
 }
 '@

@@ -9,7 +9,7 @@ Else {
     #Clear-Host
     Write-Host "In New PowerShell Session, [exit] to resume."
     $PSModuleAutoLoadingPreference = "none"
-    Import-Module $PSScriptRoot -Force
+    Import-Module $PSScriptRoot\SimplySql -Force
 
     Invoke-Pester -Script $PSScriptRoot
     <#Get-Module SimplySql | Format-List

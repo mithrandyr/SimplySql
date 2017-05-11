@@ -22,8 +22,8 @@
 
 #>
 Function Invoke-SqlUpdate {
-    [CmdletBinding()]
-    Param([Parameter(Mandatory, ParameterSetName="default")][string[]]$Query
+    [CmdletBinding(DefaultParameterSetName="default")]
+    Param([Parameter(Mandatory, ParameterSetName="default", Position=0)][string[]]$Query
         , [Parameter(ParameterSetName="default")][hashtable]$Parameters = @{}
         , [Parameter(ParameterSetName="default")][int]$CommandTimeout = -1
         , [Parameter(Mandatory,ParameterSetName="cmd")][System.Data.IDbCommand]$Command

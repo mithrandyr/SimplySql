@@ -67,7 +67,7 @@ Function Invoke-SqlBulkCopy {
         , [string]$DestinationConnectionName = "default"
         , [Parameter(Mandatory, ParameterSetName="table")][string]$SourceTable
         , [Parameter(Mandatory, ParameterSetName="query")][string]$SourceQuery
-        , [Parameter(ParameterSetName="query")][hashtable]$SourceParameters
+        , [Parameter(ParameterSetName="query")][hashtable]$SourceParameters = @{}
         , [Parameter(ParameterSetName="table")]
             [Parameter(Mandatory, ParameterSetName="query")]
             [string]$DestinationTable
@@ -107,10 +107,7 @@ Function Invoke-SqlBulkCopy {
             Else { $script:Connections.$DestinationConnectionName.BulkLoad($srcReader, $DestinationTable, $ColumnMap, $BatchSize, $BatchTimeout, $null) }
         }
         Finally {
-            If($srcReader) {
-                If($srcReader.Command) { $srcReader.Command.Dispose() }
-                $srcReader.Dispose()
-            }
+            If(Test-Path variable:srcReader) { $srcReader.Dispose() }
         }
     }
     Else { Throw [System.Management.Automation.PSArgumentException]::new("Invalid Connection Name(s).", "SourceConnectionName, DestinationConnectionName") }

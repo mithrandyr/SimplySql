@@ -8,9 +8,9 @@ Class SQLProvider : ProviderBase {
         $this.CommandTimeout = $CommandTimeout
         $this.Connection = $Connection
         
-        #$messages = $this.Messages
+        $messages = $this.Messages
         $handler = {Param($sender, [System.Data.SqlClient.SqlInfoMessageEventArgs]$e)
-            $Messages.Enqueue(([SqlMessage]@{Generated=(Get-Date); Message=$e.Message}))
+            $messages.Enqueue(([SqlMessage]@{Received=(Get-Date); Message=$e.Message}))
         }.GetNewClosure()
 
         $this.Connection.add_InfoMessage([System.Data.SqlClient.SqlInfoMessageEventHandler]$handler)
