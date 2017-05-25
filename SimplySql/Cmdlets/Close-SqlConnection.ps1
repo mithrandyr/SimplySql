@@ -19,8 +19,11 @@ Filter Close-SqlConnection {
         If($Script:Connections.$ConnectionName.HasTransaction()) {
             $Script:Connections.$ConnectionName.RollbackTransaction()
         }
-        $Script:Connections.$ConnectionName.Connection.Dispose()
-        $Script:Connections.Remove($ConnectionName)
+        Try { $Script:Connections.$ConnectionName.Connection.Close() }
+        Finally {
+            $Script:Connections.$ConnectionName.Connection.Dispose()
+            $Script:Connections.Remove($ConnectionName)
+        }        
     }    
 }
 

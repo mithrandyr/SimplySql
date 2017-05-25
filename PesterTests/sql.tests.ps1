@@ -46,18 +46,19 @@ InModuleScope SimplySql {
         It "Invoke-SqlBulkCopy" {
             Set-SqlConnection -Database "Test"
             Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
-            Open-SqlConnection -Provider SQL -DataSource "(localdb)\MSSQLLocalDB" -ConnectionName conn2 -InitialCatalog Test
+            Open-SqlConnection -Provider SQL -DataSource "(localdb)\MSSQLLocalDB" -ConnectionName bcp 
+            Set-SqlConnection -Database test -ConnectionName bcp
             
-            Invoke-SqlBulkCopy -DestinationConnectionName conn2 -SourceTable tmpTable -DestinationTable tmpTable2 |
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |
                 Should Be 65536
             
-            Close-SqlConnection -ConnectionName conn2
+            Set-SqlConnection -Database master -ConnectionName bcp
+            Close-SqlConnection -ConnectionName bcp
         }
 
         It "Remove the Test Database" {
-            Show-SqlConnection -All | Where-Object { $_ -ne "default"} | Close-SqlConnection
+            Set-SqlConnection -Database master
             Invoke-SqlUpdate "drop Database Test" | Should Be -1
         }
-
     }
 }

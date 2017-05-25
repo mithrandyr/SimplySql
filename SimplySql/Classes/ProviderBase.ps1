@@ -86,6 +86,7 @@ Class ProviderBase {
                 }
                 Else { $SchemaMap | ForEach-Object { $bulkCmd.Parameters[$_.Ordinal] = $DataReader.GetValue($_.Ordinal) } }
                 
+                $batchIteration += 1
                 $bulkCmd.ExecuteNonQuery() | Out-Null
                 
                 If($sw.Elapsed.TotalSeconds -gt $BatchTimeout) { Throw [System.TimeoutException]::new(("Batch took longer than {0} seconds to complete." -f $BatchTimeout)) }

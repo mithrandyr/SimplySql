@@ -44,7 +44,7 @@ Class SQLiteProvider : ProviderBase {
 
         If($ht.ContainsKey("ConnectionString")) { $sb["Connection String"] = $ht.ConnectionString }
         Else {
-            If($ht.ContainsKey("DataSource")) { $sb.Server = $ht.DataSource }
+            If($ht.ContainsKey("DataSource")) { $sb["Data Source"] = $ht.DataSource }
             If($ht.ContainsKey("Password")) { $sb.Password = $ht.Password }
         }        
         

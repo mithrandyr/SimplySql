@@ -12,6 +12,7 @@ Else {
     Import-Module $PSScriptRoot\SimplySql -Force
 
     Invoke-Pester -Script $PSScriptRoot
+
     <#Get-Module SimplySql | Format-List
 
     Get-SqlProviderHelp -Provider SQL

@@ -69,22 +69,21 @@ Class SQLProvider : ProviderBase {
                 $bcp.NotifyAfter = $BatchSize
                 $bcp.add_SqlRowsCopied({
                     Param($sender, [System.Data.SqlClient.SqlRowsCopiedEventArgs]$e)
-                    $RowCount = $e.RowsCopied
                     $Notify.Invoke($e.RowsCopied)
                 })
             }
             Else {
                 $bcp.NotifyAfter = $BatchSize
-                $bcp.add_SqlRowsCopied({
-                    Param($sender, [System.Data.SqlClient.SqlRowsCopiedEventArgs]$e)
-                    $RowCount = $e.RowsCopied
-                })
+                $bcp.add_SqlRowsCopied()
             }
-
+            $RowCount -= $this.GetScalar("SELECT COUNT(1) FROM [$DestinationTable]", 30, @{})
             $bcp.WriteToServer($DataReader)
+            $RowCount += $this.GetScalar("SELECT COUNT(1) FROM [$DestinationTable]", 30, @{})
         }
         Finally {
+            $bcp.Close()
             $bcp.Dispose()            
+            $DataReader.Close()
             $DataReader.Dispose()
         }
         
@@ -107,7 +106,7 @@ Class SQLProvider : ProviderBase {
             If($ht.ContainsKey("Password")) { $sb.Password = $ht.Password }
         }        
         
-        $sb["Application Name"] = "PowerShell"
+        $sb["Application Name"] = "PowerShell ({0})" -f $ht.ConnectionName
         
         If($ht.ContainsKey("Credential")) {
             [securestring]$sqlCred = $ht.Credential.Password.Copy()
