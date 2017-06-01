@@ -13,7 +13,7 @@ The basic pattern is to connect to a database, invoke one or more sql statements
 ## Status
 Version .2 is in the repository, supports SQL Server and SQLite.  Please note that this project is actively in development and should be considered beta.
 
-It has been released to PowerShellGallery.  Installation is as simple as 
+Soon, it will be released to PowerShellGallery.  Installation is as simple as 
 
     Install-Module SimplySql
 
