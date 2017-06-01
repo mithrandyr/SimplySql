@@ -41,6 +41,7 @@ Class SQLProvider : ProviderBase {
             $da.Fill($ds)
             return $ds 
         }
+        Catch { Throw $_ }
         Finally { $da.dispose() }
     }
 

@@ -33,6 +33,7 @@ Class ProviderBase {
     [System.Object] GetScalar([string]$Query, [int]$cmdTimeout, [hashtable]$Parameters) {
         $cmd = $this.GetCommand($Query, $cmdTimeout, $Parameters)
         Try { return $cmd.ExecuteScalar() }
+        Catch { Throw $_ }
         Finally { $cmd.Dispose() }
     }
 
@@ -43,6 +44,7 @@ Class ProviderBase {
     [long] Update([string]$Query, [int]$cmdTimeout, [hashtable]$Parameters) {
         $cmd = $this.GetCommand($Query, $cmdTimeout, $Parameters)
         Try { return $cmd.ExecuteNonQuery() }
+        Catch { Throw $_ }
         Finally { $cmd.Dispose() }
     }
     
@@ -54,23 +56,24 @@ Class ProviderBase {
                     , [int]$BatchSize
                     , [int]$BatchTimeout
                     , [ScriptBlock]$Notify) {
-        Throw [System.NotImplementedException]::new("ProviderBase.BulkLoad must be overloaded!")
+        #Throw [System.NotImplementedException]::new("ProviderBase.BulkLoad must be overloaded!")
 
         $SchemaMap = @()
         [long]$batchIteration = 0
         
         $DataReader.GetSchemaTable().Rows | ForEach-Object { $SchemaMap += [PSCustomObject]@{Ordinal = $_["ColumnOrdinal"]; SrcName = $_["ColumnName"]; DestName = $_["ColumnName"]}}
 
-        If(-not $ColumnMap -or $ColumnMap.Count -eq 0) {
+        If($ColumnMap -and $ColumnMap.Count -gt 0) {
             $SchemaMap = $SchemaMap |
                 Where-Object SrcName -In $ColumnMap.Keys |
                 ForEach-Object { $_.DestName = $ColumnMap[$_.SrcName]; $_ }
         }
 
-        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES (@{2})" -f $DestinationTable, ($SchemaMap.DestName -join ", "), ($SchemaMap.DestName -join ", @")
+        [string[]]$DestNames = $SchemaMap | Select-Object -ExpandProperty DestName
+        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES (@{2})" -f $DestinationTable, ($DestNames -join ", "), ($DestNames -join ", @")
 
-        Try {
-            $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
+        $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
+        Try {            
             $bulkCmd.Transaction = $this.Connection.BeginTransaction()
             $sw = [System.Diagnostics.Stopwatch]::StartNew()
             [bool]$hasPrepared = $false
@@ -83,11 +86,12 @@ Class ProviderBase {
                         $bulkCmd.Parameters.Add($param) | Out-Null
                     }
                     $bulkCmd.Prepare()
+                    $hasPrepared = $true
                 }
-                Else { $SchemaMap | ForEach-Object { $bulkCmd.Parameters[$_.Ordinal] = $DataReader.GetValue($_.Ordinal) } }
+                Else { ForEach($sm in $SchemaMap) { $bulkCmd.Parameters[$sm.Ordinal] = $DataReader.GetValue($sm.Ordinal) } }
                 
                 $batchIteration += 1
-                $bulkCmd.ExecuteNonQuery() | Out-Null
+                $null = $bulkCmd.ExecuteNonQuery()
                 
                 If($sw.Elapsed.TotalSeconds -gt $BatchTimeout) { Throw [System.TimeoutException]::new(("Batch took longer than {0} seconds to complete." -f $BatchTimeout)) }
                 If($batchIteration % $BatchSize -eq 0) {
@@ -100,6 +104,7 @@ Class ProviderBase {
             }
             $bulkCmd.Transaction.Commit()
             $bulkCmd.Transaction.Dispose()
+            $bulkCmd.Transaction = $null
         }
         Finally {
             If($bulkCmd.Transaction) { 

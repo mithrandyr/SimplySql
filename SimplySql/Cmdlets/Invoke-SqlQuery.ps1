@@ -50,11 +50,11 @@ Function Invoke-SqlQuery {
             }
             Else {
                 Try {
-                    [System.Data.DataSet]$ds = $Script:Connections.$ConnectionName.GetDataSet($cmd)
+                    $ds = $Script:Connections.$ConnectionName.GetDataSet($cmd)
                     If($ds.Tables.Count -gt 1) { Write-Output $ds.Tables }
                     Else { Write-Output $ds.Tables[0].Rows }
                 }
-                Finally { $ds.Dispose() }
+                Finally { If($ds) { $ds.Dispose() } }
             }
         }
         Finally { $cmd.Dispose() }
