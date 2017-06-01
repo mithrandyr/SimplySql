@@ -2,13 +2,13 @@
 $val = @'
 <#
 .Synopsis
-    Provides Help for SQL providers.
+    Provides Help for SimplySql providers.
 
 .Description
     Provides Help information for the Providers in the SimplySql module.
 
 .Parameter Provider
-    Specifies which provider is being used for this connection.
+    Specifies which provider to provide help for.
     Acceptable provider names are:
     <<<LIST>>>
 
