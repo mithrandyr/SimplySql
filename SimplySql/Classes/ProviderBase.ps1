@@ -1,6 +1,7 @@
 Class ProviderBase {
     [string]$ConnectionName
     [int]$CommandTimeout = 30
+    [string]$ParamPrefix = "@"
     [System.Data.IDbConnection]$Connection
     [System.Data.IDbTransaction]$Transaction
     [System.Collections.Generic.Queue[SqlMessage]]$Messages = (New-Object 'System.Collections.Generic.Queue[SqlMessage]')
@@ -70,7 +71,7 @@ Class ProviderBase {
         }
 
         [string[]]$DestNames = $SchemaMap | Select-Object -ExpandProperty DestName
-        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES (@{2})" -f $DestinationTable, ($DestNames -join ", "), ($DestNames -join ", @")
+        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES ({3}{2})" -f $DestinationTable, ($DestNames -join ", "), ($DestNames -join (", {0}" -f $this.ParamPrefix)), $this.ParamPrefix
 
         $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
         Try {            

@@ -1,16 +1,25 @@
-Class SQLiteProvider : ProviderBase {
+Class OracleProvider : ProviderBase {
     
-    SQLiteProvider([string]$ConnectionName
+    [string]$ParamPrefix = ":"
+
+    OracleProvider([string]$ConnectionName
                 , [int]$CommandTimeout
-                , [System.Data.SQLite.SQLiteConnection]$Connection) {
+                , [Oracle.ManagedDataAccess.Client.OracleConnection]$Connection) {
 
         $this.ConnectionName = $ConnectionName
         $this.CommandTimeout = $CommandTimeout
         $this.Connection = $Connection
+
+        $messages = $this.Messages
+        $handler = {Param($sender, [Oracle.ManagedDataAccess.Client.OracleInfoMessageEventArgs]$e)
+            $messages.Enqueue(([SqlMessage]@{Received=(Get-Date); Message=$e.Message}))
+        }.GetNewClosure()
+
+        $this.Connection.add_InfoMessage([Oracle.ManagedDataAccess.Client.OracleInfoMessageEventHandler]$handler)
     }
 
-    [string] ProviderType() { return "SQLite" }
-
+    [string] ProviderType() { return "Oracle" }
+    
     [PSCustomObject] ConnectionInfo() {
         return [PSCustomObject]@{
             ConnectionName = $this.ConnectionName
@@ -18,7 +27,8 @@ Class SQLiteProvider : ProviderBase {
             ConnectionState = $this.Connection.State
             ConnectionString = $this.Connection.ConnectionString
             ServerVersion = $this.Connection.ServerVersion
-            DataSource = $this.Connection.DataSource
+            HostName = $this.Connection.HostName
+            ServiceName = $this.Connection.ServiceName
             CommandTimeout = $this.CommandTimeout
             HasTransaction = $this.HasTransaction()
         }
@@ -26,7 +36,7 @@ Class SQLiteProvider : ProviderBase {
 
     [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd) {
         $ds = [System.Data.DataSet]::new()
-        $da = [System.Data.SQLite.SQLiteDataAdapter]::new($cmd)
+        $da = [Oracle.ManagedDataAccess.Client.OracleDataAdapter]::new($cmd)
         Try {
             $da.Fill($ds)
             return $ds 
@@ -35,21 +45,21 @@ Class SQLiteProvider : ProviderBase {
         Finally { $da.dispose() }
     }
 
-    [Void] GetMessage() { Write-Warning "SQLiteProvider does not support SqlMessages." }
-    [Void] ClearMessages() { Write-Warning "SQLiteProvider does not support SqlMessages." }
-
     static [System.Data.IDbConnection] CreateConnection([hashtable]$ht) {
         If($ht.ParameterSetName -notin ("Default", "Conn")) { Throw [System.InvalidOperationException]::new("Invalid ParameterSet passed to CreateConnection") }
         
-        $sb = [System.Data.SQLite.SQLiteConnectionStringBuilder]::new()
+        $sb = [Oracle.ManagedDataAccess.Client.OracleConnectionStringBuilder]::new()
 
         If($ht.ContainsKey("ConnectionString")) { $sb["Connection String"] = $ht.ConnectionString }
         Else {
-            If($ht.ContainsKey("DataSource")) { $sb["Data Source"] = $ht.DataSource }
-            If($ht.ContainsKey("Password")) { $sb.Password = $ht.Password }
+            $sb["Data Source"] = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1}))(CONNECT_DATA=(SERVICE_NAME={2})))" -f $ht.DataSource, $ht.Port, $ht.ServiceName
+            $sb["User Id"] = $ht.User
+            $sb.Password = $ht.Password
+            $sb["Statement Cache Size"] = 5
+            If($ht.ContainsKey("DBAPrivilege")) { $sb["DBA Privilege"] = $ht.DBAPrivilege }
         }        
         
-        $conn = [System.Data.SQLite.SQLiteConnection]::new($sb.ConnectionString)
+        $conn = [Oracle.ManagedDataAccess.Client.OracleConnection]::new($sb.ConnectionString)
 
         Try { $conn.Open() }
         Catch {

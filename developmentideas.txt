@@ -27,3 +27,8 @@ Structure of a Provider
             
             provider file will output a list of dynamic parameters to be used with Open-SqlConnection
             New cmd "Get-SqlProviderHelp" -- will display help for each provider
+
+
+ORACLE
+    InfoMessage
+    https://stackoverflow.com/questions/193107/print-text-in-oracle-sql-developer-sql-worksheet-window 
