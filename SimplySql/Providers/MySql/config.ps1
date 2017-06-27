@@ -1,5 +1,5 @@
-#Load Up Oracle libraries
-Add-Type -Path "$PSScriptRoot\Oracle.ManagedDataAccess.dll"
+#Load Up My Sql libraries
+Add-Type -Path "$PSScriptRoot\MySql.Data.dll"
 
 #Provider Class
 . "$PSScriptRoot\provider.ps1"
@@ -7,14 +7,14 @@ Add-Type -Path "$PSScriptRoot\Oracle.ManagedDataAccess.dll"
 #Open Cmdlet
 <#
 .Synopsis
-    Open a connection to a Oracle Database.
+    Open a connection to a MySql Database.
 
 .Description
-    Open a connection to a Oracle Database.
+    Open a connection to a MySql Database.
     
-    Oracle (Oracle.ManagedDataAccess)
-    Oracle Managed Data Access @ http://www.oracle.com/technetwork/topics/dotnet/index-085163.html
-    .NET Provider @ https://www.nuget.org/packages/Oracle.ManagedDataAccess/
+    MySql (MySql.Data)
+    MySql Managed Data Access @ https://dev.mysql.com/downloads/
+    .NET Provider @ https://www.nuget.org/packages/mysql.Data/6.9.9
 
 .Parameter ConnectionName
     The name to associate with the newly created connection.
@@ -28,14 +28,14 @@ Add-Type -Path "$PSScriptRoot\Oracle.ManagedDataAccess.dll"
 .Parameter CommandTimeout
     The default command timeout to be used for all commands executed against this connection.
 
-.Parameter DataSource
-    The datasource for the connection.
+.Parameter Server
+    The Server for the connection.
 
-.Parameter ServiceName
-    Oracle ServiceName (SID).
+.Parameter Database
+    Database name.
 
 .Parameter Port
-    Port to connect on, defaults to 1521.
+    Port to connect on, if different from default (3306).
 
 .Parameter UserName
     User to authenticate as.
@@ -44,37 +44,42 @@ Add-Type -Path "$PSScriptRoot\Oracle.ManagedDataAccess.dll"
     Password for the user.
 
 #>
-Function Open-OracleConnection {
+Function Open-MySqlConnection {
     [CmdletBinding(DefaultParameterSetName="default")]
     Param([Parameter(ValueFromPipelineByPropertyName)][Alias("cn")][string]$ConnectionName = "default"
         , [Parameter(ValueFromPipelineByPropertyName)][int]$CommandTimeout = 30
-        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$DataSource = "localhost"
-        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$ServiceName = "localhost"
-        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][int]$Port = 1521
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$Server = "localhost"
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$Database = "mysql"
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][int]$Port = 3306
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$UserName
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$Password
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")][string]$ConnectionString)
     
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
 
-    $sb = [Oracle.ManagedDataAccess.Client.OracleConnectionStringBuilder]::new()
+    $sb = [MySql.Data.MySqlClient.MySqlConnectionStringBuilder]::new()
+    $sb["Application Name"] = "PowerShell ({0})" -f $ConnectionName
 
     If($PSCmdlet.ParameterSetName -eq "Conn") { $sb["ConnectionString"] = $ConnectionString }
     Else {
-    $sb["Data Source"] = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1}))(CONNECT_DATA=(SERVICE_NAME={2})))" -f $DataSource, $Port, $ServiceName
-        $sb["User Id"] = $UserName
+        $sb.Server = $Server
+        If($Database) { $sb.Database = $Database }
+        If($Port) { $sb.Port = $Port }
+        $sb.UserId = $UserName
         $sb.Password = $Password
-        $sb["Statement Cache Size"] = 5
+
+        $sb.UseAffectedRows = $true
+        $sb.AllowUserVariables = $true    
     }
     
-    $conn = [Oracle.ManagedDataAccess.Client.OracleConnection]::new($sb.ConnectionString)
+    $conn = [MySql.Data.MySqlClient.MySqlConnection]::new($sb.ConnectionString)
 
     Try { $conn.Open() }
     Catch {
         $conn.Dispose()
         Throw $_
     }
-    $Script:Connections.$ConnectionName = [OracleProvider]::new($ConnectionName, $CommandTimeout, $conn)
+    $Script:Connections.$ConnectionName = [MySqlProvider]::new($ConnectionName, $CommandTimeout, $conn)
 }
 
-Export-ModuleMember -Function Open-OracleConnection
+Export-ModuleMember -Function Open-MySqlConnection

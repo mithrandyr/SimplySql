@@ -26,7 +26,7 @@ Class SQLProvider : ProviderBase {
             ConnectionState = $this.Connection.State
             ConnectionString = $this.Connection.ConnectionString
             ServerVersion = $this.Connection.ServerVersion
-            DataSource = $this.Connection.DataSource
+            Server = $this.Connection.DataSource
             Database = $this.Connection.Database
             CommandTimeout = $this.CommandTimeout
             HasTransaction = $this.HasTransaction()

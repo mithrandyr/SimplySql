@@ -45,7 +45,6 @@ Function Open-SQLiteConnection {
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
 
     $sb = [System.Data.SQLite.SQLiteConnectionStringBuilder]::new()
-    $sb["Application Name"] = "PowerShell ({0})" -f $ConnectionName
 
     If($PSCmdlet.ParameterSetName -eq "Conn") { $sb["ConnectionString"] = $ConnectionString }
     Else {
