@@ -96,13 +96,12 @@ Class SQLProvider : ProviderBase {
 #Open Cmdlet
 <#
 .Synopsis
-    Open a connection to a SQLite database file.
+    Open a connection to a SQL Server.
 
 .Description
-    Open a connection to a SQLite database file.
-    SQLite (System.Data.SQLite)
-    SQLite Development Team @ https://sqlite.org/
-    .NET Provider @ http://system.data.sqlite.org/ 
+    Open a connection to a SQL Server.
+    
+    System.Data.SqlClient.
 
 .Parameter ConnectionName
     The name to associate with the newly created connection.

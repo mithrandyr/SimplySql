@@ -38,8 +38,8 @@ Function Open-SQLiteConnection {
     [CmdletBinding(DefaultParameterSetName="default")]
     Param([Parameter(ValueFromPipelineByPropertyName)][Alias("cn")][string]$ConnectionName = "default"
         , [Parameter(ValueFromPipelineByPropertyName)][int]$CommandTimeout = 30
-        , [Parameter(ValueFromPipelineByPropertyName)][Alias("FilePath")][string]$DataSource = ":memory:"
-        , [Parameter(ValueFromPipelineByPropertyName)][string]$Password
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][Alias("FilePath")][string]$DataSource = ":memory:"
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$Password
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")][string]$ConnectionString)
     
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }

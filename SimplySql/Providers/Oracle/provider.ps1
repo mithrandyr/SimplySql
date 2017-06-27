@@ -44,28 +44,4 @@ Class OracleProvider : ProviderBase {
         Catch { Throw $_ }
         Finally { $da.dispose() }
     }
-
-    static [System.Data.IDbConnection] CreateConnection([hashtable]$ht) {
-        If($ht.ParameterSetName -notin ("Default", "Conn")) { Throw [System.InvalidOperationException]::new("Invalid ParameterSet passed to CreateConnection") }
-        
-        $sb = [Oracle.ManagedDataAccess.Client.OracleConnectionStringBuilder]::new()
-
-        If($ht.ContainsKey("ConnectionString")) { $sb["Connection String"] = $ht.ConnectionString }
-        Else {
-            $sb["Data Source"] = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1}))(CONNECT_DATA=(SERVICE_NAME={2})))" -f $ht.DataSource, $ht.Port, $ht.ServiceName
-            $sb["User Id"] = $ht.User
-            $sb.Password = $ht.Password
-            $sb["Statement Cache Size"] = 5
-            If($ht.ContainsKey("DBAPrivilege")) { $sb["DBA Privilege"] = $ht.DBAPrivilege }
-        }        
-        
-        $conn = [Oracle.ManagedDataAccess.Client.OracleConnection]::new($sb.ConnectionString)
-
-        Try { $conn.Open() }
-        Catch {
-            $conn.Dispose()
-            Throw $_
-        }
-        return $conn
-    }    
 }
