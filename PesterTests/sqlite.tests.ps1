@@ -1,6 +1,6 @@
 InModuleScope SimplySql {
     Describe "Provider: SQLite" {
-        BeforeEach { Open-SqlConnection -Provider SQLite  }
+        BeforeEach { Open-SQLiteConnection }
         AfterEach { 
             Show-SqlConnection -all | Close-SqlConnection
             #If(Test-Path "$home\temp.db") { Remove-Item "$home\temp.db"}
@@ -73,7 +73,7 @@ InModuleScope SimplySql {
                     , hex(randomblob(20)) AS colText
                 FROM f"
             
-            Open-SqlConnection -Provider SQLite -ConnectionName bcp -DataSource "$home\temp.db"
+            Open-SQLiteConnection -ConnectionName bcp -DataSource "$home\temp.db"
             Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable (colDec REAL, colInt INTEGER, colText TEXT)"
 
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable -Notify |

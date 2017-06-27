@@ -1,6 +1,6 @@
 InModuleScope SimplySql {
     Describe "Provider: SQL" {
-        BeforeEach { Open-SqlConnection -Provider SQL -DataSource "(localdb)\MSSQLLocalDB" }
+        BeforeEach { Open-SqlConnection -DataSource "(localdb)\MSSQLLocalDB" }
         AfterEach { Close-SqlConnection }
 
         It "Create a Test Database" {
@@ -46,7 +46,7 @@ InModuleScope SimplySql {
         It "Invoke-SqlBulkCopy" {
             Set-SqlConnection -Database "Test"
             Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
-            Open-SqlConnection -Provider SQL -DataSource "(localdb)\MSSQLLocalDB" -ConnectionName bcp 
+            Open-SqlConnection -DataSource "(localdb)\MSSQLLocalDB" -ConnectionName bcp 
             Set-SqlConnection -Database test -ConnectionName bcp
             
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |

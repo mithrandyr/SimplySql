@@ -1,3 +1,5 @@
+Class SqlMessage { [datetime]$Received; [string]$Message }
+
 Class ProviderBase {
     [string]$ConnectionName
     [int]$CommandTimeout = 30

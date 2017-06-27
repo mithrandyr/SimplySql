@@ -37,25 +37,4 @@ Class SQLiteProvider : ProviderBase {
 
     [Void] GetMessage() { Write-Warning "SQLiteProvider does not support SqlMessages." }
     [Void] ClearMessages() { Write-Warning "SQLiteProvider does not support SqlMessages." }
-
-    static [System.Data.IDbConnection] CreateConnection([hashtable]$ht) {
-        If($ht.ParameterSetName -notin ("Default", "Conn")) { Throw [System.InvalidOperationException]::new("Invalid ParameterSet passed to CreateConnection") }
-        
-        $sb = [System.Data.SQLite.SQLiteConnectionStringBuilder]::new()
-
-        If($ht.ContainsKey("ConnectionString")) { $sb["Connection String"] = $ht.ConnectionString }
-        Else {
-            If($ht.ContainsKey("DataSource")) { $sb["Data Source"] = $ht.DataSource }
-            If($ht.ContainsKey("Password")) { $sb.Password = $ht.Password }
-        }        
-        
-        $conn = [System.Data.SQLite.SQLiteConnection]::new($sb.ConnectionString)
-
-        Try { $conn.Open() }
-        Catch {
-            $conn.Dispose()
-            Throw $_
-        }
-        return $conn
-    }    
 }

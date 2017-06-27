@@ -1,1 +1,0 @@
-Class SqlMessage { [datetime]$Received; [string]$Message }

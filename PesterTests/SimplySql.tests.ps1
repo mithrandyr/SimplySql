@@ -5,7 +5,7 @@ InModuleScope SimplySql {
         }
 
         It "At least 1 provider loaded" {
-            $Script:Providers.Count | Should BeGreaterThan 0
+            Get-Command -Module SimplySql -Verb Open | Measure-Object | ForEach-Object Count | Should BeGreaterThan 0
         }
     }
 }
