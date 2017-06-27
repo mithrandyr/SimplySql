@@ -54,7 +54,7 @@ Function Invoke-SqlQuery {
                     If($ds.Tables.Count -gt 1) { Write-Output $ds.Tables }
                     Else { Write-Output $ds.Tables[0].Rows }
                 }
-                Finally { If($ds) { $ds.Dispose() } }
+                Finally { If(Test-Path variable:ds) { $ds.Dispose() } }
             }
         }
         Finally { $cmd.Dispose() }

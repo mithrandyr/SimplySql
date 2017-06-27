@@ -91,7 +91,7 @@ Class ProviderBase {
                     $bulkCmd.Prepare()
                     $hasPrepared = $true
                 }
-                Else { ForEach($sm in $SchemaMap) { $bulkCmd.Parameters[$sm.Ordinal] = $DataReader.GetValue($sm.Ordinal) } }
+                Else { ForEach($sm in $SchemaMap) { $bulkCmd.Parameters[$sm.Ordinal].Value = $DataReader.GetValue($sm.Ordinal) } }
                 
                 $batchIteration += 1
                 $null = $bulkCmd.ExecuteNonQuery()
@@ -99,21 +99,16 @@ Class ProviderBase {
                 If($sw.Elapsed.TotalSeconds -gt $BatchTimeout) { Throw [System.TimeoutException]::new(("Batch took longer than {0} seconds to complete." -f $BatchTimeout)) }
                 If($batchIteration % $BatchSize -eq 0) {
                     $bulkCmd.Transaction.Commit()
-                    $bulkCmd.Transaction.Dispose()
                     If($Notify) { $Notify.Invoke($batchIteration) }
                     $bulkCmd.Transaction = $this.Connection.BeginTransaction()
                     $sw.Restart()
                 }
             }
             $bulkCmd.Transaction.Commit()
-            $bulkCmd.Transaction.Dispose()
             $bulkCmd.Transaction = $null
         }
         Finally {
-            If($bulkCmd.Transaction) { 
-                $bulkCmd.Transaction.Rollback()
-                $bulkcmd.Transaction.Dispose()
-            }
+            If($bulkCmd.Transaction) { $bulkCmd.Transaction.Dispose() }
             $bulkCmd.Dispose()
             $DataReader.Close()
             $DataReader.Dispose()

@@ -3,7 +3,6 @@ InModuleScope SimplySql {
         BeforeEach { Open-SQLiteConnection }
         AfterEach { 
             Show-SqlConnection -all | Close-SqlConnection
-            #If(Test-Path "$home\temp.db") { Remove-Item "$home\temp.db"}
          }
 
         It "Invoke-SqlScalar" {

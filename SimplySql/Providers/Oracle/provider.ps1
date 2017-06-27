@@ -1,3 +1,5 @@
+# consider adding custom bulk implementation using array binding
+# http://www.oracle.com/technetwork/issue-archive/2009/09-sep/o59odpnet-085168.html
 Class OracleProvider : ProviderBase {
     
     [string]$ParamPrefix = ":"

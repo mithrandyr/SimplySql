@@ -4,4 +4,4 @@ Function xTest([switch]$Enter) {
         
     }
 }
-#Export-ModuleMember -function xTest
+Export-ModuleMember -function xTest
