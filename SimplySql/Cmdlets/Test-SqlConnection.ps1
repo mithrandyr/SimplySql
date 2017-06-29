@@ -15,7 +15,7 @@
 #>
 Function Test-SqlConnection {
     [cmdletBinding(DefaultParameterSetName="single")]
-    Param([Parameter(ParameterSetName="single")][string]$ConnectionName = "default"
+    Param([Parameter(ParameterSetName="single")][Alias("cn")][string]$ConnectionName = "default"
         , [Parameter(Mandatory, ParameterSetName="all")][switch]$All)
 
     If($all.IsPresent -and $Script:Connections.Count -gt 0) { return $true }

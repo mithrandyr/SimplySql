@@ -26,7 +26,7 @@ Function Invoke-SqlScalar {
     Param([Parameter(Mandatory)][string[]]$Query
         , [hashtable]$Parameters = @{}
         , [int]$CommandTimeout = -1
-        , [string]$ConnectionName = "default")
+        , [Alias("cn")][string]$ConnectionName = "default")
     
     If(TestConnectionName -ConnectionName $ConnectionName) {
         [string]$Query = $Query -join [System.Environment]::NewLine

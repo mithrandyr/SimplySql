@@ -1,8 +1,9 @@
 [cmdletBinding()]
-Param([switch]$Load)
+Param([switch]$Load, [switch]$NoTest)
 Write-Host "PID: $pid"
 If($Load) {
-    $cmd = "{0}" -f $PSCmdlet.MyInvocation.MyCommand.Source
+    If($NoTest) { $cmd = "{0} -NoTest" -f $PSCmdlet.MyInvocation.MyCommand.Source }
+    Else { $cmd = "{0}" -f $PSCmdlet.MyInvocation.MyCommand.Source }
     PowerShell -noprofile -noexit -command $cmd
 }
 Else {
@@ -12,8 +13,9 @@ Else {
     Import-Module $PSScriptRoot\SimplySql -Force
     Import-Module Pester -Force
 
-    Invoke-Pester -Script $PSScriptRoot #-TestName "Provider: Oracle"
-
+    If(-not $NoTest) {
+        Invoke-Pester -Script $PSScriptRoot #-TestName "Provider: Oracle"
+    }
     <#Get-Module SimplySql | Format-List
 
     Get-SqlProviderHelp -Provider SQL

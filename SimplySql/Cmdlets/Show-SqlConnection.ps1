@@ -15,7 +15,7 @@
 #>
 Filter Show-SqlConnection {
     [CmdletBinding()]
-    Param([parameter(ParameterSetName="single", ValueFromPipeline, Position=0)]$ConnectionName = "default"
+    Param([parameter(ParameterSetName="single", ValueFromPipeline, Position=0)][Alias("cn")][string]$ConnectionName = "default"
         , [parameter(ParameterSetName="all", Mandatory)][switch]$All)
     
     If($All.IsPresent) {

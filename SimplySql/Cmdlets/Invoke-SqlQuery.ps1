@@ -35,7 +35,7 @@ Function Invoke-SqlQuery {
     Param([Parameter(Mandatory)][string[]]$Query
         , [hashtable]$Parameters = @{}
         , [int]$CommandTimeout = -1
-        , [string]$ConnectionName = "default"
+        , [Alias("cn")][string]$ConnectionName = "default"
         , [switch]$Stream)
     
     If(TestConnectionName -ConnectionName $ConnectionName) {

@@ -11,7 +11,7 @@
 #>
 Function Complete-SqlTransaction {
     [cmdletBinding()]
-    Param([string]$ConnectionName = "default")
+    Param([Alias("cn")][string]$ConnectionName = "default")
 
     If(TestConnectionName -ConnectionName $ConnectionName) {
         $Script:Connections.$ConnectionName.CommitTransaction()

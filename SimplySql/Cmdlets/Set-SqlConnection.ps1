@@ -20,7 +20,7 @@ Function Set-SqlConnection {
     [cmdletBinding()]
     Param([string]$Database
         , [int]$CommandTimeout = -1
-        , [string]$ConnectionName = "default")
+        , [Alias("cn")][string]$ConnectionName = "default")
 
     If(TestConnectionName -ConnectionName $ConnectionName) {
         If($CommandTimeout -ge 0) {

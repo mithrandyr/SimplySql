@@ -13,7 +13,7 @@
 #>
 Function Clear-SqlMessage {
     [cmdletBinding()]
-    Param([string]$ConnectionName = "default")
+    Param([Alias("cn")][string]$ConnectionName = "default")
 
     If(TestConnectionName -ConnectionName $ConnectionName) {
         Try { $Script:Connections.$ConnectionName.ClearMessages() }

@@ -1,5 +1,23 @@
 # consider adding custom bulk implementation using array binding
 # http://www.oracle.com/technetwork/issue-archive/2009/09-sep/o59odpnet-085168.html
+Function MapDbType([string]$dbType) {
+    Switch ($dbType){
+        "System.Boolean" { "Int16" }
+        "System.Byte" { "Byte" }
+        "System.Byte[]" { "Raw" }
+        "System.Datetime" { "TimeStamp" }
+        "System.Decimal" { "Decimal" }
+        "System.Double" { "Double" }
+        "System.Float" { "Single" }
+        "System.Single" { "Single" }
+        "System.Int16" { "Int16" }
+        "System.Int32" { "Int32" }
+        "System.Int64" { "Int64" }
+        "System.TimeSpan" { "IntervalDS" }
+        default { "Varchar2" }        
+    }
+}
+
 Class OracleProvider : ProviderBase {
     
     [string]$ParamPrefix = ":"
@@ -57,7 +75,7 @@ Class OracleProvider : ProviderBase {
         $SchemaMap = @()
         [long]$batchIteration = 0
         
-        $DataReader.GetSchemaTable().Rows | ForEach-Object { $SchemaMap += [PSCustomObject]@{Ordinal = $_["ColumnOrdinal"]; SrcName = $_["ColumnName"]; DestName = $_["ColumnName"]; ProviderType = $_["ProviderType"]}}
+        $DataReader.GetSchemaTable().Rows | ForEach-Object { $SchemaMap += [PSCustomObject]@{Ordinal = $_["ColumnOrdinal"]; SrcName = $_["ColumnName"]; DestName = $_["ColumnName"]; DataType = $_["DataType"]}}
 
         If($ColumnMap -and $ColumnMap.Count -gt 0) {
             $SchemaMap = $SchemaMap |
@@ -69,11 +87,11 @@ Class OracleProvider : ProviderBase {
         [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES ({3}{2})" -f $DestinationTable, ($DestNames -join ", "), ($DestNames -join (", {0}" -f $this.ParamPrefix)), $this.ParamPrefix
 
         $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
-        Try {            
+        Try {
             ForEach($sm in $SchemaMap) {
                 $param = $bulkCmd.CreateParameter()
                 $param.ParameterName = $sm.DestName
-                $param.OracleDbType = $sm.ProviderType
+                $param.OracleDbType = MapDbType -dbType $sm.DataType
                 $bulkCmd.Parameters.Add($param) | Out-Null                
             }
             ForEach($sm in $SchemaMap) { $bulkCmd.Parameters[$sm.Ordinal].Value = @() }

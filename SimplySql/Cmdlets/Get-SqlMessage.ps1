@@ -19,7 +19,7 @@
 #>
 Function Get-SqlMessage {
     [cmdletBinding()]
-    Param([string]$ConnectionName = "default")
+    Param([Alias("cn")][string]$ConnectionName = "default")
 
     If(TestConnectionName -ConnectionName $ConnectionName) {
         Try {
