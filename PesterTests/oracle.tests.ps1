@@ -57,7 +57,7 @@ InModuleScope SimplySql {
             Open-OracleConnection -ConnectionName bcp -ServiceName xe -UserName hr -Password hr
             Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec REAL, colInt INTEGER, colText varchar(20))"
 
-            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify -BatchSize 1000 |
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
                 Should Be 65536
             
             Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"

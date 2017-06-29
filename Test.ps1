@@ -12,7 +12,7 @@ Else {
     Import-Module $PSScriptRoot\SimplySql -Force
     Import-Module Pester -Force
 
-    Invoke-Pester -Script $PSScriptRoot #-TestName "Provider: SQLite"
+    Invoke-Pester -Script $PSScriptRoot #-TestName "Provider: Oracle"
 
     <#Get-Module SimplySql | Format-List
 

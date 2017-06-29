@@ -46,4 +46,61 @@ Class OracleProvider : ProviderBase {
         Catch { Throw $_ }
         Finally { $da.dispose() }
     }
+
+    [long] BulkLoad([System.Data.IDataReader]$DataReader
+                    , [string]$DestinationTable
+                    , [hashtable]$ColumnMap = @{}
+                    , [int]$BatchSize
+                    , [int]$BatchTimeout
+                    , [ScriptBlock]$Notify) {
+
+        $SchemaMap = @()
+        [long]$batchIteration = 0
+        
+        $DataReader.GetSchemaTable().Rows | ForEach-Object { $SchemaMap += [PSCustomObject]@{Ordinal = $_["ColumnOrdinal"]; SrcName = $_["ColumnName"]; DestName = $_["ColumnName"]; ProviderType = $_["ProviderType"]}}
+
+        If($ColumnMap -and $ColumnMap.Count -gt 0) {
+            $SchemaMap = $SchemaMap |
+                Where-Object SrcName -In $ColumnMap.Keys |
+                ForEach-Object { $_.DestName = $ColumnMap[$_.SrcName]; $_ }
+        }
+
+        [string[]]$DestNames = $SchemaMap | Select-Object -ExpandProperty DestName
+        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES ({3}{2})" -f $DestinationTable, ($DestNames -join ", "), ($DestNames -join (", {0}" -f $this.ParamPrefix)), $this.ParamPrefix
+
+        $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
+        Try {            
+            ForEach($sm in $SchemaMap) {
+                $param = $bulkCmd.CreateParameter()
+                $param.ParameterName = $sm.DestName
+                $param.OracleDbType = $sm.ProviderType
+                $bulkCmd.Parameters.Add($param) | Out-Null                
+            }
+            ForEach($sm in $SchemaMap) { $bulkCmd.Parameters[$sm.Ordinal].Value = @() }
+            $bulkCmd.ArrayBindCount = $BatchSize
+            
+            While($DataReader.Read()) {
+                $batchIteration += 1
+                ForEach($sm in $SchemaMap) { $bulkCmd.Parameters[$sm.Ordinal].Value += $DataReader.GetValue($sm.Ordinal) }
+                
+                If($batchIteration % $BatchSize -eq 0) {
+                    $null = $bulkCmd.ExecuteNonQuery()
+                    If($Notify) { $Notify.Invoke($batchIteration) }
+                    ForEach($sm in $SchemaMap) { $bulkCmd.Parameters[$sm.Ordinal].Value = @() }
+                }
+            }
+            
+            $r = $batchIteration % $BatchSize
+            If($r -ne 0) {
+                $bulkCmd.ArrayBindCount = $r
+                $null = $bulkCmd.ExecuteNonQuery()
+            }
+        }
+        Finally {
+            $bulkCmd.Dispose()
+            $DataReader.Close()
+            $DataReader.Dispose()
+        }
+        Return $batchIteration
+    }
 }
