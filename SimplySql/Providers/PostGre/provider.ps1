@@ -42,4 +42,83 @@ Class PostGreProvider : ProviderBase {
         Catch { Throw $_ }
         Finally { $da.dispose() }
     }
+
+    [void] ChangeDatabase([string]$DatabaseName) { $this.Connection.ChangeDatabase($DatabaseName) }
+
+    [long] BulkLoad([System.Data.IDataReader]$DataReader
+                    , [string]$DestinationTable
+                    , [hashtable]$ColumnMap = @{}
+                    , [int]$BatchSize
+                    , [int]$BatchTimeout
+                    , [ScriptBlock]$Notify) {
+
+        $BatchSize -= $BatchSize % 10
+        $SchemaMap = @()
+        [long]$batchIteration = 0
+        [int]$ord = 0
+        $DataReader.GetSchemaTable().Rows | Sort-Object ColumnOrdinal | ForEach-Object { $SchemaMap += [PSCustomObject]@{Ordinal = $ord; SrcName = $_["ColumnName"]; DestName = $_["ColumnName"]}; $ord += 1}
+
+        If($ColumnMap -and $ColumnMap.Count -gt 0) {
+            $SchemaMap = $SchemaMap |
+                Where-Object SrcName -In $ColumnMap.Keys |
+                ForEach-Object { $_.DestName = $ColumnMap[$_.SrcName]; $_ }
+        }
+
+        [string[]]$DestNames = $SchemaMap | Select-Object -ExpandProperty DestName
+        [string]$ValueSql = (1..10 | ForEach-Object { "(@" + ($DestNames -join ("_{0}, @" -f $_)) + ("_{0})" -f $_) }) -join ", "
+        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES {2}" -f $DestinationTable, ($DestNames -join ", "), $ValueSql
+
+        $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
+        Try {
+            $bulkCmd.Transaction = $this.Connection.BeginTransaction()
+            $sw = [System.Diagnostics.Stopwatch]::StartNew()
+            While($DataReader.Read()) {                
+                $batchIteration += 1
+                $r = $batchIteration % 10
+                If($r -eq 0) { $r = 10 }
+                If($batchIteration -le 10) {
+                    $SchemaMap.ForEach({
+                        $p = "{0}_{1}" -f $_.DestName, $r
+                        $bulkCmd.Parameters.AddWithValue($p, $DataReader.GetValue($_.Ordinal))
+                    })
+                }
+                Else {
+                    $SchemaMap.ForEach({
+                        $p = "{0}_{1}" -f $_.DestName, $r
+                        $bulkCmd.Parameters[$p].Value = $DataReader.GetValue($_.Ordinal)
+                    })
+                }
+
+                If($r -eq 10) { $null = $bulkCmd.ExecuteNonQuery() }
+                If($sw.Elapsed.TotalSeconds -gt $BatchTimeout) { Throw [System.TimeoutException]::new(("Batch took longer than {0} seconds to complete." -f $BatchTimeout)) }
+                
+                If($batchIteration % $BatchSize -eq 0) {
+                    $bulkCmd.Transaction.Commit()
+                    If($Notify) { $Notify.Invoke($batchIteration) }
+                    $bulkCmd.Transaction = $this.Connection.BeginTransaction()
+                    $sw.Restart()
+                }
+            }
+            $r = $batchIteration % 10
+            If($r -eq 0) { $r = 10 }
+            If($r -ne 10) {
+                [string]$ValueSql = ((1..$r) | ForEach-Object { "(@" + ($DestNames -join ("_{0}, @" -f $_)) + ("_{0})" -f $_) }) -join ", "
+                [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES {2}" -f $DestinationTable, ($DestNames -join ", "), $ValueSql
+                $bulkCmd.CommandText = $InsertSql
+                [int]$mr = $r * $SchemaMap.Count
+                While($bulkCmd.Parameters.Count -gt $mr){ $null = $bulkCmd.Parameters.RemoveAt($mr) }
+                $null = $bulkCmd.ExecuteNonQuery()
+            }
+
+            $bulkCmd.Transaction.Commit()
+            $bulkCmd.Transaction = $null
+        }
+        Finally {
+            If($bulkCmd.Transaction) { $bulkCmd.Transaction.Dispose() }
+            $bulkCmd.Dispose()
+            $DataReader.Close()
+            $DataReader.Dispose()
+        }
+        Return $batchIteration
+    }
 }

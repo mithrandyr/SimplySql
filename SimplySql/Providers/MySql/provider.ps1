@@ -43,6 +43,8 @@ Class MySqlProvider : ProviderBase {
         Finally { $da.dispose() }
     }
 
+    [void] ChangeDatabase([string]$DatabaseName) { $this.Connection.ChangeDatabase($DatabaseName) }
+
     [long] BulkLoad([System.Data.IDataReader]$DataReader
                     , [string]$DestinationTable
                     , [hashtable]$ColumnMap = @{}
