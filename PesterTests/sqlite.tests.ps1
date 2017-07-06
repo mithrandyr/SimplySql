@@ -24,6 +24,7 @@ InModuleScope SimplySql {
                         , hex(randomblob(20)) AS colText
                     FROM f" | Should Be 65536
             
+            Invoke-SqlUpdate -Query "DROP TABLE tmpTable" | Out-Null
         }
 
         It "Invoke-SqlQuery" {

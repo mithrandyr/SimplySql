@@ -28,7 +28,7 @@
 .Parameter Stream
     Uses a datareader to stream PSObject representing the results of the query
     to the pipeline, results will appear as soon as the connection begins
-    returning data.
+    returning data.  Only returns the first resultset if there are multiples.
 #>
 Function Invoke-SqlQuery {
     [CmdletBinding()]

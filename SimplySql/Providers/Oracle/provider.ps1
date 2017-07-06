@@ -20,8 +20,6 @@ Function MapDbType([string]$dbType) {
 
 Class OracleProvider : ProviderBase {
     
-    [string]$ParamPrefix = ":"
-
     OracleProvider([string]$ConnectionName
                 , [int]$CommandTimeout
                 , [Oracle.ManagedDataAccess.Client.OracleConnection]$Connection) {
@@ -84,7 +82,7 @@ Class OracleProvider : ProviderBase {
         }
 
         [string[]]$DestNames = $SchemaMap | Select-Object -ExpandProperty DestName
-        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES ({3}{2})" -f $DestinationTable, ($DestNames -join ", "), ($DestNames -join (", {0}" -f $this.ParamPrefix)), $this.ParamPrefix
+        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES (:{2})" -f $DestinationTable, ($DestNames -join ", "), ($DestNames -join ", :")
 
         $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
         Try {

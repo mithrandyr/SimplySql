@@ -14,7 +14,7 @@ Else {
     Import-Module Pester -Force
 
     If(-not $NoTest) {
-        Invoke-Pester -Script $PSScriptRoot #-TestName "Provider: Oracle"
+        Invoke-Pester -Script $PSScriptRoot #-TestName "Provider: MySql"
     }
     <#Get-Module SimplySql | Format-List
 

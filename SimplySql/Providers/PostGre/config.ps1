@@ -44,42 +44,39 @@ Add-Type -Path "$PSScriptRoot\Npgsql.dll"
     Password for the user.
 
 #>
-Function Open-MySqlConnection {
+Function Open-PostGreConnection {
     [CmdletBinding(DefaultParameterSetName="default")]
     Param([Parameter(ValueFromPipelineByPropertyName)][Alias("cn")][string]$ConnectionName = "default"
         , [Parameter(ValueFromPipelineByPropertyName)][int]$CommandTimeout = 30
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$Server = "localhost"
-        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$Database = "mysql"
-        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][int]$Port = 3306
+        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$Database
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][int]$Port = 5432
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$UserName
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$Password
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")][string]$ConnectionString)
     
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
 
-    $sb = [MySql.Data.MySqlClient.MySqlConnectionStringBuilder]::new()
+    $sb = [Npgsql.NpgsqlConnectionStringBuilder]::new()
     $sb["Application Name"] = "PowerShell ({0})" -f $ConnectionName
 
     If($PSCmdlet.ParameterSetName -eq "Conn") { $sb["ConnectionString"] = $ConnectionString }
     Else {
         $sb.Server = $Server
-        If($Database) { $sb.Database = $Database }
+        $sb.Database = $Database
         If($Port) { $sb.Port = $Port }
-        $sb.UserId = $UserName
+        $sb.Username = $UserName
         $sb.Password = $Password
-
-        $sb.UseAffectedRows = $true
-        $sb.AllowUserVariables = $true    
     }
     
-    $conn = [MySql.Data.MySqlClient.MySqlConnection]::new($sb.ConnectionString)
+    $conn = [Npgsql.NpgsqlConnection]::new($sb.ConnectionString)
 
     Try { $conn.Open() }
     Catch {
         $conn.Dispose()
         Throw $_
     }
-    $Script:Connections.$ConnectionName = [MySqlProvider]::new($ConnectionName, $CommandTimeout, $conn)
+    $Script:Connections.$ConnectionName = [PostGreProvider]::new($ConnectionName, $CommandTimeout, $conn)
 }
 
-Export-ModuleMember -Function Open-MySqlConnection
+Export-ModuleMember -Function Open-PostGreConnection

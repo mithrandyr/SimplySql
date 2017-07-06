@@ -1,22 +1,22 @@
-Class MySqlProvider : ProviderBase {
+Class PostGreProvider : ProviderBase {
     
-    MySqlProvider([string]$ConnectionName
+    PostGreProvider([string]$ConnectionName
                 , [int]$CommandTimeout
-                , [MySql.Data.MySqlClient.MySqlConnection]$Connection) {
+                , [Npgsql.NpgsqlConnection]$Connection) {
 
         $this.ConnectionName = $ConnectionName
         $this.CommandTimeout = $CommandTimeout
         $this.Connection = $Connection
 
         $messages = $this.Messages
-        $handler = {Param($sender, [MySql.Data.MySqlClient.MySqlInfoMessageEventArgs]$e)
-            $messages.Enqueue(([SqlMessage]@{Received=(Get-Date); Message=$e.Message}))
+        $handler = {Param($sender, [Npgsql.NpgsqlNoticeEventArgs]$e)
+            $messages.Enqueue(([SqlMessage]@{Received=(Get-Date); Message=$e.Notice.MessageText}))
         }.GetNewClosure()
 
-        $this.Connection.add_InfoMessage([MySql.Data.MySqlClient.MySqlInfoMessageEventHandler]$handler)
+        $this.Connection.add_Notice([Npgsql.NoticeEventHandler]$handler)
     }
 
-    [string] ProviderType() { return "MySql" }
+    [string] ProviderType() { return "PostGre" }
     
     [PSCustomObject] ConnectionInfo() {
         return [PSCustomObject]@{
@@ -25,7 +25,7 @@ Class MySqlProvider : ProviderBase {
             ConnectionState = $this.Connection.State
             ConnectionString = $this.Connection.ConnectionString
             ServerVersion = $this.Connection.ServerVersion
-            Server = $this.Connection.Server
+            Host = $this.Connection.Host
             Database = $this.Connection.Database
             CommandTimeout = $this.CommandTimeout
             HasTransaction = $this.HasTransaction()
@@ -34,7 +34,7 @@ Class MySqlProvider : ProviderBase {
 
     [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd) {
         $ds = [System.Data.DataSet]::new()
-        $da = [MySql.Data.MySqlClient.MySqlDataAdapter]::new($cmd)
+        $da = [Npgsql.NpgsqlDataAdapter]::new($cmd)
         Try {
             $da.Fill($ds)
             return $ds 

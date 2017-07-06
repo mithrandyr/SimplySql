@@ -3,7 +3,6 @@ Class SqlMessage { [datetime]$Received; [string]$Message }
 Class ProviderBase {
     [string]$ConnectionName
     [int]$CommandTimeout = 30
-    [string]$ParamPrefix = "@"
     [System.Data.IDbConnection]$Connection
     [System.Data.IDbTransaction]$Transaction
     [System.Collections.Generic.Queue[SqlMessage]]$Messages = (New-Object 'System.Collections.Generic.Queue[SqlMessage]')
@@ -59,12 +58,11 @@ Class ProviderBase {
                     , [int]$BatchSize
                     , [int]$BatchTimeout
                     , [ScriptBlock]$Notify) {
-        #Throw [System.NotImplementedException]::new("ProviderBase.BulkLoad must be overloaded!")
 
         $SchemaMap = @()
         [long]$batchIteration = 0
-        
-        $DataReader.GetSchemaTable().Rows | ForEach-Object { $SchemaMap += [PSCustomObject]@{Ordinal = $_["ColumnOrdinal"]; SrcName = $_["ColumnName"]; DestName = $_["ColumnName"]}}
+        [int]$ord = 0
+        $DataReader.GetSchemaTable().Rows | Sort-Object ColumnOrdinal | ForEach-Object { $SchemaMap += [PSCustomObject]@{Ordinal = $ord; SrcName = $_["ColumnName"]; DestName = $_["ColumnName"]}; $ord += 1}
 
         If($ColumnMap -and $ColumnMap.Count -gt 0) {
             $SchemaMap = $SchemaMap |
@@ -73,14 +71,15 @@ Class ProviderBase {
         }
 
         [string[]]$DestNames = $SchemaMap | Select-Object -ExpandProperty DestName
-        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES ({3}{2})" -f $DestinationTable, ($DestNames -join ", "), ($DestNames -join (", {0}" -f $this.ParamPrefix)), $this.ParamPrefix
+        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES (@{2})" -f $DestinationTable, ($DestNames -join ", "), ($DestNames -join ", @")
 
         $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
-        Try {            
+        Try {
             $bulkCmd.Transaction = $this.Connection.BeginTransaction()
             $sw = [System.Diagnostics.Stopwatch]::StartNew()
             [bool]$hasPrepared = $false
             While($DataReader.Read()) {
+                
                 If(-not $hasPrepared) {
                     ForEach($sm in $SchemaMap) {
                         $param = $bulkCmd.CreateParameter()
