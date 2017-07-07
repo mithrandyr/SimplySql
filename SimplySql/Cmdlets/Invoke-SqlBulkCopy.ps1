@@ -66,7 +66,7 @@ Function Invoke-SqlBulkCopy {
         [string]$SourceConnectionName = "default"
         , [string]$DestinationConnectionName = "default"
         , [Parameter(Mandatory, ParameterSetName="table")][string]$SourceTable
-        , [Parameter(Mandatory, ParameterSetName="query")][AllowEmptyString()][string[]]$Query
+        , [Parameter(Mandatory, ParameterSetName="query")][AllowEmptyString()][string[]]$SourceQuery
         , [Parameter(ParameterSetName="query")][hashtable]$SourceParameters = @{}
         , [Parameter(ParameterSetName="table")]
             [Parameter(Mandatory, ParameterSetName="query")]
