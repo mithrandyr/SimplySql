@@ -66,7 +66,7 @@ Function Invoke-SqlBulkCopy {
         [string]$SourceConnectionName = "default"
         , [string]$DestinationConnectionName = "default"
         , [Parameter(Mandatory, ParameterSetName="table")][string]$SourceTable
-        , [Parameter(Mandatory, ParameterSetName="query")][string]$SourceQuery
+        , [Parameter(Mandatory, ParameterSetName="query")][AllowEmptyString()][string[]]$Query
         , [Parameter(ParameterSetName="query")][hashtable]$SourceParameters = @{}
         , [Parameter(ParameterSetName="table")]
             [Parameter(Mandatory, ParameterSetName="query")]
@@ -95,6 +95,7 @@ Function Invoke-SqlBulkCopy {
                 If($ColumnMap -and $ColumnMap.Count -gt 0) { $SourceQuery = "SELECT {0} FROM $SourceTable" -f $ColumnMap.Keys -join ", " }
                 Else { $SourceQuery = "SELECT * FROM $SourceTable" }
             }
+            Else { [string]$SourceQuery = $SourceQuery -join [System.Environment]::NewLine }
             
             $srcReader = $script:Connections.$SourceConnectionName.GetReader($SourceQuery, $BatchTimeout, $SourceParameters)
             If($Notify.IsPresent) {

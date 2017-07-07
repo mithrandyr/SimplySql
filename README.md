@@ -11,7 +11,7 @@ The basic pattern is to connect to a database, invoke one or more sql statements
     Close-SqlConnection
 
 ## Status
-Version 1.0.1 is in the repository, supports SQL Server, SQLite, MySql, Oracle and PostGreSql.  Please note that this project is actively in development and should be considered beta, though perfectly usuable.
+Version 1.0.x is in the repository, supports SQL Server, SQLite, MySql, Oracle and PostGreSql.  Please note that this project is actively in development and should be considered beta, though perfectly usuable.
 
 It has been released to PowerShellGallery.  Installation is as simple as 
 

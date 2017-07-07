@@ -8,7 +8,7 @@
     If there are multiple result sets, the output is datatables, otherwise
     datarows.
 
-    If the ‘Stream’ switch is used, only the first result set is returned and
+    If the <Stream> switch is used, only the first result set is returned and
     the output is a PSObject for each row in the result set.
 
 .Parameter Query
@@ -32,7 +32,7 @@
 #>
 Function Invoke-SqlQuery {
     [CmdletBinding()]
-    Param([Parameter(Mandatory)][string[]]$Query
+    Param([Parameter(Mandatory)][AllowEmptyString()][string[]]$Query
         , [hashtable]$Parameters = @{}
         , [int]$CommandTimeout = -1
         , [Alias("cn")][string]$ConnectionName = "default"
