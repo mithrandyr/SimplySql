@@ -11,10 +11,11 @@ Else {
     Write-Host "In New PowerShell Session, [exit] to resume."
     $PSModuleAutoLoadingPreference = "none"
     Import-Module $PSScriptRoot\SimplySql -Force
+    Get-Module SimplySql | Where-Object Path -NotLike "$PSScriptRoot\*" | Remove-Module
     Import-Module Pester -Force
 
     If(-not $NoTest) {
-        Invoke-Pester -Script $PSScriptRoot #-TestName "Provider: PostGre"
+        Invoke-Pester -Script $PSScriptRoot -TestName "Provider: SQL"
     }
     <#Get-Module SimplySql | Format-List
 

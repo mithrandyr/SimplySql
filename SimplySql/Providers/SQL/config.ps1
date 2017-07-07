@@ -138,11 +138,11 @@ Function Open-SqlConnection {
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="user")]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="cred")]
-                [Alias("SqlInstance")][string]$DataSource = "localhost"
+                [Alias("SqlInstance","SqlServer","DataSource")][string]$Server = "localhost"
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="user")]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="cred")]
-                [Alias("SqlDatabase")][string]$InitialCatalog = "master"
+                [Alias("SqlDatabase","InitialCatalog")][string]$Database = "master"
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="user")]
             [string]$UserName
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="user")]
@@ -158,8 +158,8 @@ Function Open-SqlConnection {
     $sb["Application Name"] = "PowerShell ({0})" -f $ConnectionName
 
     If($ConnectionString) { $sb["Connection String"] = $ConnectionString }
-    If($DataSource) { $sb.Server = $DataSource }
-    If($InitialCatalog) { $sb.Database = $InitialCatalog }
+    If($Server) { $sb.Server = $Server }
+    If($Database) { $sb.Database = $Database }
     If($UserName) { 
         $sb["User Id"] = $UserName
         $sb.Password = $Password
