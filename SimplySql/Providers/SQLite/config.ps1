@@ -48,6 +48,7 @@ Function Open-SQLiteConnection {
 
     If($PSCmdlet.ParameterSetName -eq "Conn") { $sb["ConnectionString"] = $ConnectionString }
     Else {
+        If($DataSource -ne ":memory:" -and (Test-Path $DataSource)) { $DataSource = Resolve-Path $DataSource | Select-Object -ExpandProperty ProviderPath }
         $sb["Data Source"] = $DataSource
         If($Password) { $sb.Password = $Password }
     }
