@@ -18,7 +18,7 @@
 #>
 Function Set-SqlConnection {
     [cmdletBinding()]
-    Param([string]$Database
+    Param([Parameter(Position=0)][string]$Database
         , [int]$CommandTimeout = -1
         , [Alias("cn")][string]$ConnectionName = "default")
 

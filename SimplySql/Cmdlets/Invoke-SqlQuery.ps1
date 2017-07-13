@@ -29,11 +29,17 @@
     Uses a datareader to stream PSObject representing the results of the query
     to the pipeline, results will appear as soon as the connection begins
     returning data.  Only returns the first resultset if there are multiples.
+
+.Example
+    Run a simple query and return the output
+    
+    Invoke-SqlQuery -Query "SELECT * FROM TABLE"
+
 #>
 Function Invoke-SqlQuery {
     [CmdletBinding()]
-    Param([Parameter(Mandatory)][AllowEmptyString()][string[]]$Query
-        , [hashtable]$Parameters = @{}
+    Param([Parameter(Mandatory, Position=0)][AllowEmptyString()][string[]]$Query
+        , [Parameter(Position=1)][hashtable]$Parameters = @{}
         , [int]$CommandTimeout = -1
         , [Alias("cn")][string]$ConnectionName = "default"
         , [switch]$Stream)

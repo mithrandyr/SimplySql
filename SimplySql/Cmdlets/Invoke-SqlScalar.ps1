@@ -23,8 +23,8 @@
 #>
 Function Invoke-SqlScalar {
     [CmdletBinding()]
-    Param([Parameter(Mandatory)][AllowEmptyString()][string[]]$Query
-        , [hashtable]$Parameters = @{}
+    Param([Parameter(Mandatory, Position=0)][AllowEmptyString()][string[]]$Query
+        , [Parameter(Position=1)][hashtable]$Parameters = @{}
         , [int]$CommandTimeout = -1
         , [Alias("cn")][string]$ConnectionName = "default")
     
