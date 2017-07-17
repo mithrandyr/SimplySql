@@ -135,13 +135,13 @@ Function Open-SqlConnection {
     [CmdletBinding(DefaultParameterSetName="default")]
     Param([Parameter(ValueFromPipelineByPropertyName)][Alias("cn")][string]$ConnectionName = "default"
         , [Parameter(ValueFromPipelineByPropertyName)][int]$CommandTimeout = 30
-        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
-            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="user")]
-            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="cred")]
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=0)]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="user", Position=0)]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="cred", Position=0)]
                 [Alias("SqlInstance","SqlServer","DataSource")][string]$Server = "localhost"
-        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
-            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="user")]
-            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="cred")]
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=1)]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="user", Position=1)]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="cred", Position=1)]
                 [Alias("SqlDatabase","InitialCatalog")][string]$Database = "master"
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="user")]
             [string]$UserName
