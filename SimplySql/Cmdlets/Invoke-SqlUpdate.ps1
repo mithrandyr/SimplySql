@@ -32,6 +32,7 @@ Function Invoke-SqlUpdate {
     If(TestConnectionName -ConnectionName $ConnectionName) {
         If($PSCmdlet.ParameterSetName -eq "default") {
             [string]$Query = $Query -join [System.Environment]::NewLine
+            If(-not $Parameters) { $Parameters = @{} }
             
             $cmd = $Script:Connections.$ConnectionName.GetCommand($Query, $CommandTimeout, $Parameters)
             Try { Write-Output $cmd.ExecuteNonQuery() }

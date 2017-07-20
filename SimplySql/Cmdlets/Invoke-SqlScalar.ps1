@@ -30,6 +30,7 @@ Function Invoke-SqlScalar {
     
     If(TestConnectionName -ConnectionName $ConnectionName) {
         [string]$Query = $Query -join [System.Environment]::NewLine
+        If(-not $Parameters) { $Parameters = @{} }
         Write-Output $Script:Connections.$ConnectionName.GetScalar($Query, $CommandTimeout, $Parameters)
     }
 }

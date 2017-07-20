@@ -46,6 +46,7 @@ Function Invoke-SqlQuery {
     
     If(TestConnectionName -ConnectionName $ConnectionName) {
         [string]$Query = $Query -join [System.Environment]::NewLine
+        If(-not $Parameters) { $Parameters = @{} }
         
         $cmd = $Script:Connections.$ConnectionName.GetCommand($Query, $CommandTimeout, $Parameters)
         Try {

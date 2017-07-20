@@ -97,6 +97,7 @@ Function Invoke-SqlBulkCopy {
             }
             Else { [string]$SourceQuery = $SourceQuery -join [System.Environment]::NewLine }
             
+            If(-not $SourceParameters) { $SourceParameters = @{} }
             $srcReader = $script:Connections.$SourceConnectionName.GetReader($SourceQuery, $BatchTimeout, $SourceParameters)
             If($Notify.IsPresent) {
                 $script:Connections.$DestinationConnectionName.BulkLoad($srcReader, $DestinationTable, $ColumnMap, $BatchSize, $BatchTimeout, {
