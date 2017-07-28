@@ -47,7 +47,7 @@
 
 .Parameter BatchTimeout
     How long, in seconds, that each batch can take.
-    Defaults to the command timeout for the destination connection.
+    Defaults to the command timeout for the source connection.
 
 .Parameter Notify
     If present, as each batch completes a progress notification will be
@@ -88,7 +88,7 @@ Function Invoke-SqlBulkCopy {
     }
 
     If((TestConnectionName -ConnectionName $SourceConnectionName) -and (TestConnectionName -ConnectionName $DestinationConnectionName)) {
-        If($BatchTimeout -lt 0) { $BatchTimeout = $script:Connections.$DestinationConnectionName.CommandTimeout }
+        If($BatchTimeout -lt 0) { $BatchTimeout = $script:Connections.$SourceConnectionName.CommandTimeout }
         Try {
             If($PSCmdlet.ParameterSetName -eq "table") {
                 If([string]::IsNullOrWhiteSpace($DestinationTable)) { $DestinationTable -eq $SourceTable }
