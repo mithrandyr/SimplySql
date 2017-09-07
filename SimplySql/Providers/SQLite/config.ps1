@@ -48,7 +48,19 @@ Function Open-SQLiteConnection {
 
     If($PSCmdlet.ParameterSetName -eq "Conn") { $sb["ConnectionString"] = $ConnectionString }
     Else {
-        If($DataSource -ne ":memory:" -and (Test-Path $DataSource)) { $DataSource = Resolve-Path $DataSource | Select-Object -ExpandProperty ProviderPath }
+        If($DataSource -ne ":memory:") {
+            $parent = Split-Path -Path $DataSource -Parent
+            If(-not $parent) { $parent = $pwd.Path}
+            Else {
+                If(-not (Test-Path $parent)) {
+                    New-Item -Path $parent -ItemType Directory | Out-Null
+                }
+            }
+
+            $parent = $parent | Resolve-Path | ForEach-Object ProviderPath
+
+            $DataSource = Join-Path $parent -ChildPath (Split-Path $DataSource -Leaf)
+        }
         $sb["Data Source"] = $DataSource
         If($Password) { $sb.Password = $Password }
     }
