@@ -1,5 +1,5 @@
 InModuleScope SimplySql {
-    Describe "Provider: SQL" {
+    Describe "MSSQL" {
         BeforeEach { Open-SqlConnection -DataSource "(localdb)\MSSQLLocalDB" }
         AfterEach { Close-SqlConnection }
 

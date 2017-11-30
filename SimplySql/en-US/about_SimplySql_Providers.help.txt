@@ -10,10 +10,8 @@ LONG DESCRIPTION
     including capitalization.  This folder will contain all the files
     necessary for the provider to work.
     
-    There are two required files: a config file and a provider file.
-    For example, if your provider is "Acme", then the config file would be
-    "acme.ps1" and the provider file would be "acmeProvider.ps1".
-    During module loading, the config file is invoked to create the provider
+    There are two required files: a config file (config.ps1) and a provider
+    file (provider.ps1).  During module loading, the config file is invoked to create the provider
     Configuration object.  The provider file is dotsourced and should
     define a class (named like the file without .ps1) that derives from
     [ProviderBase].

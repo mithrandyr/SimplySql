@@ -82,7 +82,7 @@ Class OracleProvider : ProviderBase {
         }
 
         [string[]]$DestNames = $SchemaMap | Select-Object -ExpandProperty DestName
-        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES (:{2})" -f $DestinationTable, ($DestNames -join ", "), ($DestNames -join ", :")
+        [string]$InsertSql = 'INSERT INTO {0} ("{1}") VALUES (:Param{2})' -f $DestinationTable, ($DestNames -join '", "'), (($SchemaMap | ForEach-Object Ordinal) -join ", :Param")
 
         $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
         Try {

@@ -65,8 +65,8 @@ Class PostGreProvider : ProviderBase {
         }
 
         [string[]]$DestNames = $SchemaMap | Select-Object -ExpandProperty DestName
-        [string]$ValueSql = (1..10 | ForEach-Object { "(@" + ($DestNames -join ("_{0}, @" -f $_)) + ("_{0})" -f $_) }) -join ", "
-        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES {2}" -f $DestinationTable, ($DestNames -join ", "), $ValueSql
+        [string]$ValueSql = (1..10 | ForEach-Object { "(@Param" + (($SchemaMap | ForEach-Object Ordinal) -join ("_{0}, @Param" -f $_)) + ("_{0})" -f $_) }) -join ", "
+        [string]$InsertSql = 'INSERT INTO {0} ("{1}") VALUES {2}' -f $DestinationTable, ($DestNames -join '", "'), $ValueSql
 
         $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
         Try {
@@ -78,13 +78,13 @@ Class PostGreProvider : ProviderBase {
                 If($r -eq 0) { $r = 10 }
                 If($batchIteration -le 10) {
                     $SchemaMap.ForEach({
-                        $p = "{0}_{1}" -f $_.DestName, $r
+                        $p = "Param{0}_{1}" -f $_.Ordinal, $r
                         $bulkCmd.Parameters.AddWithValue($p, $DataReader.GetValue($_.Ordinal))
                     })
                 }
                 Else {
                     $SchemaMap.ForEach({
-                        $p = "{0}_{1}" -f $_.DestName, $r
+                        $p = "Param{0}_{1}" -f $_.Ordinal, $r
                         $bulkCmd.Parameters[$p].Value = $DataReader.GetValue($_.Ordinal)
                     })
                 }
@@ -102,8 +102,8 @@ Class PostGreProvider : ProviderBase {
             $r = $batchIteration % 10
             If($r -eq 0) { $r = 10 }
             If($r -ne 10) {
-                [string]$ValueSql = ((1..$r) | ForEach-Object { "(@" + ($DestNames -join ("_{0}, @" -f $_)) + ("_{0})" -f $_) }) -join ", "
-                [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES {2}" -f $DestinationTable, ($DestNames -join ", "), $ValueSql
+                [string]$ValueSql = ((1..$r) | ForEach-Object { "(@Param" + (($SchemaMap | ForEach-Object Ordinal) -join ("_{0}, @Param" -f $_)) + ("_{0})" -f $_) }) -join ", "
+                [string]$InsertSql = 'INSERT INTO {0} ("{1}") VALUES {2}' -f $DestinationTable, ($DestNames -join '", "'), $ValueSql
                 $bulkCmd.CommandText = $InsertSql
                 [int]$mr = $r * $SchemaMap.Count
                 While($bulkCmd.Parameters.Count -gt $mr){ $null = $bulkCmd.Parameters.RemoveAt($mr) }

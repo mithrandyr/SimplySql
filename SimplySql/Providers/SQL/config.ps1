@@ -17,7 +17,7 @@ Class SQLProvider : ProviderBase {
         $this.Connection.add_InfoMessage([System.Data.SqlClient.SqlInfoMessageEventHandler]$handler)
     }
 
-    [string] ProviderType() { return "SQL" }
+    [string] ProviderType() { return "MSSQL" }
 
     [PSCustomObject] ConnectionInfo() {
         return [PSCustomObject]@{

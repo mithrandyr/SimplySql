@@ -11,10 +11,15 @@ The basic pattern is to connect to a database, invoke one or more sql statements
     Close-SqlConnection
 
 ## Status
-Version 1.0.x is in the repository, supports SQL Server, SQLite, MySql, Oracle and PostGreSql.  Please note that this project is actively in development and should be considered beta, though perfectly usuable.
+Version 1.1.x is in the repository, supports SQL Server, SQLite, MySql, Oracle and PostGreSql.  Please note that this project is actively in development and should be considered beta, though perfectly usuable.
 
 It has been released to PowerShellGallery.  Installation is as simple as 
 
     Install-Module SimplySql
 
 This module requires PowerShell Version 5.0 or greater
+
+## Version History
+### 1.1.0
+* Added support for non standard column names (ie those that might include spaces, etc) in Invoke-SqlBulkCopy.
+* Changed Open-MySqlConnection to no longer require setting the database, defaults to "mysql"

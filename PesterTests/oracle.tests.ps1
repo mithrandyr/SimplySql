@@ -3,7 +3,7 @@
     using oracle 11.2g Express instance
 #>
 InModuleScope SimplySql {
-    Describe "Provider: Oracle" {
+    Describe "Oracle" {
         BeforeEach { Open-OracleConnection -ServiceName xe -UserName hr -Password hr }
         AfterEach { 
             Show-SqlConnection -all | Close-SqlConnection

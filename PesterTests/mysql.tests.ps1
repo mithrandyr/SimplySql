@@ -2,7 +2,7 @@
     http://use-the-index-luke.com/blog/2011-07-30/mysql-row-generator#mysql_generator_code
 #>
 InModuleScope SimplySql {
-    Describe "Provider: MySql" {
+    Describe "MySql" {
         BeforeEach { Open-MySqlConnection -UserName root -Password password -Database sys }
         AfterEach { 
             Show-SqlConnection -all | Close-SqlConnection

@@ -1,5 +1,5 @@
 InModuleScope SimplySql {
-    Describe "Provider: SQLite" {
+    Describe "SQLite" {
         BeforeEach { Open-SQLiteConnection }
         AfterEach { 
             Show-SqlConnection -all | Close-SqlConnection

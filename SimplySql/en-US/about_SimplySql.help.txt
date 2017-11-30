@@ -14,21 +14,17 @@ LONG DESCRIPTION
 	statements and then close your database connection.  This module provides
 	cmdlets that map to this basic pattern.
 
-	Get-SqlProviderHelp
-        This cmdlet provides information for the specific provider that you
-        are trying to use and provides details for the dynamic parameters
-        that this provider adds to Open-SqlConnection.
-
-    Open/Close/Show/Test/Set -SqlConnection
+	Open/Close/Show/Test/Set -SqlConnection
 		These cmdlets (Open/Close) enable you to connect to databases in
 		straightforward terms without worrying about differences between
-		database vendors.  Each provider adds its own dynamic parameters,
-        see Get-SqlProviderHelp for details.
+		database vendors.  There is a specific "Open-*" cmdlet for each
+		provider
 
 		Show/Test cmdlets allow you to see what connections are currently
 		active in your powershell session and see specific details about
 		those connections.
-        Set cmdlet allows you to change the default commandTimeout and
+        
+		Set cmdlet allows you to change the default commandTimeout and
         the database/catalog in use (if the provider supports it).
 
 	Invoke- SqlScalar/SqlQuery/SqlUpdate

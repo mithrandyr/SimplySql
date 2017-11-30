@@ -1,5 +1,5 @@
 InModuleScope SimplySql {
-    Describe "Provider: PostGre" {
+    Describe "PostGre" {
         BeforeEach { Open-PostGreConnection -Database postgres -UserName postgres -password password }
         AfterEach { Close-SqlConnection }
 

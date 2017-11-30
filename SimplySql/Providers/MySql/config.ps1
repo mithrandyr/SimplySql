@@ -49,7 +49,7 @@ Function Open-MySqlConnection {
     Param([Parameter(ValueFromPipelineByPropertyName)][Alias("cn")][string]$ConnectionName = "default"
         , [Parameter(ValueFromPipelineByPropertyName)][int]$CommandTimeout = 30
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=0)][string]$Server = "localhost"
-        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default", Position=1)][string]$Database
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=1)][string]$Database = "mysql"
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][int]$Port = 3306
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$UserName
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$Password

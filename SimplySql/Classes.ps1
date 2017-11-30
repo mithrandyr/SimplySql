@@ -71,7 +71,9 @@ Class ProviderBase {
         }
 
         [string[]]$DestNames = $SchemaMap | Select-Object -ExpandProperty DestName
-        [string]$InsertSql = "INSERT INTO {0} ({1}) VALUES (@{2})" -f $DestinationTable, ($DestNames -join ", "), ($DestNames -join ", @")
+        [string]$InsertSql = "INSERT INTO {0} ([{1}]) VALUES (@Param{2})" -f $DestinationTable, ($DestNames -join "], ["), (($SchemaMap | ForEach-Object Ordinal) -join ", @Param")
+
+        Write-Host $InsertSql
 
         $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
         Try {
@@ -83,7 +85,7 @@ Class ProviderBase {
                 If(-not $hasPrepared) {
                     ForEach($sm in $SchemaMap) {
                         $param = $bulkCmd.CreateParameter()
-                        $param.ParameterName = $sm.DestName
+                        $param.ParameterName = "Param{0}" -f $sm.Ordinal
                         $param.Value = $DataReader.GetValue($sm.Ordinal)
                         $bulkCmd.Parameters.Add($param) | Out-Null
                     }
