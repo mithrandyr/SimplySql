@@ -14,7 +14,7 @@ LONG DESCRIPTION
 	statements and then close your database connection.  This module provides
 	cmdlets that map to this basic pattern.
 
-	Open/Close/Show/Test/Set -SqlConnection
+	Open/Close/Show/Test/Set/Get -SqlConnection
 		These cmdlets (Open/Close) enable you to connect to databases in
 		straightforward terms without worrying about differences between
 		database vendors.  There is a specific "Open-*" cmdlet for each
@@ -26,6 +26,8 @@ LONG DESCRIPTION
         
 		Set cmdlet allows you to change the default commandTimeout and
         the database/catalog in use (if the provider supports it).
+
+		Get cmdlet retruns the underlying connection object itself.
 
 	Invoke- SqlScalar/SqlQuery/SqlUpdate
 		These cmdlets allow you to execute sql statements against the database
