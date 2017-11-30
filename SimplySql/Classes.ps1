@@ -73,8 +73,6 @@ Class ProviderBase {
         [string[]]$DestNames = $SchemaMap | Select-Object -ExpandProperty DestName
         [string]$InsertSql = "INSERT INTO {0} ([{1}]) VALUES (@Param{2})" -f $DestinationTable, ($DestNames -join "], ["), (($SchemaMap | ForEach-Object Ordinal) -join ", @Param")
 
-        Write-Host $InsertSql
-
         $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
         Try {
             $bulkCmd.Transaction = $this.Connection.BeginTransaction()
