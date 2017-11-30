@@ -10,53 +10,36 @@ LONG DESCRIPTION
     including capitalization.  This folder will contain all the files
     necessary for the provider to work.
     
-    There are two required files: a config file (config.ps1) and a provider
-    file (provider.ps1).  During module loading, the config file is invoked to create the provider
-    Configuration object.  The provider file is dotsourced and should
-    define a class (named like the file without .ps1) that derives from
-    [ProviderBase].
+    There is only one required file: a config file (config.ps1).  During module
+    loading, this file is dotsourced.  Most modules include an additional provider
+    (provider.ps1) file that creates a subclass of ProviderBase.  However, all
+    logic necessary to setup the module must be in the config file.  Whether you
+    create the subclass in a separate file (and dotsource to your config.ps1) or
+    create the subclass in your config.ps1 is up to you, but you must subclass
+    ProviderBase.
     
-    If your provider requires any initialization logic, then include an
-    optional "init.ps1" with the required logic (such as adding types necessary
-    for the provider).
+    The config file, at the most basic, must create a function to instantiate
+    a connection.  Naming convention should be "Open-<Provider>Connection", with
+    "Open-SqlConnection" being reserved for the MSSQL implementation.  Any logic
+    necessary for setting up the required libraries must be included in this file
+    as well.
 
-    The config file, at the most basic, must create a new object of type 
-    [ProviderConfig] and then output this object (Write-Output).  This object
-    has 4 properties that need to be populated: ShortDescription, HelpText,
-    Parameters, CreateProvider.
-        
-        ShortDescription <string> = is a single line description of the provider
-        
-        HelpText <string> = is a here string (@''@) that contains any help
-            information that you want to provide for your module.  The
-            included information will be added to the output of
-            Get-SqlProviderHelp.
-        
-        Parameters <System.Management.Automation.RuntimeDefinedParameterDictionary>
-            = is a dictionary of RuntimeDefinedParameters.  These are the
-            dynamic parameters that will be added to Open-SqlConnection when
-            the provider is used.
-        
-        CreateProvider <scriptblock> = This is the scriptblock that will be
-            invoked by Open-SqlConnection in order to create the connection 
-            provider.  It must return an instantiated class derived from 
-            [ProviderBase].
+    The "Open-<Provider>Connection" function must include the following parameter:
+    ConnectionName (with a default of "default").  It is also suggested to include
+    a "CommandTimeout" (default 30) parameter and a "ConnectionString" parameter.
 
-    When creating the [ProviderConfig] object, there are two options.  The
-    first is to create an empty object and then populate its parameters, ie
-    [ProviderConfig]::new().  The second option is to use the constructor of
-    [ProviderConfig] to create an object.
-
-    If you use the second option, then you will pass an array of hashtables for
-    the ParameterHashes value of [ProviderConfig]::new(ShortDescription,
-    HelpText, ParameterHashes, CreateProvider).
+    The basic pattern of the function::
+        Check to see if the ConnectionName already exists in the $Script:Connections
+            hashtable, and if so, close that connection (via Close-SqlConnection).
+        Create a new connection object of the appropriate type and attempt to open it.
+        Add an instantiation of your SubClass to the $Script:Connections hashtable with
+            a key equal to ConnectionName.        
 
 EXAMPLES
     See the existing providers.
 
 KEYWORDS
+    SimplySql, Provider
 
 SEE ALSO
     about_SimplySql
-    about_SimplySql_ProviderConfig
-    about_SimplySql_ProviderBase

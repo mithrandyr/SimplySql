@@ -20,6 +20,10 @@ It has been released to PowerShellGallery.  Installation is as simple as
 This module requires PowerShell Version 5.0 or greater
 
 ## Version History
+### 1.1.1
+* Removed a debugging message from the base Provider.BulkLoad method (only showed up in sqlite)
+* Added functionality to retrieve the underlying provider connection object via Get-SqlConnection (gsc)
+* Updated information in the about files.
 ### 1.1.0
 * Added support for non standard column names (ie those that might include spaces, etc) in Invoke-SqlBulkCopy.
 * Changed Open-MySqlConnection to no longer require setting the database, defaults to "mysql"
