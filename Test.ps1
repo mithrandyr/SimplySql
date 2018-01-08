@@ -1,7 +1,7 @@
 [cmdletBinding()]
 Param([switch]$Load, [switch]$NoTest, [string]$TestName)
-Write-Host "PID: $pid"
 If($Load) {
+    Write-Host "Original PID: $pid"
     If($NoTest) { $cmd = "{0} -NoTest" -f $PSCmdlet.MyInvocation.MyCommand.Source }
     Else { 
         If($TestName) { $cmd = "{0} -TestName '{1}'" -f $PSCmdlet.MyInvocation.MyCommand.Source, $TestName }
@@ -10,6 +10,7 @@ If($Load) {
     PowerShell -noprofile -noexit -command $cmd
 }
 Else {
+    Write-Host "Session PID: $pid"
     #Clear-Host
     Write-Host "In New PowerShell Session, [exit] to resume."
     $PSModuleAutoLoadingPreference = "none"
