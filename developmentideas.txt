@@ -11,3 +11,5 @@ Providers now simply need to have a config.ps1 in their folder, that file will c
 ORACLE
     InfoMessage
     https://stackoverflow.com/questions/193107/print-text-in-oracle-sql-developer-sql-worksheet-window 
+
+Always roll version (minor) forward by 1 when updating provider nuget packages.
