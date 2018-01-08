@@ -43,6 +43,11 @@ Add-Type -Path "$PSScriptRoot\Npgsql.dll"
 .Parameter Password
     Password for the user.
 
+.Parameter MaxAutoPrepare
+    The maximum number SQL statements that can be automatically prepared at any
+    given point. Beyond this number the least-recently-used statement will be
+    recycled. Zero disables automatic preparation.  DEFAULTS TO 25.
+
 #>
 Function Open-PostGreConnection {
     [CmdletBinding(DefaultParameterSetName="default")]
@@ -53,12 +58,14 @@ Function Open-PostGreConnection {
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][int]$Port = 5432
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$UserName
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$Password
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$MaxAutoPrepare = 25
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")][string]$ConnectionString)
     
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
 
     $sb = [Npgsql.NpgsqlConnectionStringBuilder]::new()
     $sb["Application Name"] = "PowerShell ({0})" -f $ConnectionName
+    $sb["Max Auto Prepare"] = $MaxAutoPrepare
 
     If($PSCmdlet.ParameterSetName -eq "Conn") { $sb["ConnectionString"] = $ConnectionString }
     Else {
