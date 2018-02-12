@@ -79,15 +79,12 @@ Class SQLProvider : ProviderBase {
             $bcp.WriteToServer($DataReader)
             $RowCount += $this.GetScalar("SELECT COUNT(1) FROM $DestinationTable", 30, @{})
         }
-        Catch {
-            Write-Error $_
-            $this.Update("SET IDENTITY_INSERT $DestinationTable OFF", 30, @{}) | Out-Null #make sure Identity Insert is off...
-        }        
         Finally {
             $bcp.Close()
             $bcp.Dispose()
             $DataReader.Close()
             $DataReader.Dispose()
+            $this.Update("IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('$DestinationTable') AND is_identity = 1) SET IDENTITY_INSERT $DestinationTable OFF", 30, @{}) | Out-Null #make sure Identity Insert is off...
         }
         
         return $RowCount
