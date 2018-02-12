@@ -80,8 +80,8 @@ Class SQLProvider : ProviderBase {
             $RowCount += $this.GetScalar("SELECT COUNT(1) FROM $DestinationTable", 30, @{})
         }
         Catch {
+            Write-Error $_
             $this.Update("SET IDENTITY_INSERT $DestinationTable OFF", 30, @{}) | Out-Null #make sure Identity Insert is off...
-            throw $_
         }        
         Finally {
             $bcp.Close()

@@ -20,6 +20,13 @@ It has been released to PowerShellGallery.  Installation is as simple as
 This module requires PowerShell Version 5.0 or greater
 
 ## Version History
+### 1.3.1
+* Fixed minor issues with SQLBulkCopy: -notify is not required and if SQLBulkCopy errors, Identity Insert will be turned off.
+### 1.3.0
+* Added support for Azure AD auth for Azure SQL Dbs
+* Fix issue in PostGre when using the -stream parameter and querying scalar data without a table, select "1, 2, 3"
+### 1.2.0
+* Updated providers
 ### 1.1.1
 * Removed a debugging message from the base Provider.BulkLoad method (only showed up in sqlite)
 * Added functionality to retrieve the underlying provider connection object via Get-SqlConnection (gsc)
