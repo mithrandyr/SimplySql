@@ -127,6 +127,11 @@ Class SQLProvider : ProviderBase {
 .Parameter Password
     Password for the connecting user.
 
+.Parameter AzureAD
+    Use this when connecting to an Azure SQL Database and you are using Azure AD credentials.
+    You can specify the credentials either by using the UserName/Password parameters or by
+    passing in a credential object to the Credential parameter.
+
 .Parameter Credential
     Credential object containing the SQL user/pass.
 
@@ -150,6 +155,8 @@ Function Open-SqlConnection {
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="cred")]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="conn")]
                 [pscredential]$Credential
+        , [Parameter(ParameterSetName="user")]
+            [Parameter(ParameterSetName="cred")][Switch]$AzureAD
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")][string]$ConnectionString)
 
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
@@ -158,13 +165,19 @@ Function Open-SqlConnection {
     $sb["Application Name"] = "PowerShell ({0})" -f $ConnectionName
 
     If($ConnectionString) { $sb["Connection String"] = $ConnectionString }
-    If($Server) { $sb.Server = $Server }
-    If($Database) { $sb.Database = $Database }
-    If($UserName) { 
-        $sb["User Id"] = $UserName
-        $sb.Password = $Password
-     }
-     Else { $sb["Integrated Security"] = $true }
+    Else {
+        If($Server) { $sb.Server = $Server }
+        If($Database) { $sb.Database = $Database }
+        If($UserName) { 
+            $sb["User Id"] = $UserName
+            $sb.Password = $Password
+        }
+        If($AzureAD) {
+            $sb.Encrypt = $true
+            $sb.Authentication = "Active Directory Password"
+        }
+        If(-not $UserName -and -not $Credential) { $sb["Integrated Security"] = $true }
+    }
     
     If($Credential) {
         [securestring]$sqlCred = $Credential.Password.Copy()
