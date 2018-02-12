@@ -67,24 +67,25 @@ Class SQLProvider : ProviderBase {
                 }
             }
             
-            If ($Notify) {
+            If($Notify) {
                 $bcp.NotifyAfter = $BatchSize
                 $bcp.add_SqlRowsCopied({
                     Param($sender, [System.Data.SqlClient.SqlRowsCopiedEventArgs]$e)
                     $Notify.Invoke($e.RowsCopied)
                 })
             }
-            Else {
-                $bcp.NotifyAfter = $BatchSize
-                $bcp.add_SqlRowsCopied()
-            }
-            $RowCount -= $this.GetScalar("SELECT COUNT(1) FROM [$DestinationTable]", 30, @{})
+            
+            $RowCount -= $this.GetScalar("SELECT COUNT(1) FROM $DestinationTable", 30, @{})
             $bcp.WriteToServer($DataReader)
-            $RowCount += $this.GetScalar("SELECT COUNT(1) FROM [$DestinationTable]", 30, @{})
+            $RowCount += $this.GetScalar("SELECT COUNT(1) FROM $DestinationTable", 30, @{})
         }
+        Catch {
+            $this.Update("SET IDENTITY_INSERT $DestinationTable OFF", 30, @{}) | Out-Null #make sure Identity Insert is off...
+            throw $_
+        }        
         Finally {
             $bcp.Close()
-            $bcp.Dispose()            
+            $bcp.Dispose()
             $DataReader.Close()
             $DataReader.Dispose()
         }
