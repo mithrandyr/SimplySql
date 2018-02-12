@@ -92,49 +92,49 @@ Class SQLProvider : ProviderBase {
 }
 
 #Open Cmdlet
-<#
-.Synopsis
-    Open a connection to a SQL Server.
-
-.Description
-    Open a connection to a SQL Server.
-    
-    System.Data.SqlClient.
-
-.Parameter ConnectionName
-    The name to associate with the newly created connection.
-    This connection will be used with other cmdlets when specifying
-    -ConnectionName <name>.  If you don't specify one, it will be
-    set to the default.
-
-.Parameter ConnectionString
-    Specifies a provider specific connectionstring to be used.
-
-.Parameter CommandTimeout
-    The default command timeout to be used for all commands executed against this connection.
-
-.Parameter DataSource
-    The datasource for the connection.
-
-.Parameter InitialCatalog
-    Database catalog connecting to.
-
-.Parameter UserName
-    Username to connect as.
-
-.Parameter Password
-    Password for the connecting user.
-
-.Parameter AzureAD
-    Use this when connecting to an Azure SQL Database and you are using Azure AD credentials.
-    You can specify the credentials either by using the UserName/Password parameters or by
-    passing in a credential object to the Credential parameter.
-
-.Parameter Credential
-    Credential object containing the SQL user/pass.
-
-#>
 Function Open-SqlConnection {
+    <#
+    .Synopsis
+        Open a connection to a SQL Server.
+
+    .Description
+        Open a connection to a SQL Server.
+        
+        System.Data.SqlClient.
+
+    .Parameter ConnectionName
+        The name to associate with the newly created connection.
+        This connection will be used with other cmdlets when specifying
+        -ConnectionName <name>.  If you don't specify one, it will be
+        set to the default.
+
+    .Parameter ConnectionString
+        Specifies a provider specific connectionstring to be used.
+
+    .Parameter CommandTimeout
+        The default command timeout to be used for all commands executed against this connection.
+
+    .Parameter DataSource
+        The datasource for the connection.
+
+    .Parameter InitialCatalog
+        Database catalog connecting to.
+
+    .Parameter UserName
+        Username to connect as.
+
+    .Parameter Password
+        Password for the connecting user.
+
+    .Parameter AzureAD
+        Use this when connecting to an Azure SQL Database and you are using Azure AD credentials.
+        You can specify the credentials either by using the UserName/Password parameters or by
+        passing in a credential object to the Credential parameter.
+
+    .Parameter Credential
+        Credential object containing the SQL user/pass.
+
+    #>
     [CmdletBinding(DefaultParameterSetName="default")]
     Param([Parameter(ValueFromPipelineByPropertyName)][Alias("cn")][string]$ConnectionName = "default"
         , [Parameter(ValueFromPipelineByPropertyName)][int]$CommandTimeout = 30

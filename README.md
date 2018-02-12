@@ -20,6 +20,9 @@ It has been released to PowerShellGallery.  Installation is as simple as
 This module requires PowerShell Version 5.0 or greater
 
 ## Version History
+### 1.3.2
+* Fixed issue with help missing from the open-*connection cmdlets.
+* removed unnecessary files from the Functions subfolder.
 ### 1.3.1
 * Fixed minor issues with SQLBulkCopy: -notify is not required and if SQLBulkCopy errors, Identity Insert will be turned off.
 ### 1.3.0

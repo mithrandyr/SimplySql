@@ -5,36 +5,36 @@ Add-Type -Path "$PSScriptRoot\System.Data.SQLite.dll"
 . "$PSScriptRoot\provider.ps1"
 
 #Open Cmdlet
-<#
-.Synopsis
-    Open a connection to a SQLite database file.
-
-.Description
-    Open a connection to a SQLite database file.
-    SQLite (System.Data.SQLite)
-    SQLite Development Team @ https://sqlite.org/
-    .NET Provider @ http://system.data.sqlite.org/ 
-
-.Parameter ConnectionName
-    The name to associate with the newly created connection.
-    This connection will be used with other cmdlets when specifying
-    -ConnectionName <name>.  If you don't specify one, it will be
-    set to the default.
-
-.Parameter ConnectionString
-    Specifies a provider specific connectionstring to be used.
-
-.Parameter CommandTimeout
-    The default command timeout to be used for all commands executed against this connection.
-
-.Parameter DataSource
-    The datasource for the connection.
-
-.Parameter Password
-    Password for the database file.
-
-#>
 Function Open-SQLiteConnection {
+    <#
+    .Synopsis
+        Open a connection to a SQLite database file.
+
+    .Description
+        Open a connection to a SQLite database file.
+        SQLite (System.Data.SQLite)
+        SQLite Development Team @ https://sqlite.org/
+        .NET Provider @ http://system.data.sqlite.org/ 
+
+    .Parameter ConnectionName
+        The name to associate with the newly created connection.
+        This connection will be used with other cmdlets when specifying
+        -ConnectionName <name>.  If you don't specify one, it will be
+        set to the default.
+
+    .Parameter ConnectionString
+        Specifies a provider specific connectionstring to be used.
+
+    .Parameter CommandTimeout
+        The default command timeout to be used for all commands executed against this connection.
+
+    .Parameter DataSource
+        The datasource for the connection.
+
+    .Parameter Password
+        Password for the database file.
+
+    #>
     [CmdletBinding(DefaultParameterSetName="default")]
     Param([Parameter(ValueFromPipelineByPropertyName)][Alias("cn")][string]$ConnectionName = "default"
         , [Parameter(ValueFromPipelineByPropertyName)][int]$CommandTimeout = 30
