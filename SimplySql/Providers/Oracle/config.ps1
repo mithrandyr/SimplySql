@@ -56,10 +56,17 @@ Function Open-OracleConnection {
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")][string]$ConnectionString)
     
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
-
-    $sb = [Oracle.ManagedDataAccess.Client.OracleConnectionStringBuilder]::new()
-
-    If($PSCmdlet.ParameterSetName -eq "Conn") { $sb["ConnectionString"] = $ConnectionString }
+    
+        $sb = [Oracle.ManagedDataAccess.Client.OracleConnectionStringBuilder]::new()
+    
+    If($PSCmdlet.ParameterSetName -eq "Conn") 
+    { 
+        try{
+        $sb["ConnectionString"] = $ConnectionString
+        }
+        catch
+        {$sb = [Oracle.ManagedDataAccess.Client.OracleConnectionStringBuilder]::new($ConnectionString)}
+     }
     Else {
     $sb["Data Source"] = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1}))(CONNECT_DATA=(SERVICE_NAME={2})))" -f $DataSource, $Port, $ServiceName
         $sb["User Id"] = $UserName
@@ -67,8 +74,14 @@ Function Open-OracleConnection {
         $sb["Statement Cache Size"] = 5
     }
     
-    $conn = [Oracle.ManagedDataAccess.Client.OracleConnection]::new($sb.ConnectionString)
-
+    try
+    {
+        $conn = [Oracle.ManagedDataAccess.Client.OracleConnection]::new($sb.ConnectionString)
+    }
+    catch
+    {
+        $conn = [Oracle.ManagedDataAccess.Client.OracleConnection]::new($sb)
+    }
     Try { $conn.Open() }
     Catch {
         $conn.Dispose()
