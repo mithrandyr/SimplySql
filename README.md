@@ -20,6 +20,8 @@ It has been released to PowerShellGallery.  Installation is as simple as
 This module requires PowerShell Version 5.0 or greater
 
 ## Version History
+### 1.3.3
+* Fixed issue where -ConnectionString was not working properly with the Oracle Provider.
 ### 1.3.2
 * Fixed issue with help missing from the open-*connection cmdlets.
 * removed unnecessary files from the Functions subfolder.

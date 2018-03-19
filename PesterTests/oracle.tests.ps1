@@ -7,7 +7,14 @@ InModuleScope SimplySql {
         BeforeEach { Open-OracleConnection -ServiceName xe -UserName hr -Password hr }
         AfterEach { 
             Show-SqlConnection -all | Close-SqlConnection
-         }
+        }
+
+        It "Testing ConnectionString" {
+            {
+                Open-OracleConnection -ConnectionName Test -ConnectionString 'USER ID=hr;PASSWORD=hr;DATA SOURCE="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))";STATEMENT CACHE SIZE=5;'
+                Close-SqlConnection
+            } | Should Not Throw
+        }
 
         It "Invoke-SqlScalar" {
             Invoke-SqlScalar -Query "SELECT 1 FROM DUAL" | Should BeOfType System.Decimal

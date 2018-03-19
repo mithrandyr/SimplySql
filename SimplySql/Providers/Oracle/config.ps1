@@ -59,16 +59,15 @@ Function Open-OracleConnection {
 
     $sb = [Oracle.ManagedDataAccess.Client.OracleConnectionStringBuilder]::new()
 
-    If($PSCmdlet.ParameterSetName -eq "Conn") { $sb["ConnectionString"] = $ConnectionString }
+    If($PSCmdlet.ParameterSetName -eq "Conn") { $conn = [Oracle.ManagedDataAccess.Client.OracleConnection]::new($ConnectionString) }
     Else {
-    $sb["Data Source"] = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1}))(CONNECT_DATA=(SERVICE_NAME={2})))" -f $DataSource, $Port, $ServiceName
+        $sb["Data Source"] = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1}))(CONNECT_DATA=(SERVICE_NAME={2})))" -f $DataSource, $Port, $ServiceName
         $sb["User Id"] = $UserName
         $sb.Password = $Password
         $sb["Statement Cache Size"] = 5
+        $conn = [Oracle.ManagedDataAccess.Client.OracleConnection]::new($sb.ConnectionString)
     }
     
-    $conn = [Oracle.ManagedDataAccess.Client.OracleConnection]::new($sb.ConnectionString)
-
     Try { $conn.Open() }
     Catch {
         $conn.Dispose()
