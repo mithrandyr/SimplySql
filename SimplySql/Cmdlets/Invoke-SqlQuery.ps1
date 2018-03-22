@@ -35,6 +35,11 @@
     
     Invoke-SqlQuery -Query "SELECT * FROM TABLE"
 
+.Example
+    Runs a simple query with parameters
+    
+    Invoke-SqlQuery -Query "SELECT * FROM TABLE WHERE col1=@id' AND colb > @someDate" -Parameters @{id = 1; someDate = (Get-Date)}
+
 #>
 Function Invoke-SqlQuery {
     [CmdletBinding()]

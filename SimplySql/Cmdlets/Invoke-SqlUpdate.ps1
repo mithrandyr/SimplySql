@@ -20,6 +20,12 @@
 .Parameter ConnectionName
     User defined name for connection.
 
+.Example
+    Invoke-SqlUpdate -Query "TRUNCATE TABLE employees"
+
+.Example
+    Invoke-SqlUpdate -Query "UPDATE employees SET salary = @val WHERE manager = @managerId" -Parameters @{val = 999999; managerId = 549}
+
 #>
 Function Invoke-SqlUpdate {
     [CmdletBinding(DefaultParameterSetName="default")]

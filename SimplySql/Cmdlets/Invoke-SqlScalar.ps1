@@ -20,6 +20,13 @@
 
 .Parameter ConnectionName
     User defined name for connection.
+
+    .Example
+    Invoke-SqlScalar -Query "SELECT Count(1) FROM TABLE"
+
+.Example
+    Invoke-SqlQuery -Query "SELECT Count(1) FROM TABLE WHERE colb > @someDate" -Parameters @{someDate = (Get-Date)}
+
 #>
 Function Invoke-SqlScalar {
     [CmdletBinding()]

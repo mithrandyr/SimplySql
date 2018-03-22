@@ -36,7 +36,7 @@ Function Open-PostGreConnection {
         Database name.
 
     .Parameter Port
-        Port to connect on, if different from default (3306).
+        Port to connect on, if different from default (5432).
 
     .Parameter UserName
         User to authenticate as.

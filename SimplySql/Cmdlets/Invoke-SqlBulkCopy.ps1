@@ -39,7 +39,7 @@
     If not specified, will be taken from SourceTable parameter.
 
 .Parameter ColumnMap
-    Key is the column name in the source connection,
+    Key is the column name in the source connection.
     Value is the column name in the destination connection.
 
 .Parameter BatchSize

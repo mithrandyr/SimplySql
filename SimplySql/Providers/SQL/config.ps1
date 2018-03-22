@@ -98,7 +98,7 @@ Function Open-SqlConnection {
         Open a connection to a SQL Server.
 
     .Description
-        Open a connection to a SQL Server.
+        Open a connection to a SQL Server.  Default authentication is Integrated Windows Authetication.
         
         System.Data.SqlClient.
 

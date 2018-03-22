@@ -7,8 +7,8 @@
     Invoke-SqlScalar, Invoke-SqlQuery, or Invoke-SqlUpdate.  Not all providers
     support informational messages.
 
-    If you use Print or Raiserror without the "NoWait", then messages will be
-    batched to 8kb and then sent.  To get messages immediately sent, your 
+    SQL Server, if you use Print or Raiserror without the "NoWait", then messages
+    will be batched to 8kb and then sent.  To get messages immediately sent, your 
     query needs to use
         
         RAISERROR('your message', 10,1) WITH NOWAIT

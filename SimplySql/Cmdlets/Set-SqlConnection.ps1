@@ -13,7 +13,7 @@
     Name of the database to connect to.
 
 .Parameter CommandTimeout
-    Command timeout in seconds.
+    Command timeout in seconds, only changed if greater than 0.
 
 #>
 Function Set-SqlConnection {
