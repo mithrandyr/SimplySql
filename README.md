@@ -20,6 +20,8 @@ It has been released to PowerShellGallery.  Installation is as simple as
 This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
+### 1.3.5
+* fixed issue with Postgre that got released in version 1.3.4.
 ### 1.3.4
 * Updated help: cmdlets and the about_* files (about_SimplySql & about SimplySql_Providers).
 * Updated provider DLLs for PostGre, MySql, and SQLite.
