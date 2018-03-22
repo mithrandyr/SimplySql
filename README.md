@@ -10,12 +10,14 @@ The basic pattern is to connect to a database, invoke one or more sql statements
     $data = Invoke-SqlQuery -query "SELECT * FROM someTable"
     Close-SqlConnection
 
+See the [Wiki](https://github.com/mithrandyr/SimplySql/wiki) for more details
+
 ## Status
-Version 1.1.x is in the repository, supports SQL Server, SQLite, MySql, Oracle and PostGreSql.  Please note that this project is actively in development and should be considered beta, though perfectly usuable.
+Version 1.3.x is in the repository, supports SQL Server, SQLite, MySql, Oracle and PostGreSql.  Please note that this project is actively in development and should be considered beta, though perfectly usuable.
 
 It has been released to PowerShellGallery.  Installation is as simple as 
 
-    Install-Module SimplySql
+    Install-Module SimplySql -Scope CurrentUser
 
 This module requires PowerShell Version 5.0 or greater
 
