@@ -24,4 +24,4 @@ This module requires PowerShell Version 5.0 or greater
 * Updated help: cmdlets and the about_* files (about_SimplySql & about SimplySql_Providers).
 * Updated provider DLLs for PostGre, MySql, and SQLite.
 
-[View Version History|(VersionHistory.md)
+[View Version History](VersionHistory.md)
