@@ -24,7 +24,7 @@ Class ProviderBase {
         ForEach($de in $Parameters.GetEnumerator()) {
             $param = $cmd.CreateParameter()
             $param.ParameterName = $de.Name
-            If($de.Value) { $param.Value = $de.Value }
+            If($de.Value -ne $null) { $param.Value = $de.Value }
             Else { $param.Value = [System.DBNull]::Value }
             $cmd.Parameters.Add($param)
         }
