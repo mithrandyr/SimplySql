@@ -1,6 +1,6 @@
 # SimplySql
 ## Introduction
-![](https://img.shields.io/powershellgallery/v/SimplySql.svg) [Go to PowerShell Gallery](https://www.powershellgallery.com/packages/SimplySql/)
+[![Powershell Gallery](https://img.shields.io/powershellgallery/v/SimplySql.svg)](https://www.powershellgallery.com/packages/SimplySql/)
 
 Querying SQL (SQL Server, Oracle, PostgreSql, SQLite, & mySql) the PowerShell way: simple commands... powerful opportunities.
 
