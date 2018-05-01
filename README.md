@@ -1,5 +1,7 @@
 # SimplySql
 ## Introduction
+![](https://img.shields.io/powershellgallery/v/SimplySql.svg) [Go to PowerShell Gallery](https://www.powershellgallery.com/packages/SimplySql/)
+
 Querying SQL (SQL Server, Oracle, PostgreSql, SQLite, & mySql) the PowerShell way: simple commands... powerful opportunities.
 
 SimplySql is a module that provides an intuitive set of cmdlets for talking to databases that abstracts the vendor specifics, allowing you to focus on getting work done.
@@ -13,7 +15,6 @@ The basic pattern is to connect to a database, invoke one or more sql statements
 See the [Wiki](https://github.com/mithrandyr/SimplySql/wiki) for more details
 
 ## Status
-![PowerShell Gallery](https://img.shields.io/powershellgallery/v/SimplySql.svg)  
 Version 1.3.x is in the repository, supports SQL Server, SQLite, MySql, Oracle and PostGreSql.  Please note that this project is actively in development and should be considered beta, though perfectly usuable.
 
 It has been released to PowerShellGallery.  Installation is as simple as 
