@@ -13,6 +13,7 @@ The basic pattern is to connect to a database, invoke one or more sql statements
 See the [Wiki](https://github.com/mithrandyr/SimplySql/wiki) for more details
 
 ## Status
+![PowerShell Gallery](https://img.shields.io/powershellgallery/v/SimplySql.svg)  
 Version 1.3.x is in the repository, supports SQL Server, SQLite, MySql, Oracle and PostGreSql.  Please note that this project is actively in development and should be considered beta, though perfectly usuable.
 
 It has been released to PowerShellGallery.  Installation is as simple as 
