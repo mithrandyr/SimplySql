@@ -1,10 +1,14 @@
 InModuleScope SimplySql {
     Describe "SQLite" {
         BeforeEach { Open-SQLiteConnection }
-        AfterEach { 
-            Show-SqlConnection -all | Close-SqlConnection
-         }
-
+        AfterEach { Show-SqlConnection -all | Close-SqlConnection }
+        
+        It "Test ConnectionString Switch" {
+            {
+                Open-SQLiteConnection -ConnectionString "Data Source=:memory:" -ConnectionName Test
+                Close-SqlConnection -ConnectionName Test
+            } | Should Not Throw
+        }
         It "Invoke-SqlScalar" {
             Invoke-SqlScalar -Query "SELECT 1" | Should BeOfType System.Int64
         }

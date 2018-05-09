@@ -4,10 +4,14 @@
 InModuleScope SimplySql {
     Describe "MySql" {
         BeforeEach { Open-MySqlConnection -UserName root -Password password -Database sys }
-        AfterEach { 
-            Show-SqlConnection -all | Close-SqlConnection
-         }
+        AfterEach { Show-SqlConnection -all | Close-SqlConnection }
         
+        It "Test ConnectionString Switch " {
+            {
+                Open-MySqlConnection -ConnectionString "server=localhost;database=sys;port=3306;user id=root;password=password;useaffectedrows=True;allowuservariables=True" -ConnectionName Test
+                Close-SqlConnection -ConnectionName Test
+            } | Should Not Throw
+        }
         It "Creating Views" {
             Invoke-SqlUpdate -Query "CREATE OR REPLACE VIEW sys.generator_16
                 AS SELECT 0 n UNION ALL SELECT 1  UNION ALL SELECT 2  UNION ALL 

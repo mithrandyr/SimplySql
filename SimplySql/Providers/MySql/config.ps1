@@ -59,7 +59,7 @@ Function Open-MySqlConnection {
 
     $sb = [MySql.Data.MySqlClient.MySqlConnectionStringBuilder]::new()
 
-    If($PSCmdlet.ParameterSetName -eq "Conn") { $sb["ConnectionString"] = $ConnectionString }
+    If($PSCmdlet.ParameterSetName -eq "Conn") { $conn = [MySql.Data.MySqlClient.MySqlConnection]::new($ConnectionString) }
     Else {
         $sb.Server = $Server
         $sb.Database = $Database
@@ -69,10 +69,10 @@ Function Open-MySqlConnection {
 
         $sb.UseAffectedRows = $true
         $sb.AllowUserVariables = $true    
+
+        $conn = [MySql.Data.MySqlClient.MySqlConnection]::new($sb.ConnectionString)
     }
     
-    $conn = [MySql.Data.MySqlClient.MySqlConnection]::new($sb.ConnectionString)
-
     Try { $conn.Open() }
     Catch {
         $conn.Dispose()

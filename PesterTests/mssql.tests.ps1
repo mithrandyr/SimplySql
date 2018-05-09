@@ -1,8 +1,14 @@
 InModuleScope SimplySql {
     Describe "MSSQL" {
         BeforeEach { Open-SqlConnection -DataSource "(localdb)\MSSQLLocalDB" }
-        AfterEach { Close-SqlConnection }
+        AfterEach { Show-SqlConnection -all | Close-SqlConnection }
 
+        It "Test ConnectionString Switch" {
+            {
+                Open-SqlConnection -ConnectionString "Data Source=(localdb)\MSSQLLocalDB" -ConnectionName Test
+                Close-SqlConnection -ConnectionName Test
+            } | Should Not Throw
+        }
         It "Create a Test Database" {
             Invoke-SqlUpdate "Create Database Test" | Should Be -1
         }

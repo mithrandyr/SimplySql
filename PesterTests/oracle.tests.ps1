@@ -5,14 +5,12 @@
 InModuleScope SimplySql {
     Describe "Oracle" {
         BeforeEach { Open-OracleConnection -ServiceName xe -UserName hr -Password hr }
-        AfterEach { 
-            Show-SqlConnection -all | Close-SqlConnection
-        }
+        AfterEach { Show-SqlConnection -all | Close-SqlConnection }
 
-        It "Testing ConnectionString" {
+        It "Test ConnectionString Switch" {
             {
                 Open-OracleConnection -ConnectionName Test -ConnectionString 'USER ID=hr;PASSWORD=hr;DATA SOURCE="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))";STATEMENT CACHE SIZE=5;'
-                Close-SqlConnection
+                Close-SqlConnection -ConnectionName Test
             } | Should Not Throw
         }
 

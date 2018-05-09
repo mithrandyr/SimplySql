@@ -1,4 +1,7 @@
 ## Version History
+### 1.3.7
+* Fixed issue with SqlConnection not accepting ConnectionStrings (root issue, you can't assign a connection string to an existing SqlConnectionStringBuilder.)
+* Fixed issue with MySqlConnection and PostGreConnection, can't assign connection string to *ConnectionStringBuilder, instead simply create the connection object if connectionstring is passed in.
 ### 1.3.6
 * Fixed issue with -Parameters on Invoke-SqlQuery/Scalar/Update, passing in '$false' as a value was failing to pass anything at all.
 ### 1.3.5

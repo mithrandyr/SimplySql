@@ -159,11 +159,10 @@ Function Open-SqlConnection {
 
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
 
-    $sb = [System.Data.SqlClient.SqlConnectionStringBuilder]::new()
-    $sb["Application Name"] = "PowerShell ({0})" -f $ConnectionName
-
-    If($ConnectionString) { $sb["Connection String"] = $ConnectionString }
+    If($ConnectionString) { $sb = [System.Data.SqlClient.SqlConnectionStringBuilder]::new($ConnectionString) }
     Else {
+        $sb = [System.Data.SqlClient.SqlConnectionStringBuilder]::new()
+
         If($Server) { $sb.Server = $Server }
         If($Database) { $sb.Database = $Database }
         If($UserName) { 
@@ -176,7 +175,8 @@ Function Open-SqlConnection {
         }
         If(-not $UserName -and -not $Credential) { $sb["Integrated Security"] = $true }
     }
-    
+    $sb["Application Name"] = "PowerShell ({0})" -f $ConnectionName
+
     If($Credential) {
         [securestring]$sqlCred = $Credential.Password.Copy()
         $sqlCred.MakeReadOnly()

@@ -1,9 +1,16 @@
 InModuleScope SimplySql {
     Describe "PostGre" {
         BeforeEach { Open-PostGreConnection -Database postgres -UserName postgres -password password }
-        AfterEach { Close-SqlConnection }
+        AfterEach { Show-SqlConnection -all | Close-SqlConnection }
 
         It "Warmup Connection" { $true | Should Be True }
+
+        It "Test ConnectionString Switch" {
+            {
+                Open-PostGreConnection -ConnectionString "Max Auto Prepare=25;Host=localhost;Database=postgres;Port=5432;Username=postgres;password=password" -ConnectionName Test
+                Close-SqlConnection -ConnectionName Test
+            } | Should Not Throw
+        }
         
         It "Invoke-SqlScalar" {
             Invoke-SqlScalar -Query "SELECT Now()" | Should BeOfType System.DateTime

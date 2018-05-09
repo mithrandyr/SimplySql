@@ -67,16 +67,15 @@ Function Open-PostGreConnection {
     $sb["Application Name"] = "PowerShell ({0})" -f $ConnectionName
     $sb["Max Auto Prepare"] = $MaxAutoPrepare
 
-    If($PSCmdlet.ParameterSetName -eq "Conn") { $sb["ConnectionString"] = $ConnectionString }
+    If($PSCmdlet.ParameterSetName -eq "Conn") { $conn = [Npgsql.NpgsqlConnection]::new($ConnectionString) }
     Else {
         $sb.Server = $Server
         $sb.Database = $Database
         If($Port) { $sb.Port = $Port }
         $sb.Username = $UserName
         $sb.Password = $Password
-    }
-    
-    $conn = [Npgsql.NpgsqlConnection]::new($sb.ConnectionString)
+        $conn = [Npgsql.NpgsqlConnection]::new($sb.ConnectionString)
+    }    
 
     Try { $conn.Open() }
     Catch {
