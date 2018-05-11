@@ -24,6 +24,9 @@ It has been released to PowerShellGallery.  Installation is as simple as
 This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
+### 1.3.8
+* Fixed issue with Invoke-SqlQuery throwing an error when there is no resultset, now creates a warning.
+* Added Pester tests to cover this scenario.
 ### 1.3.7
 * Fixed issue with SqlConnection not accepting ConnectionStrings (root issue, you can't assign a connection string to an existing SqlConnectionStringBuilder.)
 * Fixed issue with MySqlConnection and PostGreConnection, can't assign connection string to *ConnectionStringBuilder, instead simply create the connection object if connectionstring is passed in.

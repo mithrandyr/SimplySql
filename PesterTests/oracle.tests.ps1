@@ -18,6 +18,15 @@ InModuleScope SimplySql {
             Invoke-SqlScalar -Query "SELECT 1 FROM DUAL" | Should BeOfType System.Decimal
         }
 
+        It "Invoke-SqlQuery (No ResultSet Warning)" {
+            Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
+            $WarningPreference = "stop"
+            Try { Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" }
+            Catch { $val = $_.ToString() }
+            Finally { Invoke-SqlUpdate -Query "DROP TABLE temp" }
+            $val | Should Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
+        }
+
         It "Invoke-SqlUpdate" {
             Invoke-SqlUpdate -Query "CREATE TABLE tmpTable (colDec REAL, colInt INTEGER, colText varchar(20))"
             Invoke-SqlUpdate -Query "INSERT INTO tmpTable

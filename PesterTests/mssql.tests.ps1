@@ -9,12 +9,22 @@ InModuleScope SimplySql {
                 Close-SqlConnection -ConnectionName Test
             } | Should Not Throw
         }
+        
         It "Create a Test Database" {
             Invoke-SqlUpdate "Create Database Test" | Should Be -1
         }
 
         It "Invoke-SqlScalar" {
             Invoke-SqlScalar -Query "SELECT GETDATE()" | Should BeOfType System.DateTime
+        }
+
+        It "Invoke-SqlQuery (No ResultSet Warning)" {
+            Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
+            $WarningPreference = "stop"
+            Try { Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" }
+            Catch { $val = $_.ToString() }
+            Finally { Invoke-SqlUpdate -Query "DROP TABLE temp" }
+            $val | Should Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
         }
 
         It "Invoke-SqlUpdate" {

@@ -64,6 +64,7 @@ Function Invoke-SqlQuery {
                 Try {
                     $ds = $Script:Connections.$ConnectionName.GetDataSet($cmd)
                     If($ds.Tables.Count -gt 1) { Write-Output $ds.Tables }
+                    ElseIf($ds.Tables.Count -eq 0) { Write-Warning "Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning." }
                     Else { Write-Output $ds.Tables[0].Rows }
                 }
                 Finally { If(Test-Path variable:ds) { $ds.Dispose() } }
