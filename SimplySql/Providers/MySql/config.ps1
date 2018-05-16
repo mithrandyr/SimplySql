@@ -39,20 +39,24 @@ Function Open-MySqlConnection {
         Port to connect on, if different from default (3306).
 
     .Parameter UserName
-        User to authenticate as.
+        User to authenticate as. (deprecated, use -Credential)
 
     .Parameter Password
-        Password for the user.
+        Password for the user. (deprecated, use -Credential)
 
     #>
     [CmdletBinding(DefaultParameterSetName="default")]
     Param([Parameter(ValueFromPipelineByPropertyName)][Alias("cn")][string]$ConnectionName = "default"
         , [Parameter(ValueFromPipelineByPropertyName)][int]$CommandTimeout = 30
-        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=0)][string]$Server = "localhost"
-        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=1)][string]$Database = "mysql"
-        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][int]$Port = 3306
-        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$UserName
-        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$Password
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=0)]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass", Position=0)][string]$Server = "localhost"
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=1)]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass", Position=1)][string]$Database = "mysql"
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass")][int]$Port = 3306
+        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][pscredential]$Credential
+        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$UserName
+        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$Password
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")][string]$ConnectionString)
     
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
@@ -64,13 +68,23 @@ Function Open-MySqlConnection {
         $sb.Server = $Server
         $sb.Database = $Database
         If($Port) { $sb.Port = $Port }
-        $sb.UserId = $UserName
-        $sb.Password = $Password
-
+        If($Credential) {
+            $sb.UserID = $Credential.UserName
+            $sb.Password = $Credential.GetNetworkCredential().Password
+        }
+        Else {
+            Write-Warning "You are using -UserName and -Password, these options are deprecated and will be removed in the future.  Please consider using -Credential."
+            $sb.UserId = $UserName
+            $sb.Password = $Password
+        }
+        
         $sb.UseAffectedRows = $true
         $sb.AllowUserVariables = $true    
 
-        $conn = [MySql.Data.MySqlClient.MySqlConnection]::new($sb.ConnectionString)
+        $conn = [MySql.Data.MySqlClient.MySqlConnection]::new($sb.ConnectionString)    
+        $sb.Clear()
+        $sb = $null
+        Remove-Variable sb    
     }
     
     Try { $conn.Open() }

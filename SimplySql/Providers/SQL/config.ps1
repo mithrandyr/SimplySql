@@ -166,6 +166,7 @@ Function Open-SqlConnection {
         If($Server) { $sb.Server = $Server }
         If($Database) { $sb.Database = $Database }
         If($UserName) { 
+            Write-Warning "You are using -UserName and -Password, these options are deprecated and will be removed in the future.  Please consider using -Credential."
             $sb["User Id"] = $UserName
             $sb.Password = $Password
         }

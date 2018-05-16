@@ -3,7 +3,7 @@
 #>
 InModuleScope SimplySql {
     Describe "MySql" {
-        BeforeEach { Open-MySqlConnection -UserName root -Password password -Database sys }
+        BeforeEach { Open-MySqlConnection -Database sys -Credential ([pscredential]::new("root", (ConvertTo-SecureString -Force -AsPlainText "password"))) }
         AfterEach { Show-SqlConnection -all | Close-SqlConnection }
         
         It "Test ConnectionString Switch " {
@@ -12,6 +12,14 @@ InModuleScope SimplySql {
                 Close-SqlConnection -ConnectionName Test
             } | Should Not Throw
         }
+
+        It "Test UserName/Password Parameters" {
+            {
+                Open-MySqlConnection -UserName root -Password password -Database sys -ConnectionName test
+                Close-SqlConnection -ConnectionName test
+            } | Should Not Throw
+        }
+
         It "Creating Views" {
             Invoke-SqlUpdate -Query "CREATE OR REPLACE VIEW sys.generator_16
                 AS SELECT 0 n UNION ALL SELECT 1  UNION ALL SELECT 2  UNION ALL 
@@ -85,7 +93,7 @@ InModuleScope SimplySql {
                     , uuid() AS colText
                 FROM sys.generator_64k"
             
-            Open-MySqlConnection -ConnectionName bcp -UserName root -Password password -Database sys 
+            Open-MySqlConnection -ConnectionName bcp -Database sys -Credential ([pscredential]::new("root", (ConvertTo-SecureString -Force -AsPlainText "password")))
             Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE sys.tmpTable2 (colDec REAL, colInt INTEGER, colText TEXT)"
 
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "sys.tmpTable2" -Notify |

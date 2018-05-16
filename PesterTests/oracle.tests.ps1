@@ -4,13 +4,20 @@
 #>
 InModuleScope SimplySql {
     Describe "Oracle" {
-        BeforeEach { Open-OracleConnection -ServiceName xe -UserName hr -Password hr }
+        BeforeEach { Open-OracleConnection -ServiceName xe -Credential ([pscredential]::new("hr", (ConvertTo-SecureString -Force -AsPlainText "hr"))) }
         AfterEach { Show-SqlConnection -all | Close-SqlConnection }
 
         It "Test ConnectionString Switch" {
             {
                 Open-OracleConnection -ConnectionName Test -ConnectionString 'USER ID=hr;PASSWORD=hr;DATA SOURCE="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))";STATEMENT CACHE SIZE=5;'
                 Close-SqlConnection -ConnectionName Test
+            } | Should Not Throw
+        }
+
+        It "Test UserName/Password Parameters" {
+            {
+                Open-OracleConnection -ServiceName xe -UserName hr -Password hr -ConnectionName test
+                Close-SqlConnection -ConnectionName test
             } | Should Not Throw
         }
 
@@ -68,7 +75,7 @@ InModuleScope SimplySql {
                 FROM dual
                 CONNECT BY ROWNUM <= 65536"
             
-            Open-OracleConnection -ConnectionName bcp -ServiceName xe -UserName hr -Password hr
+            Open-OracleConnection -ConnectionName bcp -ServiceName xe -Credential ([pscredential]::new("hr", (ConvertTo-SecureString -Force -AsPlainText "hr")))
             Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec REAL, colInt INTEGER, colText varchar(20))"
 
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |

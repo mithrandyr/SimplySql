@@ -48,11 +48,15 @@ Function Open-OracleConnection {
     [CmdletBinding(DefaultParameterSetName="default")]
     Param([Parameter(ValueFromPipelineByPropertyName)][Alias("cn")][string]$ConnectionName = "default"
         , [Parameter(ValueFromPipelineByPropertyName)][int]$CommandTimeout = 30
-        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=0)][string]$DataSource = "localhost"
-        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default", Position=1)][string]$ServiceName
-        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][int]$Port = 1521
-        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$UserName
-        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][string]$Password
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=0)]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass", Position=0)][string]$DataSource = "localhost"
+        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default", Position=1)]
+            [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass", Position=1)][string]$ServiceName
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass")][int]$Port = 1521
+        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][pscredential]$Credential
+        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$UserName
+        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$Password
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")][string]$ConnectionString)
     
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
@@ -62,10 +66,22 @@ Function Open-OracleConnection {
     If($PSCmdlet.ParameterSetName -eq "Conn") { $conn = [Oracle.ManagedDataAccess.Client.OracleConnection]::new($ConnectionString) }
     Else {
         $sb["Data Source"] = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1}))(CONNECT_DATA=(SERVICE_NAME={2})))" -f $DataSource, $Port, $ServiceName
-        $sb["User Id"] = $UserName
-        $sb.Password = $Password
+        
+        If($Credential) {
+            $sb["User Id"] = $Credential.UserName
+            $sb.Password = $Credential.GetNetworkCredential().Password
+        }
+        Else {
+            Write-Warning "You are using -UserName and -Password, these options are deprecated and will be removed in the future.  Please consider using -Credential."
+            $sb["User Id"] = $UserName
+            $sb.Password = $Password
+        }
+                
         $sb["Statement Cache Size"] = 5
         $conn = [Oracle.ManagedDataAccess.Client.OracleConnection]::new($sb.ConnectionString)
+        $sb.Clear()
+        $sb = $null
+        Remove-Variable sb  
     }
     
     Try { $conn.Open() }

@@ -1,6 +1,6 @@
 InModuleScope SimplySql {
     Describe "PostGre" {
-        BeforeEach { Open-PostGreConnection -Database postgres -UserName postgres -password password }
+        BeforeEach { Open-PostGreConnection -Database postgres -Credential ([pscredential]::new("postgres", (ConvertTo-SecureString -Force -AsPlainText "password"))) }
         AfterEach { Show-SqlConnection -all | Close-SqlConnection }
 
         It "Warmup Connection" { $true | Should Be True }
@@ -12,6 +12,13 @@ InModuleScope SimplySql {
             } | Should Not Throw
         }
         
+        It "Test UserName/Password Parameters" {
+            {
+                Open-PostGreConnection -Database postgres -UserName postgres -Password password -ConnectionName test
+                Close-SqlConnection -ConnectionName test
+            } | Should Not Throw
+        }
+
         It "Invoke-SqlScalar" {
             Invoke-SqlScalar -Query "SELECT Now()" | Should BeOfType System.DateTime
         }
@@ -57,7 +64,7 @@ InModuleScope SimplySql {
 
         It "Invoke-SqlBulkCopy" {
             Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
-            Open-PostGreConnection -Database postgres -UserName postgres -password password -ConnectionName bcp 
+            Open-PostGreConnection -Database postgres -ConnectionName bcp -Credential ([pscredential]::new("postgres", (ConvertTo-SecureString -Force -AsPlainText "password")))
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |
                 Should Be 65536
             Close-SqlConnection -ConnectionName bcp
