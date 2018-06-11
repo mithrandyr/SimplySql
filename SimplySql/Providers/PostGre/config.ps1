@@ -64,6 +64,8 @@ Function Open-PostGreConnection {
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$Password
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$MaxAutoPrepare = 25
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass")][switch]$RequireSSL
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")][string]$ConnectionString)
     
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
@@ -87,6 +89,10 @@ Function Open-PostGreConnection {
             $sb.Username = $UserName
             $sb.Password = $Password
         }
+
+        If($RequireSSL) { $sb.SslMode = "Require" }
+        Else { $sb.SslMode = "Prefer" }
+        
         $conn = [Npgsql.NpgsqlConnection]::new($sb.ConnectionString)
         $sb.Clear()
         $sb = $null

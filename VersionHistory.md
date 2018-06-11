@@ -1,4 +1,6 @@
 ## Version History
+### 1.4.1
+* Added support for SSL connections to PostGre provider.
 ### 1.4.0
 * Added support for PSCredential on MySql, Oracle and PostGre providers, marking UserName/Password as deprecated.  Sql Provider already had support, added deprecation warning.  SQLite only has -Password, no change to this provider.
 ### 1.3.8

@@ -24,20 +24,9 @@ It has been released to PowerShellGallery.  Installation is as simple as
 This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
+### 1.4.1
+* Added support for SSL connections to PostGre provider.
 ### 1.4.0
 * Added support for PSCredential on MySql, Oracle and PostGre providers, marking UserName/Password as deprecated.  Sql Provider already had support, added deprecation warning.  SQLite only has -Password, no change to this provider.
-### 1.3.8
-* Fixed issue with Invoke-SqlQuery throwing an error when there is no resultset, now creates a warning.
-* Added Pester tests to cover this scenario.
-### 1.3.7
-* Fixed issue with SqlConnection not accepting ConnectionStrings (root issue, you can't assign a connection string to an existing SqlConnectionStringBuilder.)
-* Fixed issue with MySqlConnection and PostGreConnection, can't assign connection string to *ConnectionStringBuilder, instead simply create the connection object if connectionstring is passed in.
-### 1.3.6
-* Fixed issue with -Parameters on Invoke-SqlQuery/Scalar/Update, passing in '$false' as a value was failing to pass anything at all.
-### 1.3.5
-* Fixed issue with Postgre that got released in version 1.3.4.
-### 1.3.4
-* Updated help: cmdlets and the about_* files (about_SimplySql & about SimplySql_Providers).
-* Updated provider DLLs for PostGre, MySql, and SQLite.
 
 [View Version History](VersionHistory.md)
