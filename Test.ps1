@@ -8,11 +8,15 @@ If($Load) {
         Else { $cmd = "{0}" -f $PSCmdlet.MyInvocation.MyCommand.Source }
     }
     PowerShell -noprofile -noexit -command $cmd
+    if($global:IsNestedSessionSimplySql) { Write-Warning "Exited one session, but currently in another nested session!" }
+    else { Write-Warning "You have exited the last nested session."}
 }
 Else {
     Write-Host "Session PID: $pid"
     #Clear-Host
     Write-Host "In New PowerShell Session, [exit] to resume."
+    $global:IsNestedSessionSimplySql = $true
+
     $PSModuleAutoLoadingPreference = "none"
     Import-Module $PSScriptRoot\SimplySql -Force
     Get-Module SimplySql | Where-Object Path -NotLike "$PSScriptRoot\*" | Remove-Module
