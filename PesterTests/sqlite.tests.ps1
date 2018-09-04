@@ -7,10 +7,10 @@ InModuleScope SimplySql {
             {
                 Open-SQLiteConnection -ConnectionString "Data Source=:memory:" -ConnectionName Test
                 Close-SqlConnection -ConnectionName Test
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
         It "Invoke-SqlScalar" {
-            Invoke-SqlScalar -Query "SELECT 1" | Should BeOfType System.Int64
+            Invoke-SqlScalar -Query "SELECT 1" | Should -BeOfType System.Int64
         }
 
         It "Invoke-SqlQuery (No ResultSet Warning)" {
@@ -19,7 +19,7 @@ InModuleScope SimplySql {
             Try { Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" }
             Catch { $val = $_.ToString() }
             Finally { Invoke-SqlUpdate -Query "DROP TABLE temp" }
-            $val | Should Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
+            $val | Should -Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
         }
 
         It "Invoke-SqlUpdate" {
@@ -35,7 +35,7 @@ InModuleScope SimplySql {
                     SELECT random()/1000000000000. AS colDec
                         , random() AS colInt
                         , hex(randomblob(20)) AS colText
-                    FROM f" | Should Be 65536
+                    FROM f" | Should -Be 65536
             
             Invoke-SqlUpdate -Query "DROP TABLE tmpTable" | Out-Null
         }
@@ -54,7 +54,7 @@ InModuleScope SimplySql {
                 LIMIT 1000" |
                 Measure-Object |
                 Select-Object -ExpandProperty Count |
-                Should Be 1000
+                Should -Be 1000
         }
 
         It "Invoke-SqlQuery -stream" {
@@ -71,7 +71,7 @@ InModuleScope SimplySql {
                 LIMIT 1000" -Stream |
                 Measure-Object |
                 Select-Object -ExpandProperty Count |
-                Should Be 1000
+                Should -Be 1000
         }
 
         It "Invoke-SqlBulkCopy" {
@@ -90,11 +90,30 @@ InModuleScope SimplySql {
             Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable (colDec REAL, colInt INTEGER, colText TEXT)"
 
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable -Notify |
-                Should Be 65536
+                Should -Be 65536
             
             Close-SqlConnection -ConnectionName bcp
-       }
+        }
 
-       It "Remove File" { { Remove-Item "$home\temp.db" } | Should Not Throw }
+        It "Transaction: Invoke-SqlScalar" {
+            Start-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1" } | Should -Not -Throw
+            Undo-SqlTransaction
+        }
+
+        It "Transaction: Invoke-SqlQuery" {
+            Start-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1" } | Should -Not -Throw
+            Undo-SqlTransaction
+        }
+
+        It "Transaction: Invoke-SqlUpdate" {
+            Start-SqlTransaction
+            { Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)" } | Should -Not -Throw
+            Undo-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1 FROM transactionTest" } | Should -Throw
+        }
+
+        It "Remove File" { { Remove-Item "$home\temp.db" } | Should -Not -Throw }
     }
 }

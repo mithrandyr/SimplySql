@@ -7,15 +7,15 @@ InModuleScope SimplySql {
             {
                 Open-SqlConnection -ConnectionString "Data Source=(localdb)\MSSQLLocalDB" -ConnectionName Test
                 Close-SqlConnection -ConnectionName Test
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
         
         It "Create a Test Database" {
-            Invoke-SqlUpdate "Create Database Test" | Should Be -1
+            Invoke-SqlUpdate "Create Database Test" | Should -Be -1
         }
 
         It "Invoke-SqlScalar" {
-            Invoke-SqlScalar -Query "SELECT GETDATE()" | Should BeOfType System.DateTime
+            Invoke-SqlScalar -Query "SELECT GETDATE()" | Should -BeOfType System.DateTime
         }
 
         It "Invoke-SqlQuery (No ResultSet Warning)" {
@@ -24,7 +24,7 @@ InModuleScope SimplySql {
             Try { Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" }
             Catch { $val = $_.ToString() }
             Finally { Invoke-SqlUpdate -Query "DROP TABLE temp" }
-            $val | Should Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
+            $val | Should -Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
         }
 
         It "Invoke-SqlUpdate" {
@@ -40,7 +40,7 @@ InModuleScope SimplySql {
                     , CAST(RAND(n*n / 4) * 1000000 AS int) AS colInt
                     , CAST(NEWID() AS VARCHAR(50)) AS colText
                 INTO tmpTable
-                FROM tally" | Should Be 65536
+                FROM tally" | Should -Be 65536
         }
 
         It "Invoke-SqlQuery" {
@@ -48,7 +48,7 @@ InModuleScope SimplySql {
             Invoke-SqlQuery -Query "SELECT TOP 1000 * FROM tmpTable" |
                 Measure-Object |
                 Select-Object -ExpandProperty Count |
-                Should Be 1000
+                Should -Be 1000
         }
 
         It "Invoke-SqlQuery -stream" {
@@ -56,7 +56,7 @@ InModuleScope SimplySql {
             Invoke-SqlQuery -Query "SELECT TOP 1000 * FROM tmpTable" -Stream |
                 Measure-Object |
                 Select-Object -ExpandProperty Count |
-                Should Be 1000
+                Should -Be 1000
         }
 
         It "Invoke-SqlBulkCopy" {
@@ -66,15 +66,34 @@ InModuleScope SimplySql {
             Set-SqlConnection -Database test -ConnectionName bcp
             
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |
-                Should Be 65536
+                Should -Be 65536
             
             Set-SqlConnection -Database master -ConnectionName bcp
             Close-SqlConnection -ConnectionName bcp
         }
 
+        It "Transaction: Invoke-SqlScalar" {
+            Start-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1" } | Should -Not -Throw
+            Undo-SqlTransaction
+        }
+
+        It "Transaction: Invoke-SqlQuery" {
+            Start-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1" } | Should -Not -Throw
+            Undo-SqlTransaction
+        }
+
+        It "Transaction: Invoke-SqlUpdate" {
+            Start-SqlTransaction
+            { Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)" } | Should -Not -Throw
+            Undo-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1 FROM transactionTest" } | Should -Throw
+        }
+
         It "Remove the Test Database" {
             Set-SqlConnection -Database master
-            Invoke-SqlUpdate "drop Database Test" | Should Be -1
+            Invoke-SqlUpdate "drop Database Test" | Should -Be -1
         }
     }
 }

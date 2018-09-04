@@ -11,18 +11,18 @@ InModuleScope SimplySql {
             {
                 Open-OracleConnection -ConnectionName Test -ConnectionString 'USER ID=hr;PASSWORD=hr;DATA SOURCE="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))";STATEMENT CACHE SIZE=5;'
                 Close-SqlConnection -ConnectionName Test
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
 
         It "Test UserName/Password Parameters" {
             {
                 Open-OracleConnection -ServiceName xe -UserName hr -Password hr -ConnectionName test
                 Close-SqlConnection -ConnectionName test
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
 
         It "Invoke-SqlScalar" {
-            Invoke-SqlScalar -Query "SELECT 1 FROM DUAL" | Should BeOfType System.Decimal
+            Invoke-SqlScalar -Query "SELECT 1 FROM DUAL" | Should -BeOfType System.Decimal
         }
 
         It "Invoke-SqlQuery (No ResultSet Warning)" {
@@ -31,7 +31,7 @@ InModuleScope SimplySql {
             Try { Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" }
             Catch { $val = $_.ToString() }
             Finally { Invoke-SqlUpdate -Query "DROP TABLE temp" }
-            $val | Should Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
+            $val | Should -Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
         }
 
         It "Invoke-SqlUpdate" {
@@ -41,7 +41,7 @@ InModuleScope SimplySql {
                     , dbms_random.random AS colInt
                     , dbms_random.string('x',20) AS colText
                 FROM dual
-                CONNECT BY ROWNUM <= 65536" | Should Be 65536
+                CONNECT BY ROWNUM <= 65536" | Should -Be 65536
 
             Invoke-SqlUpdate -Query "DROP TABLE tmpTable"            
         }
@@ -54,7 +54,7 @@ InModuleScope SimplySql {
                 CONNECT BY ROWNUM <= 1000" |
                 Measure-Object |
                 Select-Object -ExpandProperty Count |
-                Should Be 1000
+                Should -Be 1000
         }
 
         It "Invoke-SqlQuery -stream" {
@@ -65,7 +65,7 @@ InModuleScope SimplySql {
                 CONNECT BY ROWNUM <= 1000" |
                 Measure-Object |
                 Select-Object -ExpandProperty Count |
-                Should Be 1000
+                Should -Be 1000
         }
 
         It "Invoke-SqlBulkCopy" {
@@ -79,16 +79,38 @@ InModuleScope SimplySql {
             Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec REAL, colInt INTEGER, colText varchar(20))"
 
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
-                Should Be 65536
+                Should -Be 65536
             
             Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"
             Close-SqlConnection -ConnectionName bcp
-       }
+        }
 
-       It "Dropping Tables" {
+        It "Transaction: Invoke-SqlScalar" {
+            Start-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1 FROM dual" } | Should -Not -Throw
+            Undo-SqlTransaction
+        }
+
+        It "Transaction: Invoke-SqlQuery" {
+            Start-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1 FROM dual" } | Should -Not -Throw
+            Undo-SqlTransaction
+        }
+
+        It "Transaction: Invoke-SqlUpdate" {
+            Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)"
+            Start-SqlTransaction
+            { Invoke-SqlUpdate "INSERT INTO transactionTest VALUES (1)" } | Should -Not -Throw
+            Undo-SqlTransaction
+            Invoke-SqlScalar "SELECT Count(1) FROM transactionTest" | Should -Be 0
+            Invoke-SqlUpdate "DROP TABLE transactionTest"
+        }
+
+        It "Dropping Tables" {
+            Try { Invoke-SqlUpdate "DROP TABLE transactionTest" | Out-Null } Catch {}
             Try { Invoke-SqlUpdate "DROP TABLE tmpTable" | Out-Null } Catch {}
             Try { Invoke-SqlUpdate "DROP TABLE tmpTable2" | Out-Null } Catch {}
-            1 | Should Be 1            
-       }
+            1 | Should -Be 1            
+        }
     }
 }

@@ -3,24 +3,24 @@ InModuleScope SimplySql {
         BeforeEach { Open-PostGreConnection -Database postgres -Credential ([pscredential]::new("postgres", (ConvertTo-SecureString -Force -AsPlainText "password"))) }
         AfterEach { Show-SqlConnection -all | Close-SqlConnection }
 
-        It "Warmup Connection" { $true | Should Be True }
+        It "Warmup Connection" { $true | Should -Be True }
 
         It "Test ConnectionString Switch" {
             {
                 Open-PostGreConnection -ConnectionString "Max Auto Prepare=25;Host=localhost;Database=postgres;Port=5432;Username=postgres;password=password" -ConnectionName Test
                 Close-SqlConnection -ConnectionName Test
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
         
         It "Test UserName/Password Parameters" {
             {
                 Open-PostGreConnection -Database postgres -UserName postgres -Password password -ConnectionName test
                 Close-SqlConnection -ConnectionName test
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
 
         It "Invoke-SqlScalar" {
-            Invoke-SqlScalar -Query "SELECT Now()" | Should BeOfType System.DateTime
+            Invoke-SqlScalar -Query "SELECT Now()" | Should -BeOfType System.DateTime
         }
 
         It "Invoke-SqlQuery (No ResultSet Warning)" {
@@ -29,7 +29,7 @@ InModuleScope SimplySql {
             Try { Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" }
             Catch { $val = $_.ToString() }
             Finally { Invoke-SqlUpdate -Query "DROP TABLE temp" }
-            $val | Should Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
+            $val | Should -Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
         }
 
         It "Invoke-SqlUpdate" {
@@ -45,35 +45,55 @@ InModuleScope SimplySql {
                     SELECT random() AS colDec
                         , CAST(random() * 1000000 AS int) AS colInt
                         , CAST(Random() AS VARCHAR(50)) AS colText                
-                    FROM tally" | Should Be 65536
+                    FROM tally" | Should -Be 65536
         }
 
         It "Invoke-SqlQuery" {
             Invoke-SqlQuery -Query "SELECT * FROM tmpTable LIMIT 1000" |
                 Measure-Object |
                 Select-Object -ExpandProperty Count |
-                Should Be 1000
+                Should -Be 1000
         }
 
         It "Invoke-SqlQuery -stream" {
             Invoke-SqlQuery -Query "SELECT * FROM tmpTable LIMIT 1000" -Stream |
                 Measure-Object |
                 Select-Object -ExpandProperty Count |
-                Should Be 1000
+                Should -Be 1000
         }
 
         It "Invoke-SqlBulkCopy" {
             Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
             Open-PostGreConnection -Database postgres -ConnectionName bcp -Credential ([pscredential]::new("postgres", (ConvertTo-SecureString -Force -AsPlainText "password")))
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |
-                Should Be 65536
+                Should -Be 65536
             Close-SqlConnection -ConnectionName bcp
         }
 
+        It "Transaction: Invoke-SqlScalar" {
+            Start-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1" } | Should -Not -Throw
+            Undo-SqlTransaction
+        }
+
+        It "Transaction: Invoke-SqlQuery" {
+            Start-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1" } | Should -Not -Throw
+            Undo-SqlTransaction
+        }
+
+        It "Transaction: Invoke-SqlUpdate" {
+            Start-SqlTransaction
+            { Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)" } | Should -Not -Throw
+            Undo-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1 FROM transactionTest" } | Should -Throw
+        }
+        
         It "Dropping Tables" {
+            Try { Invoke-SqlUpdate "DROP TABLE transactionTest" | Out-Null } Catch {}
             Try { Invoke-SqlUpdate "DROP TABLE tmpTable" | Out-Null } Catch {}
             Try { Invoke-SqlUpdate "DROP TABLE tmpTable2" | Out-Null } Catch {}
-            1 | Should Be 1            
+            1 | Should -Be 1            
        }
     }
 }
