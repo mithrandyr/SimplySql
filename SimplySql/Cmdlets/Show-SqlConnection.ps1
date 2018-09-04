@@ -20,7 +20,7 @@ Filter Show-SqlConnection {
     
     If($All.IsPresent) {
         [string[]]$keys = $Script:Connections.Keys | ForEach-Object { $_ }
-        $keys | Write-Output
+        if($keys) { $keys | Write-Output }        
     }
     Else {
         If(-not (TestConnectionName $ConnectionName)) { return }
