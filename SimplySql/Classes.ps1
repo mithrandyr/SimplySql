@@ -20,6 +20,7 @@ Class ProviderBase {
         $cmd = $this.Connection.CreateCommand()
         $cmd.CommandText = $Query
         $cmd.CommandTimeout = $cmdTimeout
+        if($this.HasTransaction()) { $cmd.Transaction = $this.Transaction } # apply transaction to command if connection has transaction
         
         ForEach($de in $Parameters.GetEnumerator()) {
             $param = $cmd.CreateParameter()
