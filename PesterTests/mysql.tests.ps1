@@ -8,7 +8,7 @@ InModuleScope SimplySql {
         
         It "Test ConnectionString Switch " {
             {
-                Open-MySqlConnection -ConnectionString "server=localhost;database=sys;port=3306;user id=root;password=password;useaffectedrows=True;allowuservariables=True" -ConnectionName Test
+                Open-MySqlConnection -ConnectionString "server=localhost;database=sys;port=3306;user id=root;password=password;useaffectedrows=True;allowuservariables=True;sslmode=none" -ConnectionName Test
                 Close-SqlConnection -ConnectionName Test
             } | Should -Not -Throw
         }

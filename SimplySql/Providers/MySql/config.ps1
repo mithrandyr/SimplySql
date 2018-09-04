@@ -43,6 +43,12 @@ Function Open-MySqlConnection {
 
     .Parameter Password
         Password for the user. (deprecated, use -Credential)
+    
+    .Parameter SSLMode
+        None: Do not use SSL.
+        Required: Always use SSL. Deny connection if server does not support SSL. Do not perform server certificate validation.
+        VerifyCA: Always use SSL. Validate server SSL certificate, but different host name mismatch.
+        VerifyFull: Always use SSL and perform full certificate validation.
 
     #>
     [CmdletBinding(DefaultParameterSetName="default")]
@@ -57,6 +63,9 @@ Function Open-MySqlConnection {
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][pscredential]$Credential
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$UserName
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$Password
+        , [Parameter(ValueFromPipeline, ParameterSetName="default")]
+            [Parameter(ValueFromPipeline, ParameterSetName="userpass")]
+            [ValidateSet("None","Required","VerifyCA","VerifyFull")][string]$SSLMode = "None"
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")][string]$ConnectionString)
     
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
@@ -77,9 +86,10 @@ Function Open-MySqlConnection {
             $sb.UserId = $UserName
             $sb.Password = $Password
         }
-        
+
         $sb.UseAffectedRows = $true
-        $sb.AllowUserVariables = $true    
+        $sb.AllowUserVariables = $true
+        $sb.SslMode = $SSLMode
 
         $conn = [MySql.Data.MySqlClient.MySqlConnection]::new($sb.ConnectionString)    
         $sb.Clear()
