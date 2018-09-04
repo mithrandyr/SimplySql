@@ -15,6 +15,7 @@ InModuleScope SimplySql {
         }
 
         It "Test UserName/Password Parameters" {
+            Write-Warning "starting test"
             {
                 Open-OracleConnection -ServiceName xe -UserName hr -Password hr -ConnectionName test
                 Close-SqlConnection -ConnectionName test
