@@ -28,6 +28,10 @@ This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
 
+### 1.5.2
+
+* Fixed issue with OracleProvider -- binding by position rather than by parameter name. (@Abrechnung1)
+
 ### 1.5.1
 
 * Updated tests for Pester v4

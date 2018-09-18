@@ -26,6 +26,13 @@ InModuleScope SimplySql {
             Invoke-SqlScalar -Query "SELECT 1 FROM DUAL" | Should -BeOfType System.Decimal
         }
 
+        It "Positional Binding" {
+            $result = Invoke-SqlQuery "SELECT :a AS First, :b AS Second, :c AS Third FROM dual" -Parameters @{c="Third";a="First";b="Second"}
+            $result.First | Should -Be "First"
+            $result.Second | Should -Be "Second"
+            $result.Third | Should -Be "Third"
+        }
+
         It "Invoke-SqlQuery (No ResultSet Warning)" {
             Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
             $WarningPreference = "stop"

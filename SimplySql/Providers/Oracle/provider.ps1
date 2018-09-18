@@ -52,6 +52,25 @@ Class OracleProvider : ProviderBase {
         }
     }
 
+    [System.Data.IDbCommand] GetCommand([string]$Query, [int]$cmdTimeout, [hashtable]$Parameters) {
+        If($cmdTimeout -lt 0) { $cmdTimeout = $this.CommandTimeout }
+        $cmd = $this.Connection.CreateCommand()
+        $cmd.BindByName = $true #otherwise oracle will bind by position!
+        $cmd.CommandText = $Query
+        $cmd.CommandTimeout = $cmdTimeout
+        if($this.HasTransaction()) { $cmd.Transaction = $this.Transaction } # apply transaction to command if connection has transaction
+        
+        ForEach($de in $Parameters.GetEnumerator()) {
+            $param = $cmd.CreateParameter()
+            $param.ParameterName = $de.Name
+            If($de.Value -ne $null) { $param.Value = $de.Value }
+            Else { $param.Value = [System.DBNull]::Value }
+            $cmd.Parameters.Add($param)
+        }
+        
+        Return $cmd
+    }
+
     [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd) {
         $ds = [System.Data.DataSet]::new()
         $da = [Oracle.ManagedDataAccess.Client.OracleDataAdapter]::new($cmd)
@@ -88,7 +107,7 @@ Class OracleProvider : ProviderBase {
         Try {
             ForEach($sm in $SchemaMap) {
                 $param = $bulkCmd.CreateParameter()
-                $param.ParameterName = $sm.DestName
+                $param.ParameterName = "Param{0}" -f $sm.Ordinal
                 $param.OracleDbType = MapDbType -dbType $sm.DataType
                 $bulkCmd.Parameters.Add($param) | Out-Null                
             }
