@@ -101,10 +101,7 @@ Function Open-PostGreConnection {
         Remove-Variable sb
     }    
 
-    Try {
-        $conn.Open()
-        [Npgsql.NpgsqlNetTopologySuiteExtensions]::UseNetTopologySuite($conn.TypeMapper) | Out-Null
-    }
+    Try { $conn.Open() }
     Catch {
         $conn.Dispose()
         Throw $_

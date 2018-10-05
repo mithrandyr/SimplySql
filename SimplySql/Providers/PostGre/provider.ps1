@@ -14,6 +14,19 @@ Class PostGreProvider : ProviderBase {
         }.GetNewClosure()
 
         $this.Connection.add_Notice([Npgsql.NoticeEventHandler]$handler)
+
+        #enable geom on reconnect
+        $tryEnableGeometry = $this.TryEnableGeometry
+        $stateChange = {Param($sender, [System.Data.StateChangeEventArgs]$e)
+            if($e.CurrentState -eq "Open") {
+                $tryEnableGeometry.Invoke()
+            }
+        }.GetNewClosure()
+
+        $this.Connection.add_StateChange([System.Data.StateChangeEventHandler]$stateChange)
+        
+        #enable geometry on initial connection
+        $this.TryEnableGeometry()
     }
 
     [string] ProviderType() { return "PostGre" }
@@ -43,7 +56,21 @@ Class PostGreProvider : ProviderBase {
         Finally { $da.dispose() }
     }
 
-    [void] ChangeDatabase([string]$DatabaseName) { $this.Connection.ChangeDatabase($DatabaseName) }
+    [void] TryEnableGeometry() {
+        try {
+            if(-not $this.Connection.TypeMapper.Mappings.where({$_.PgTypeName -eq "geometry"})){
+                if($this.GetScalar("SELECT 1 FROM pg_extension WHERE extname = 'postgis'", 15, @{})) {
+                    [Npgsql.NpgsqlNetTopologySuiteExtensions]::UseNetTopologySuite($this.Connection.TypeMapper) | Out-Null
+                }
+            }
+        }
+        catch { Write-Verbose "Failed to enable geometry (safely): $_" }
+    }
+    
+    [void] ChangeDatabase([string]$DatabaseName) { 
+        $this.Connection.ChangeDatabase($DatabaseName)
+        $this.TryEnableGeometry()
+    }
 
     [long] BulkLoad([System.Data.IDataReader]$DataReader
                     , [string]$DestinationTable
