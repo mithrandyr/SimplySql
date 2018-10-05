@@ -28,6 +28,11 @@ This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
 
+### 1.5.4
+
+* Fixed issue with loading the Geometry npgsql extension (Npgsql.NetTopologySuite) when database in connection string did not have PostGIS installed.
+* Automatically load geometry npgsql extension on database switch and on re-opening the connection (if current database has PostGIS installed).
+
 ### 1.5.3
 
 * Fixed issue with Geometry not being supported in PostGre provider.
