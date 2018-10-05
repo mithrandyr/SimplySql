@@ -37,7 +37,7 @@ Class PostGreProvider : ProviderBase {
         $da = [Npgsql.NpgsqlDataAdapter]::new($cmd)
         Try {
             $da.Fill($ds)
-            return $ds 
+            return $ds
         }
         Catch { Throw $_ }
         Finally { $da.dispose() }

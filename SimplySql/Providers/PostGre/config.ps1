@@ -1,5 +1,6 @@
 #Load Up PostGre libraries
 Add-Type -Path "$PSScriptRoot\Npgsql.dll"
+Add-Type -Path "$PSScriptRoot\Npgsql.NetTopologySuite.dll"
 
 #Provider Class
 . "$PSScriptRoot\provider.ps1"
@@ -16,6 +17,7 @@ Function Open-PostGreConnection {
         PostGreSQL @ https://www.postgresql.org/
         PostGre via Npgsql @ http://www.npgsql.org/
         .NET Provider @ https://www.nuget.org/packages/Npgsql/
+        Geometry: http://www.npgsql.org/doc/types/nts.html
 
     .Parameter ConnectionName
         The name to associate with the newly created connection.
@@ -96,10 +98,13 @@ Function Open-PostGreConnection {
         $conn = [Npgsql.NpgsqlConnection]::new($sb.ConnectionString)
         $sb.Clear()
         $sb = $null
-        Remove-Variable sb 
+        Remove-Variable sb
     }    
 
-    Try { $conn.Open() }
+    Try {
+        $conn.Open()
+        [Npgsql.NpgsqlNetTopologySuiteExtensions]::UseNetTopologySuite($conn.TypeMapper) | Out-Null
+    }
     Catch {
         $conn.Dispose()
         Throw $_

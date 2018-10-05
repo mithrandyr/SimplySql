@@ -1,5 +1,9 @@
 # Version History
 
+### 1.5.3
+
+* Fixed issue with Geometry not being supported in PostGre provider.
+
 ### 1.5.2
 
 * Fixed issue with OracleProvider -- binding by position rather than by parameter name. (@Abrechnung1)
@@ -12,7 +16,7 @@
 * Updated MySql Provider to 8.0.12, added parameter for SSLmode
 * Updated SQLite provider to 1.0.109.1
 * Updated Oracle provider to 18.3 (added support for oracleCredential)
-* Updated PostGre proivder (npgsql) to 4.0.2
+* Updated PostGre provider (npgsql) to 4.0.2
 
 ### 1.4.1
 
