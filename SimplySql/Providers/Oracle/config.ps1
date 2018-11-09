@@ -15,7 +15,7 @@ Function Open-OracleConnection {
         
         Oracle (Oracle.ManagedDataAccess)
         Oracle Managed Data Access @ http://www.oracle.com/technetwork/topics/dotnet/index-085163.html
-        .NET Provider @ https://www.nuget.org/packages/Oracle.ManagedDataAccess/
+        Provider for .NET @ https://www.nuget.org/packages/Oracle.ManagedDataAccess/
 
     .Parameter ConnectionName
         The name to associate with the newly created connection.
