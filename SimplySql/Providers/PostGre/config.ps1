@@ -50,6 +50,13 @@ Function Open-PostGreConnection {
         The maximum number SQL statements that can be automatically prepared at any
         given point. Beyond this number the least-recently-used statement will be
         recycled. Zero disables automatic preparation.  DEFAULTS TO 25.
+    
+    .Parameter RequireSSL
+        This will change the SSLMode from 'prefer' to 'require'.
+
+    .Parameter TrustSSL
+        This will auto-accept the SSL certificate provided by the server, useful
+        for self-signed certificate scenarios.
 
     #>
     [CmdletBinding(DefaultParameterSetName="default")]
@@ -68,6 +75,8 @@ Function Open-PostGreConnection {
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$MaxAutoPrepare = 25
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass")][switch]$RequireSSL
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass")][switch]$TrustSSL
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")][string]$ConnectionString)
     
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
@@ -94,6 +103,8 @@ Function Open-PostGreConnection {
 
         If($RequireSSL) { $sb.SslMode = "Require" }
         Else { $sb.SslMode = "Prefer" }
+        
+        if($TrustSSL) { $sb["Trust Server Certificate"] = $true }
         
         $conn = [Npgsql.NpgsqlConnection]::new($sb.ConnectionString)
         $sb.Clear()

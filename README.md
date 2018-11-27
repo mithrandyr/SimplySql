@@ -28,9 +28,12 @@ This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
 
-### 1.5.5
+### 1.5.7
 
 * Fixed issue with `Open-OracleConnection` help (@PaulWalkerUK)
+* Added -AsDataTable to Open-SqlQuery (@ili101)
+* Added -TrustSSL to Open-PostGreConnection, allowing for self-signed certificates (@ili101)
+* Updated -ConnectionName parameter on all cmdlets to no longer allow null or empty strings.
 
 ### 1.5.4
 

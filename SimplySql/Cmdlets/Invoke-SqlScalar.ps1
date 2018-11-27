@@ -33,7 +33,7 @@ Function Invoke-SqlScalar {
     Param([Parameter(Mandatory, Position=0)][AllowEmptyString()][string[]]$Query
         , [Parameter(Position=1)][hashtable]$Parameters = @{}
         , [int]$CommandTimeout = -1
-        , [Alias("cn")][string]$ConnectionName = "default")
+        , [ValidateNotNullOrEmpty()][Alias("cn")][string]$ConnectionName = "default")
     
     If(TestConnectionName -ConnectionName $ConnectionName) {
         [string]$Query = $Query -join [System.Environment]::NewLine

@@ -33,7 +33,7 @@ Function Invoke-SqlUpdate {
         , [Parameter(ParameterSetName="default",Position=1)][hashtable]$Parameters = @{}
         , [Parameter(ParameterSetName="default")][int]$CommandTimeout = -1
         , [Parameter(Mandatory,ParameterSetName="cmd")][System.Data.IDbCommand]$Command
-        , [Alias("cn")][string]$ConnectionName = "default")
+        , [ValidateNotNullOrEmpty()][Alias("cn")][string]$ConnectionName = "default")
     
     If(TestConnectionName -ConnectionName $ConnectionName) {
         If($PSCmdlet.ParameterSetName -eq "default") {

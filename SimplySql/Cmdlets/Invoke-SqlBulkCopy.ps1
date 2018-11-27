@@ -63,8 +63,8 @@
 Function Invoke-SqlBulkCopy {
     [CmdletBinding()]
     Param(
-        [string]$SourceConnectionName = "default"
-        , [string]$DestinationConnectionName = "default"
+        [ValidateNotNullOrEmpty()][string]$SourceConnectionName = "default"
+        , [ValidateNotNullOrEmpty()][string]$DestinationConnectionName = "default"
         , [Parameter(Mandatory, ParameterSetName="table")][string]$SourceTable
         , [Parameter(Mandatory, ParameterSetName="query")][AllowEmptyString()][string[]]$SourceQuery
         , [Parameter(ParameterSetName="query")][hashtable]$SourceParameters = @{}

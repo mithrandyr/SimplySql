@@ -51,7 +51,7 @@ Function Invoke-SqlQuery {
     Param([Parameter(Mandatory, Position=0)][AllowEmptyString()][string[]]$Query
         , [Parameter(Position=1)][hashtable]$Parameters = @{}
         , [int]$CommandTimeout = -1
-        , [Alias("cn")][string]$ConnectionName = "default"
+        , [ValidateNotNullOrEmpty()][ValidateNotNullOrEmpty()][Alias("cn")][string]$ConnectionName = "default"
         , [switch]$Stream
         , [switch]$AsDataTable)
     
