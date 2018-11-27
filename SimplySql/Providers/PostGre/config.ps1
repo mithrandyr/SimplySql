@@ -64,8 +64,8 @@ Function Open-PostGreConnection {
         , [Parameter(ValueFromPipelineByPropertyName)][int]$CommandTimeout = 30
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=0)]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass", Position=0)][string]$Server = "localhost"
-        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default", Position=1)]
-            [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass", Position=1)][string]$Database
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=1)]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass", Position=1)][string]$Database ="postgres"
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass")][int]$Port = 5432
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][pscredential]$Credential
