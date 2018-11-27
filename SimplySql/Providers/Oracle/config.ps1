@@ -43,6 +43,9 @@ Function Open-OracleConnection {
 
     .Parameter Password
         Password for the user.
+    
+    .Parameter DBPrivilege
+        Specify either SYSOPER or SYSDBA.
 
     #>
     [CmdletBinding(DefaultParameterSetName="default")]
@@ -57,6 +60,9 @@ Function Open-OracleConnection {
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass")]
             [int]$Port = 1521
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass")]
+            [ValidateSet("SYSOPER","SYSDBA")][string]$DBAPrivilege
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][pscredential]$Credential
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$UserName
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$Password
@@ -70,6 +76,9 @@ Function Open-OracleConnection {
     Else {
         $sb["Data Source"] = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1}))(CONNECT_DATA=(SERVICE_NAME={2})))" -f $DataSource, $Port, $ServiceName
         $sb["Statement Cache Size"] = 5
+        
+        if($DBAPrivilege) { $sb["DBA Privilege"] = $DBAPrivilege.ToLower() }
+        
         If($Credential) {
             $secPwd = $Credential.Password
             $secPwd.MakeReadOnly()
