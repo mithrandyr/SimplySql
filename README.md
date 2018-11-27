@@ -28,6 +28,10 @@ This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
 
+### 1.5.5
+
+* Fixed issue with `Open-OracleConnection` help (@PaulWalkerUK)
+
 ### 1.5.4
 
 * Fixed issue with loading the Geometry npgsql extension (Npgsql.NetTopologySuite) when database in connection string did not have PostGIS installed.

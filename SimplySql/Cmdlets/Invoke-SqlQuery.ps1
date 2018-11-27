@@ -29,6 +29,11 @@
     Uses a datareader to stream PSObject representing the results of the query
     to the pipeline, results will appear as soon as the connection begins
     returning data.  Only returns the first resultset if there are multiples.
+    If combined with -AsDataTable, -AsDataTable will be ignored.
+
+.Parameter AsDataTable
+    Forces the return objects to be one or more datatables.
+    If combined with -Stream, -AsDataTable will be ignored.
 
 .Example
     Run a simple query and return the output
@@ -47,9 +52,11 @@ Function Invoke-SqlQuery {
         , [Parameter(Position=1)][hashtable]$Parameters = @{}
         , [int]$CommandTimeout = -1
         , [Alias("cn")][string]$ConnectionName = "default"
-        , [switch]$Stream)
+        , [switch]$Stream
+        , [switch]$AsDataTable)
     
-    If(TestConnectionName -ConnectionName $ConnectionName) {
+    if($Stream -and $AsDataTable) { Write-Warning "You should not specify both -Stream and -AsDataTable, -Stream overrules -AsDataTable." }
+    if(TestConnectionName -ConnectionName $ConnectionName) {
         [string]$Query = $Query -join [System.Environment]::NewLine
         If(-not $Parameters) { $Parameters = @{} }
         
@@ -63,9 +70,9 @@ Function Invoke-SqlQuery {
             Else {
                 Try {
                     $ds = $Script:Connections.$ConnectionName.GetDataSet($cmd)
-                    If($ds.Tables.Count -gt 1) { Write-Output $ds.Tables }
-                    ElseIf($ds.Tables.Count -eq 0) { Write-Warning "Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning." }
-                    Else { Write-Output $ds.Tables[0].Rows }
+                    if($ds.Tables.Count -eq 0) { Write-Warning "Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning." }
+                    elseif($ds.Tables.Count -gt 1 -or $AsDataTable) { Write-Output $ds.Tables }
+                    else { Write-Output $ds.Tables[0].Rows }
                 }
                 Finally { If(Test-Path variable:ds) { $ds.Dispose() } }
             }
