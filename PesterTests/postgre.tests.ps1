@@ -14,7 +14,7 @@ InModuleScope SimplySql {
         
         It "Test UserName/Password Parameters" {
             {
-                Open-PostGreConnection -Database postgres -UserName postgres -Password password -ConnectionName test
+                Open-PostGreConnection -Database postgres -UserName postgres -Password postgres -ConnectionName test
                 Close-SqlConnection -ConnectionName test
             } | Should -Not -Throw
         }
@@ -64,7 +64,7 @@ InModuleScope SimplySql {
 
         It "Invoke-SqlBulkCopy" {
             Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
-            Open-PostGreConnection -Database postgres -ConnectionName bcp -Credential ([pscredential]::new("postgres", (ConvertTo-SecureString -Force -AsPlainText "password")))
+            Open-PostGreConnection -Database postgres -ConnectionName bcp -Credential ([pscredential]::new("postgres", (ConvertTo-SecureString -Force -AsPlainText "postgres")))
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |
                 Should -Be 65536
             Close-SqlConnection -ConnectionName bcp
