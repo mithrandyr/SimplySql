@@ -34,6 +34,7 @@ This module requires PowerShell Version 5.0 or greater
 * Added -AsDataTable to Open-SqlQuery (@ili101)
 * Added -TrustSSL to Open-PostGreConnection, allowing for self-signed certificates (@ili101)
 * Updated -ConnectionName parameter on all cmdlets to no longer allow null or empty strings.
+* Added better handling around SqlTransactions when an error is thrown (for SQL Server this happens when the server takes longer than the connectionTimeout, however the transaction action (COMMIT or ROLLBACK) still goes through properly).
 
 ### 1.5.4
 
