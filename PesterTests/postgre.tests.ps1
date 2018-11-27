@@ -7,7 +7,7 @@ InModuleScope SimplySql {
 
         It "Test ConnectionString Switch" {
             {
-                Open-PostGreConnection -ConnectionString "Max Auto Prepare=25;Host=localhost;Database=postgres;Port=5432;Username=postgres;password=password" -ConnectionName Test
+                Open-PostGreConnection -ConnectionString "Max Auto Prepare=25;Host=localhost;Database=postgres;Port=5432;Username=postgres;password=postgres" -ConnectionName Test
                 Close-SqlConnection -ConnectionName Test
             } | Should -Not -Throw
         }
