@@ -1,6 +1,6 @@
 InModuleScope SimplySql {
     Describe "PostGre" {
-        BeforeEach { Open-PostGreConnection -Database postgres -Credential ([pscredential]::new("postgres", (ConvertTo-SecureString -Force -AsPlainText "password"))) }
+        BeforeEach { Open-PostGreConnection -Database postgres -Credential ([pscredential]::new("postgres", (ConvertTo-SecureString -Force -AsPlainText "postgres"))) }
         AfterEach { Show-SqlConnection -all | Close-SqlConnection }
 
         It "Warmup Connection" { $true | Should -Be True }
