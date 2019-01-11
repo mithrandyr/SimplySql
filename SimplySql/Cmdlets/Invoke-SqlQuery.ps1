@@ -66,20 +66,7 @@ Function Invoke-SqlQuery {
             If($stream.IsPresent) {
                 $dr = $cmd.ExecuteReader()
                 Try { 
-                    if ($ProviderTypes) {
-                        $fc = $dr.FieldCount
-                        $fields = 0..($fc - 1) | ForEach-Object { $dr.GetName($_) }
-                        while ($dr.Read()) {
-                            $row = [ordered]@{}
-                            foreach ($field in $fields) {
-                                $row.Add($field, $dr.GetProviderSpecificValue($fields.IndexOf($field)))
-                            }
-                            [PSCustomObject]$row
-                        }
-                    }
-                    else {
-                        [DataReaderToPSObject]::Translate($dr)
-                    }
+                    [DataReaderToPSObject]::Translate($dr, $ProviderTypes)
                 }
                 Finally { $dr.Dispose() }
             }
