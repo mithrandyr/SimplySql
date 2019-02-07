@@ -24,9 +24,12 @@ Class SQLiteProvider : ProviderBase {
         }
     }
 
-    [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd) {
+    [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd, [Boolean]$ProviderTypes) {
         $ds = [System.Data.DataSet]::new()
         $da = [System.Data.SQLite.SQLiteDataAdapter]::new($cmd)
+        if ($ProviderTypes) {
+            $da.ReturnProviderSpecificTypes = $true
+        }
         Try {
             $da.Fill($ds)
             return $ds 

@@ -35,9 +35,12 @@ Class SQLProvider : ProviderBase {
 
     [void] ChangeDatabase([string]$DatabaseName) { $this.Connection.ChangeDatabase($DatabaseName) }
 
-    [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd) {
+    [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd, [Boolean]$ProviderTypes) {
         $ds = [System.Data.DataSet]::new()
         $da = [System.Data.SqlClient.SqlDataAdapter]::new($cmd)
+        if ($ProviderTypes) {
+            $da.ReturnProviderSpecificTypes = $true
+        }
         Try {
             $da.Fill($ds)
             return $ds 

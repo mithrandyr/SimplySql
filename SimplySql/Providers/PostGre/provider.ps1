@@ -45,9 +45,12 @@ Class PostGreProvider : ProviderBase {
         }
     }
 
-    [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd) {
+    [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd, [Boolean]$ProviderTypes) {
         $ds = [System.Data.DataSet]::new()
         $da = [Npgsql.NpgsqlDataAdapter]::new($cmd)
+        if ($ProviderTypes) {
+            $da.ReturnProviderSpecificTypes = $true
+        }
         Try {
             $da.Fill($ds)
             return $ds

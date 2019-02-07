@@ -95,5 +95,41 @@ InModuleScope SimplySql {
             Try { Invoke-SqlUpdate "DROP TABLE tmpTable2" | Out-Null } Catch {}
             1 | Should -Be 1            
        }
+
+        It "Test ProviderTypes" {
+            $Query = @"
+                SELECT
+                5 AS "Int",
+                'foo' AS "String",
+                NOW() AS "DateTime",
+                NOW() AT TIME ZONE 'Universal' AS "DateTimeNoZone",
+                DATE(NOW()) AS "Date"
+"@
+            function Test-Type {
+                param (
+                    $Response,
+                    [Switch]$ProviderTypes
+                )
+                $Response.Int            | Should -BeOfType 'Int'
+                $Response.String         | Should -BeOfType 'String'
+                if ($ProviderTypes) {
+                    $Response.DateTime            | Should -BeOfType 'NpgsqlTypes.NpgsqlDateTime'
+                    $Response.DateTime.Kind	      | Should -Be       'Local'
+                    $Response.DateTimeNoZone      | Should -BeOfType 'NpgsqlTypes.NpgsqlDateTime'
+                    $Response.DateTimeNoZone.Kind | Should -Be       'Unspecified'
+                    $Response.Date                | Should -BeOfType 'NpgsqlTypes.NpgsqlDate'
+                }
+                else {
+                    $Response.DateTime       | Should -BeOfType 'DateTime'
+                    $Response.DateTimeNoZone | Should -BeOfType 'DateTime'
+                    $Response.Date           | Should -BeOfType 'DateTime'
+                }
+            }
+
+            Test-Type -Response (Invoke-SqlQuery -Query $Query)
+            Test-Type -Response (Invoke-SqlQuery -Query $Query -Stream)
+            Test-Type -Response (Invoke-SqlQuery -Query $Query -ProviderTypes) -ProviderTypes
+            Test-Type -Response (Invoke-SqlQuery -Query $Query -ProviderTypes -Stream) -ProviderTypes
+        }
     }
 }

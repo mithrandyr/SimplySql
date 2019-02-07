@@ -51,7 +51,7 @@ Class ProviderBase {
         Finally { $cmd.Dispose() }
     }
     
-    [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd) { Throw [System.NotImplementedException]::new("ProviderBase.GetDataSet must be overloaded!") }
+    [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd, [Boolean]$ProviderTypes) { Throw [System.NotImplementedException]::new("ProviderBase.GetDataSet must be overloaded!") }
     
     [long] BulkLoad([System.Data.IDataReader]$DataReader
                     , [string]$DestinationTable
