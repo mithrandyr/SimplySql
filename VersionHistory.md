@@ -1,5 +1,11 @@
 # Version History
 
+### 1.6.0
+
+* Updated DataReaderToObject.dll (@ili101)
+* Added -TrustServerCertificate to Open-PostgreConnection (@ili101)
+* Added -ProviderTypes to Invoke-SqlQuery (@ili1010)
+
 ### 1.5.9
 
 * Fixed issue with `Open-OracleConnection` help (@PaulWalkerUK)

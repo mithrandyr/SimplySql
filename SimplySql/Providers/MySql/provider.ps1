@@ -32,9 +32,12 @@ Class MySqlProvider : ProviderBase {
         }
     }
 
-    [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd) {
+    [System.Data.DataSet] GetDataSet([System.Data.IDbCommand]$cmd, [Boolean]$ProviderTypes) {
         $ds = [System.Data.DataSet]::new()
         $da = [MySql.Data.MySqlClient.MySqlDataAdapter]::new($cmd)
+        if ($ProviderTypes) {
+            $da.ReturnProviderSpecificTypes = $true
+        }
         Try {
             $da.Fill($ds)
             return $ds 

@@ -53,7 +53,8 @@ Function Invoke-SqlQuery {
         , [int]$CommandTimeout = -1
         , [ValidateNotNullOrEmpty()][ValidateNotNullOrEmpty()][Alias("cn")][string]$ConnectionName = "default"
         , [switch]$Stream
-        , [switch]$AsDataTable)
+        , [switch]$AsDataTable
+        , [switch]$ProviderTypes)
     
     if($Stream -and $AsDataTable) { Write-Warning "You should not specify both -Stream and -AsDataTable, -Stream overrules -AsDataTable." }
     if(TestConnectionName -ConnectionName $ConnectionName) {
@@ -64,12 +65,14 @@ Function Invoke-SqlQuery {
         Try {
             If($stream.IsPresent) {
                 $dr = $cmd.ExecuteReader()
-                Try { [DataReaderToPSObject]::Translate($dr) }
+                Try { 
+                    [DataReaderToPSObject]::Translate($dr, $ProviderTypes)
+                }
                 Finally { $dr.Dispose() }
             }
             Else {
                 Try {
-                    $ds = $Script:Connections.$ConnectionName.GetDataSet($cmd)
+                    $ds = $Script:Connections.$ConnectionName.GetDataSet($cmd, $ProviderTypes)
                     if($ds.Tables.Count -eq 0) { Write-Warning "Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning." }
                     elseif($ds.Tables.Count -gt 1 -or $AsDataTable) { Write-Output $ds.Tables }
                     else { Write-Output $ds.Tables[0].Rows }
