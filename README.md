@@ -32,6 +32,10 @@ This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
 
+### 1.6.1
+
+* added support for Azure Token authentication to SQL Server
+
 ### 1.6.0
 
 * Updated DataReaderToObject.dll (@ili101)

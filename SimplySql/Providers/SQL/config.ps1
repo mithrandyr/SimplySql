@@ -133,6 +133,10 @@ Function Open-SqlConnection {
         Use this when connecting to an Azure SQL Database and you are using Azure AD credentials.
         You can specify the credentials either by using the UserName/Password parameters or by
         passing in a credential object to the Credential parameter.
+    
+    .Parameter AzureToken
+        Pass in Azure Token (make sure you use the proper resource). If your token begins with "bearer "
+        that will be stripped off first.
 
     .Parameter Credential
         Credential object containing the SQL user/pass.
@@ -144,10 +148,12 @@ Function Open-SqlConnection {
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=0)]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="user", Position=0)]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="cred", Position=0)]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="token", Position=0)]
                 [Alias("SqlInstance","SqlServer","DataSource")][string]$Server = "localhost"
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default", Position=1)]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="user", Position=1)]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="cred", Position=1)]
+            [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="token", Position=1)]
                 [Alias("SqlDatabase","InitialCatalog")][string]$Database = "master"
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="user")]
             [string]$UserName
@@ -158,7 +164,9 @@ Function Open-SqlConnection {
                 [pscredential]$Credential
         , [Parameter(ParameterSetName="user")]
             [Parameter(ParameterSetName="cred")][Switch]$AzureAD
-        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")][string]$ConnectionString)
+        , [Parameter(Mandatory, ParameterSetName="token")][string]$AzureToken
+        , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="Conn")]
+            [Parameter(ParameterSetName="token")][string]$ConnectionString)
 
     If($Script:Connections.ContainsKey($ConnectionName)) { Close-SqlConnection $ConnectionName }
 
@@ -177,7 +185,7 @@ Function Open-SqlConnection {
             $sb.Encrypt = $true
             $sb.Authentication = "Active Directory Password"
         }
-        If(-not $UserName -and -not $Credential) { $sb["Integrated Security"] = $true }
+        If(-not $UserName -and -not $Credential -and -not $AzureToken) { $sb["Integrated Security"] = $true }
     }
     $sb["Application Name"] = "PowerShell ({0})" -f $ConnectionName
 
@@ -186,7 +194,13 @@ Function Open-SqlConnection {
         $sqlCred.MakeReadOnly()
         $conn =  [System.Data.SqlClient.SqlConnection]::new($sb.ConnectionString, [System.Data.SqlClient.SqlCredential]::new($Credential.UserName, $sqlCred))
     }
-    Else { $conn = [System.Data.SqlClient.SqlConnection]::new($sb.ConnectionString) }
+    Else {
+        $conn = [System.Data.SqlClient.SqlConnection]::new($sb.ConnectionString)
+        if($AzureToken) { 
+            if($AzureToken.Substring(0,7) -eq "bearer ") { $AzureToken = $AzureToken.Substring(7) }
+            $conn.AccessToken = $AzureToken
+        }
+    }
     
     Try { $conn.Open() }
     Catch {
