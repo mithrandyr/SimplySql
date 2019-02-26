@@ -1,5 +1,9 @@
 # Version History
 
+### 1.6.2
+
+* added support for .Net Framework 4.6.1 (included library 'DataReaderToPSObject' is compiled against .Net Standard 2.0 which requires shims on .Net 4.6.1).  (@jantari)
+
 ### 1.6.1
 
 * added support for Azure Token authentication to SQL Server

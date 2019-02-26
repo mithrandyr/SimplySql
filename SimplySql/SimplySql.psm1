@@ -5,7 +5,7 @@ $Script:Connections = @{}
 
 #Add Type for translating DataReader to PSObject
 #Repo for source code is at https://github.com/mithrandyr/DataReaderToPSObject
-Add-Type -Path "$PSScriptRoot\DataReaderToPSObject.dll"
+Add-Type -Path "$PSScriptRoot\DataReaderToPSObject\DataReaderToPSObject.dll"
 
 #Load up base Classes
 . "$PSScriptRoot\Classes.ps1"
