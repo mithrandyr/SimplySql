@@ -64,7 +64,7 @@ Function Open-MySqlConnection {
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass")][int]$Port = 3306
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][pscredential]$Credential
-        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][Hashtable]$AdvancedOptions
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][Hashtable]$AdvancedOptions 
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$UserName
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$Password
         , [Parameter(ValueFromPipeline, ParameterSetName="default")]
