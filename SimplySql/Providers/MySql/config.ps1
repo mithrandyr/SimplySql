@@ -43,6 +43,9 @@ Function Open-MySqlConnection {
 
     .Parameter Password
         Password for the user. (deprecated, use -Credential)
+
+    .Parameter AdvancedOptions
+        Hashtable of additional options to include in connection string.
     
     .Parameter SSLMode
         None: Do not use SSL.
@@ -61,6 +64,7 @@ Function Open-MySqlConnection {
         , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")]
             [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="userpass")][int]$Port = 3306
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="default")][pscredential]$Credential
+        , [Parameter(ValueFromPipelineByPropertyName, ParameterSetName="default")][Hashtable]$AdvancedOptions
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$UserName
         , [Parameter(Mandatory, ValueFromPipelineByPropertyName, ParameterSetName="userpass")][string]$Password
         , [Parameter(ValueFromPipeline, ParameterSetName="default")]
@@ -87,9 +91,24 @@ Function Open-MySqlConnection {
             $sb.Password = $Password
         }
 
+        
+        if ($AdvancedOptions) {
+            foreach ($key in $AdvancedOptions.keys) {
+
+                try { $sb.$key = $AdvancedOptions.$key }
+                catch [System.ArgumentException] {
+
+                    Write-Warning "Option '$($key)' not supported - please double check documentation - skipping option"
+                    Write-Warning  "   https://dev.mysql.com/doc/connector-net/en/connector-net-6-10-connection-options.html"
+                    Write-Warning $_.ScriptStackTrace
+                }
+            }
+        }
+
         $sb.UseAffectedRows = $true
         $sb.AllowUserVariables = $true
         $sb.SslMode = $SSLMode
+
 
         $conn = [MySql.Data.MySqlClient.MySqlConnection]::new($sb.ConnectionString)    
         $sb.Clear()
