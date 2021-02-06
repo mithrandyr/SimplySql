@@ -32,6 +32,10 @@ This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
 
+### 2.0.0
+* First release to support Windows PowerShell 5.1, PS Core and PS7.
+* Migrated the base provider class to .Net
+
 ### 1.6.2
 
 * added support for .Net Framework 4.6.1 (included library 'DataReaderToPSObject' is compiled against .Net Standard 2.0 which requires shims on .Net 4.6.1).  (@jantari)

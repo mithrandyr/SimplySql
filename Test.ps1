@@ -18,8 +18,8 @@ Else {
     $global:IsNestedSessionSimplySql = $true
 
     $PSModuleAutoLoadingPreference = "none"
-    Import-Module $PSScriptRoot\SimplySql -Force
     Get-Module SimplySql | Where-Object Path -NotLike "$PSScriptRoot\*" | Remove-Module
+    Import-Module $PSScriptRoot\Output\SimplySql.psd1 -Force    
     Import-Module Pester -Force
     Write-Host ("Loaded '{0}' of SimplySql!" -f (Get-Module SimplySql).Version.ToString())
 
