@@ -1,5 +1,9 @@
 # Version History
 
+### 1.7.0
+
+* Minor update to expose the transaction object to the user via the new `Get-SqlTransaction` cmdlet.
+
 ### 1.6.2
 
 * added support for .Net Framework 4.6.1 (included library 'DataReaderToPSObject' is compiled against .Net Standard 2.0 which requires shims on .Net 4.6.1).  (@jantari)
