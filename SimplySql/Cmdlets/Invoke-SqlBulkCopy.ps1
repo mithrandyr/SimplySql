@@ -72,9 +72,10 @@ Function Invoke-SqlBulkCopy {
             [Parameter(Mandatory, ParameterSetName="query")]
             [string]$DestinationTable
         , [hashtable]$ColumnMap = @{}
-        , [ValidateRange(1,5000)][int]$BatchSize = 500
+        , [ValidateRange(1,25000)][int]$BatchSize = 500
         , [int]$BatchTimeout = -1
         , [switch]$Notify
+        , [scriptblock]$NotifyAction
     )
     
     If($SourceConnectionName -eq $DestinationConnectionName) {
