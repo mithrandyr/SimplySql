@@ -32,22 +32,10 @@ This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
 
+### 1.8.0
+* Minor Update, enhancing progress notifications for Invoke-SqlBulkCopy
 ### 1.7.0
 
 * Minor update to expose the transaction object to the user via the new `Get-SqlTransaction` cmdlet.
-
-### 1.6.2
-
-* added support for .Net Framework 4.6.1 (included library 'DataReaderToPSObject' is compiled against .Net Standard 2.0 which requires shims on .Net 4.6.1).  (@jantari)
-
-### 1.6.1
-
-* added support for Azure Token authentication to SQL Server
-
-### 1.6.0
-
-* Updated DataReaderToObject.dll (@ili101)
-* Added -TrustServerCertificate to Open-PostgreConnection (@ili101)
-* Added -ProviderTypes to Invoke-SqlQuery (@ili1010)
 
 [View Version History](VersionHistory.md)
