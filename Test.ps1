@@ -24,8 +24,8 @@ Else {
     Write-Host ("Loaded '{0}' of SimplySql!" -f (Get-Module SimplySql).Version.ToString())
 
     If(-not $NoTest) {
-        If($TestName) { Invoke-Pester -Script $PSScriptRoot -TestName $TestName }
-        Else { Invoke-Pester -Script $PSScriptRoot }
+        If($TestName) { Invoke-Pester -Script $PSScriptRoot -FullNameFilter $TestName -Show All}
+        Else { Invoke-Pester -Script $PSScriptRoot -Show All }
     }
     <#Get-Module SimplySql | Format-List
 

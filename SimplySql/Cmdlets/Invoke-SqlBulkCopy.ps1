@@ -53,6 +53,11 @@
     If present, as each batch completes a progress notification will be
     generated with the total number of rows inserted so far.
 
+.Parameter NotifyAction
+    If specified, then on the completion of each batch, this action will be invoked.
+    The first argument will have the rows completed so far, either use $args[0]
+    or specify a param block.    
+
 .Parameter SourceQuery
     The query to determine the source data, instead of specifying a table.
 
@@ -72,9 +77,10 @@ Function Invoke-SqlBulkCopy {
             [Parameter(Mandatory, ParameterSetName="query")]
             [string]$DestinationTable
         , [hashtable]$ColumnMap = @{}
-        , [ValidateRange(1,5000)][int]$BatchSize = 500
+        , [ValidateRange(1,25000)][int]$BatchSize = 500
         , [int]$BatchTimeout = -1
         , [switch]$Notify
+        , [scriptblock]$NotifyAction
     )
     
     If($SourceConnectionName -eq $DestinationConnectionName) {
@@ -99,7 +105,10 @@ Function Invoke-SqlBulkCopy {
             
             If(-not $SourceParameters) { $SourceParameters = @{} }
             $srcReader = $script:Connections.$SourceConnectionName.GetReader($SourceQuery, $BatchTimeout, $SourceParameters)
-            If($Notify.IsPresent) {
+            If($NotifyAction){
+                $script:Connections.$DestinationConnectionName.BulkLoad($srcReader, $DestinationTable, $ColumnMap, $BatchSize, $BatchTimeout, $NotifyAction.GetNewClosure())
+            }
+            ElseIf($Notify.IsPresent) {
                 $script:Connections.$DestinationConnectionName.BulkLoad($srcReader, $DestinationTable, $ColumnMap, $BatchSize, $BatchTimeout, {
                         Param([int]$insertCount)
                         Write-Progress -Activity "SimplySql BulkCopy" -Status $DestinationTable -CurrentOperation "Inserted $insertCount rows."
