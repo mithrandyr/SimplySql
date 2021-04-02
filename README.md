@@ -33,7 +33,7 @@ This module requires PowerShell Version 5.0 or greater
 ## Latest Version
 
 ### 1.8.0
-* Minor Update, enhancing progress notifications for Invoke-SqlBulkCopy
+* Minor Update, enhancing progress notifications for Invoke-SqlBulkCopy, you can now specify -NotifyAction and pass in a scriptblock
 ### 1.7.0
 
 * Minor update to expose the transaction object to the user via the new `Get-SqlTransaction` cmdlet.
