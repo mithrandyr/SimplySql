@@ -1,5 +1,13 @@
 #Load Up SQLite libraries
-Add-Type -Path "$PSScriptRoot\System.Data.SQLite.dll"
+if($IsLinux){
+    Add-Type -Path "$PSScriptRoot\runtimes\linux-x64\native\netstandard2.0\System.Data.SQLite.dll"
+}
+elseif($IsMacOS){
+    Add-Type -Path "$PSScriptRoot\runtimes\osx-x64\native\netstandard2.0\System.Data.SQLite.dll"
+}
+else{
+    Add-Type -Path "$PSScriptRoot\System.Data.SQLite.dll"
+}
 
 #Provider Class
 . "$PSScriptRoot\provider.ps1"
