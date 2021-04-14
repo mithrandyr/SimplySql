@@ -1,5 +1,10 @@
 #Load Up Oracle libraries
-Add-Type -Path "$PSScriptRoot\Oracle.ManagedDataAccess.dll"
+if($PSVersionTable.PSEdition -eq "Core") {
+	Add-Type -Path "$PSScriptRoot\Oracle.ManagedDataAccess.Core.dll"
+} else {
+	Add-Type -Path "$PSScriptRoot\Oracle.ManagedDataAccess.dll"		
+}
+
 
 #Provider Class
 . "$PSScriptRoot\provider.ps1"
