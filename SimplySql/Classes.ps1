@@ -5,7 +5,7 @@ Class ProviderBase {
     [int]$CommandTimeout = 30
     [System.Data.IDbConnection]$Connection
     [System.Data.IDbTransaction]$Transaction
-    [System.Collections.Generic.Queue[SqlMessage]]$Messages = (New-Object 'System.Collections.Generic.Queue[SqlMessage]')
+    [System.Collections.Generic.Queue[SqlMessage]]$Messages = ([System.Collections.Generic.Queue[SqlMessage]]::new())
 
     ProviderBase() { If($this.GetType().Name -eq "ProviderBase") { Throw [System.InvalidOperationException]::new("ProviderBase must be inherited!") } }
     
