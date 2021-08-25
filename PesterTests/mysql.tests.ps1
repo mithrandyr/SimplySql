@@ -122,6 +122,20 @@ InModuleScope SimplySql {
             Invoke-SqlScalar "SELECT Count(1) FROM transactionTest" | Should -Be 0
             Invoke-SqlUpdate "DROP TABLE transactionTest"
         }
+        
+        It "Should create a stored procedure without throwing an exception" {
+            Invoke-SqlUpdate -Query @'
+                CREATE DATABASE procedure_tests;
+                DELIMITER //
+
+                CREATE PROCEDURE procedure_tests.sp_addPerson (IN firstName varchar(30), IN lastName varchar(30))
+                BEGIN
+                    INSERT INTO procedure_tests.people (firstName, lastName) VALUES (@firstName, @lastName);
+                END//
+
+                DROP DATABASE procedure_tests;
+            '@
+        }
 
         It "Dropping Tables, Views" {
             Try { Invoke-SqlUpdate "DROP TABLE transactionTest" | Out-Null } Catch {}
