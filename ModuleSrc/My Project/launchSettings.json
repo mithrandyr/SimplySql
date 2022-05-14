@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "ModuleSrc": {
+      "commandName": "Executable",
+      "executablePath": "pwsh",
+      "commandLineArgs": "-noexit -nologo -noprofile -command \"function prompt {'Testing SimplySQL> '}; .\\LoadDlls.ps1; Import-Module .\\SimplySql.dll\""
+    }
+  }
+}
