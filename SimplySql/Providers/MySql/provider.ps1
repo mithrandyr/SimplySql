@@ -70,9 +70,9 @@ Class MySqlProvider : ProviderBase {
         [string[]]$DestNames = $SchemaMap | Select-Object -ExpandProperty DestName
         [string]$ValueSql = (1..10 | ForEach-Object { "(@Param" + (($SchemaMap | ForEach-Object Ordinal) -join ("_{0}, @Param" -f $_)) + ("_{0})" -f $_) }) -join ", "
         [string]$InsertSql = 'INSERT INTO {0} (`{1}`) VALUES {2}' -f $DestinationTable, ($DestNames -join '`, `'), $ValueSql
-
+        write-host $InsertSql
         $bulkCmd = $this.GetCommand($InsertSql, -1, @{})
-        $bulkCmd.Prepare()
+        #$bulkCmd.Prepare()
         Try {
             $bulkCmd.Transaction = $this.Connection.BeginTransaction()
             $sw = [System.Diagnostics.Stopwatch]::StartNew()
