@@ -1,5 +1,9 @@
 # Version History
 
+### 1.9.0
+* Updated classes to use `::new()` constructor.  thanks @joalcorn
+* Updated MySql provider to use new library.  thanks @twerthi
+
 ### 1.8.0
 * Minor Update, enhancing progress notifications for Invoke-SqlBulkCopy, you can now specify -NotifyAction and pass in a scriptblock
 ### 1.7.0
