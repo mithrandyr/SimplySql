@@ -1,6 +1,5 @@
 #Load Up My Sql libraries
 
-Add-Type -Path "$PSScriptRoot\Google.Protobuf.dll"
 Add-Type -Path "$PSScriptRoot\MySql.Data.dll"
 
 #Provider Class
