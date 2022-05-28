@@ -98,7 +98,7 @@ InModuleScope SimplySql {
 
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "mysql.tmpTable2" -Notify |
                 Should -Be 65536
-            
+
             Close-SqlConnection -ConnectionName bcp
         }
 
