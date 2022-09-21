@@ -22,3 +22,25 @@ TODO:
     - update sqlBulkcopy to take objects directly / andor to take datareader directly?
     - or create full fleged provider for objects? (maybe using datatable as backend?)
 + Allow invoke-SqlQuery/SqlUpdate to take objects as input (translate to parameters) -- single or multiple objects? (probably single only)
+
+------Sample Code to handle loading (Windows PowerShell 5.1) the right assemblies-----
+$SystemComponentModelAnnotations = [reflection.assembly]::LoadFrom((Join-Path $PSScriptRoot "..\Output\Seeddata\System.ComponentModel.Annotations.dll"))
+    $SystemThreadingTasksExtensions = [reflection.assembly]::LoadFrom((Join-Path $PSScriptRoot "..\Output\Seeddata\System.Threading.Tasks.Extensions.dll"))
+    $MicrosoftIdentityClient = [reflection.assembly]::LoadFrom((Join-Path $PSScriptRoot "..\Output\Seeddata\Microsoft.Identity.Client.dll"))
+    $OnAssemblyResolve = [System.ResolveEventHandler] {
+        param($sender, $e)
+        # from:System.ComponentModel.Annotations, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+        # to:  System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+        if ($e.Name -eq "System.ComponentModel.Annotations, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a") { return $SystemComponentModelAnnotations }
+        if ($e.Name.StartsWith("System.Threading.Tasks.Extensions")) { return $SystemThreadingTasksExtensions }
+        if ($e.Name.StartsWith("Microsoft.Identity.Client")) { return $MicrosoftIdentityClient }
+        foreach($a in [System.AppDomain]::CurrentDomain.GetAssemblies())
+        {
+            if ($a.FullName -eq $e.Name)
+            {
+            return $a
+            }
+        }
+        return $null
+    }
+    [System.AppDomain]::CurrentDomain.add_AssemblyResolve($OnAssemblyResolve)
