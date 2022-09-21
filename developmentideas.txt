@@ -44,3 +44,69 @@ $SystemComponentModelAnnotations = [reflection.assembly]::LoadFrom((Join-Path $P
         return $null
     }
     [System.AppDomain]::CurrentDomain.add_AssemblyResolve($OnAssemblyResolve)
+
+
+---- Better Information : https://devblogs.microsoft.com/powershell/resolving-powershell-module-assembly-dependency-conflicts/#quick-fixes-and-their-limitations ----
+Add an AssemblyResolve event handler to create a dynamic binding redirect
+When changing your own dependency version isn’t possible, or is too hard, another way to make your module play nicely with other dependencies is to set up a dynamic binding redirect by registering an event handler for the AssemblyResolve event.
+
+As with a static binding redirect, the point here to is force all consumers of a dependency to use the same actual assembly. This means we need to intercept calls to load the dependency and always redirect them to the version we want.
+
+This looks something like this:
+
+// Register the event handler as early as you can in your code.
+// A good option is to use the IModuleAssemblyInitializer interface
+// that PowerShell provides to run code early on when your module is loaded.
+
+// This class will be instantiated on module import and the OnImport() method run.
+// Make sure that:
+//  - the class is public
+//  - the class has a public, parameterless constructor
+//  - the class implements IModuleAssemblyInitializer
+public class MyModuleInitializer : IModuleAssemblyInitializer
+{
+    public void OnImport()
+    {
+        AppDomain.CurrentDomain.AssemblyResolve += DependencyResolution.ResolveNewtonsoftJson;
+    }
+}
+
+// Clean up the event handler when the the module is removed
+// to prevent memory leaks.
+//
+// Like IModuleAssemblyInitializer, IModuleAssemblyCleanup allows
+// you to register code to run when a module is removed (with Remove-Module).
+// Make sure it is also public with a public parameterless contructor
+// and implements IModuleAssemblyCleanup.
+public class MyModuleCleanup : IModuleAssemblyCleanup
+{
+    public void OnRemove()
+    {
+        AppDomain.CurrentDomain.AssemblyResolve -= DependencyResolution.ResolveNewtonsoftJson;
+    }
+}
+
+internal static class DependencyResolution
+{
+    private static readonly string s_modulePath = Path.GetDirectoryName(
+        Assembly.GetExecutingAssembly().Location);
+
+    public static Assembly ResolveNewtonsoftJson(object sender, ResolveEventArgs args)
+    {
+        // Parse the assembly name
+        var assemblyName = new AssemblyName(args.Name);
+
+        // We only want to handle the dependency we care about.
+        // In this example it's Newtonsoft.Json.
+        if (!assemblyName.Name.Equals("Newtonsoft.Json"))
+        {
+            return null;
+        }
+
+        // Generally the version of the dependency you want to load is the higher one,
+        // since it's the most likely to be compatible with all dependent assemblies.
+        // The logic here assumes our module always has the version we want to load.
+        // Also note the use of Assembly.LoadFrom() here rather than Assembly.LoadFile().
+        return Assembly.LoadFrom(Path.Combine(s_modulePath, "Newtonsoft.Json.dll"));
+    }
+}
