@@ -12,9 +12,8 @@ Public Class ContextHandling
     End Sub
 
     Private Shared ReadOnly BinPath As String = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Bin"))
-    Private Shared ReadOnly AssemblyList As IReadOnlyList(Of String) = Directory.EnumerateFiles(BinPath, "*.dll").Select(Function(file) file.TrimStart(BinPath).TrimEnd(".dll")).ToList
+    Private Shared ReadOnly AssemblyList As IReadOnlyList(Of String) = Directory.EnumerateFiles(BinPath, "*.dll").Select(Function(file) file.Substring((BinPath.Length + 1), (file.Length - 5 - BinPath.Length))).ToList
     Private Shared IsEngineLoaded As Boolean = False
-
 
     Private Shared Function HandleResolveEvent(ByVal sender As Object, ByVal args As ResolveEventArgs) As Assembly
         Dim asmName = New AssemblyName(args.Name)
