@@ -9,7 +9,7 @@
     <Authors>Mithrandyr</Authors>
     <Company>SolarNet</Company>
     <Description>Querying SQL (SQL Server, Oracle, PostgreSql, SQLite, &amp; MySql) the PowerShell way: simple commands... powerful opportunities.</Description>
-    <Copyright>2021 Mithrandyr (SolarNet)</Copyright>
+    <Copyright>2022 Mithrandyr (SolarNet)</Copyright>
     <PackageProjectUrl>https://github.com/mithrandyr/SimplySql</PackageProjectUrl>
   </PropertyGroup>
 
@@ -22,18 +22,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.1" />
-    <PackageReference Include="NetTopologySuite" Version="2.4.0" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
+    <PackageReference Include="MySqlConnector" Version="2.2.0" />
+    <PackageReference Include="NetTopologySuite" Version="2.5.0" />
     <PackageReference Include="NetTopologySuite.IO.PostGis" Version="2.1.0" />
-    <PackageReference Include="Npgsql" Version="5.0.12" />
-    <PackageReference Include="Npgsql.NetTopologySuite" Version="5.0.12" />
-    <PackageReference Include="PowerShellStandard.Library" Version="5.1.0" />
+    <PackageReference Include="Npgsql" Version="7.0.0" />
+    <PackageReference Include="Npgsql.NetTopologySuite" Version="7.0.0" />
+    <PackageReference Include="Oracle.ManagedDataAccess" Version="21.8.0">
+      <NoWarn>NU1701</NoWarn>
+    </PackageReference>
+    <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" />
+    <PackageReference Include="Stub.System.Data.SQLite.Core.NetStandard" Version="1.0.116" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="loadDlls.ps1">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Import Include="System.Management.Automation" />
   </ItemGroup>
 
 </Project>
