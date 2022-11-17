@@ -4,6 +4,12 @@
       "commandName": "Executable",
       "executablePath": "pwsh",
       "commandLineArgs": "-noexit -nologo -noprofile -command \"function prompt {'Testing SimplySQL> '}; Import-Module .\\SimplySql.dll\""
+    },
+    "Bare": {
+      "commandName": "Executable",
+      "executablePath": "pwsh",
+      "commandLineArgs": "-noexit -nologo -noprofile -command \"function prompt {'Testing SimplySQL> '}\"",
+      "nativeDebugging": true
     }
   }
 }

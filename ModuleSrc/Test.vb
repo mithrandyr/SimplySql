@@ -10,13 +10,13 @@ Public Class Test
     Protected Overrides Sub ProcessRecord()
         Select Case ProviderType
             Case Providers.PostGre
-                WriteObject(New Npgsql.NpgsqlConnection)
+                'WriteObject(New Npgsql.NpgsqlConnection)
             Case Providers.MSSQL
-                WriteObject(New Data.SqlClient.SqlConnection)
+                'WriteObject(New Data.SqlClient.SqlConnection)
             Case Providers.SQLite
                 WriteObject(New Data.SQLite.SQLiteConnection)
             Case Providers.Oracle
-                WriteObject(New Oracle.ManagedDataAccess.Client.OracleConnection)
+                'WriteObject(New Oracle.ManagedDataAccess.Client.OracleConnection)
             Case Providers.MySql
                 WriteObject(New MySqlConnector.MySqlConnection)
             Case Else

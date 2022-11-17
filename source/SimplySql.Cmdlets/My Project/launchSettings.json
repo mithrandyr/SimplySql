@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "PWSH": {
+      "commandName": "Executable",
+      "executablePath": "pwsh",
+      "commandLineArgs": "-noexit -nologo -noprofile -file \"..\\..\\..\\..\\ConstructModule.ps1\""
+    }
+  }
+}
