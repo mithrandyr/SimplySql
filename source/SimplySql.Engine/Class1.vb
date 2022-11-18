@@ -3,17 +3,17 @@ Public Class Test
         Return $"Hello {Name}!"
     End Function
 
-    Public Shared Function NewConnection(providerName As Common.ProviderType) As Data.IDbConnection
+    Public Shared Function NewConnection(providerName As Common.ProviderTypes) As Data.IDbConnection
         Select Case providerName
-            Case Common.ProviderType.PostGre
+            Case Common.ProviderTypes.PostGre
                 Return New Npgsql.NpgsqlConnection
-            Case Common.ProviderType.MSSQL
+            Case Common.ProviderTypes.MSSQL
                 Return New Microsoft.Data.SqlClient.SqlConnection
-            Case Common.ProviderType.SQLite
+            Case Common.ProviderTypes.SQLite
                 Return New Microsoft.Data.Sqlite.SqliteConnection
-            Case Common.ProviderType.Oracle
+            Case Common.ProviderTypes.Oracle
                 Return New Oracle.ManagedDataAccess.Client.OracleConnection
-            Case Common.ProviderType.MySql
+            Case Common.ProviderTypes.MySql
                 Return New MySqlConnector.MySqlConnection
             Case Else
                 Throw New ArgumentOutOfRangeException("providerName", providerName, "Not a valid ProviderType.")

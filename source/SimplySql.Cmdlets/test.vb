@@ -16,7 +16,7 @@ Public Class testSimplySql
     Inherits PSCmdlet
 
     <Parameter(Mandatory:=True, Position:=0)>
-    Public Property ProviderType As Common.ProviderType
+    Public Property ProviderType As Common.ProviderTypes
 
     Protected Overrides Sub ProcessRecord()
         Try

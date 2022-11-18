@@ -1,4 +1,4 @@
-﻿Public Enum ProviderType
+﻿Public Enum ProviderTypes
     PostGre
     Oracle
     MySql

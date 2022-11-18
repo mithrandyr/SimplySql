@@ -1,3 +1,7 @@
 automapper v10 (supports .net standard 2) -- use this for datareader to psobject?
 
 EnumerableToDataReader -- for getting input objects to datareader to be used by bulkCopy
+
+
+Tasks
+-Add argumentcompleted to all ConnectionName parameters

@@ -1,13 +1,22 @@
 ﻿Imports System.Data
+Imports SimplySql.Common
 Public MustInherit Class ProviderBase
     Implements ISimplySqlProvider
     Public ReadOnly Property ConnectionName As String Implements ISimplySqlProvider.ConnectionName
     Public ReadOnly Property Connection As IDbConnection Implements ISimplySqlProvider.Connection
-    Public ReadOnly Property ProviderType As String = Me.GetType.Name Implements ISimplySqlProvider.ProviderName
-    Private _transaction As IDbTransaction
+
+    Private _providerType As Common.ProviderTypes
+    Public ReadOnly Property ProviderType As String Implements ISimplySqlProvider.ProviderName
+        Get
+            Return _providerType.ToString()
+        End Get
+    End Property
+
     Public ReadOnly Property Messages As New Queue(Of SqlMessage) Implements ISimplySqlProvider.Messages
     Public ReadOnly Property HasTransaction As Boolean = Me.Transaction IsNot Nothing Implements ISimplySqlProvider.HasTransaction
     Public Property CommandTimeout As Integer = 30 Implements ISimplySqlProvider.CommandTimeout
+
+    Private _transaction As IDbTransaction
     Public Property Transaction As IDbTransaction Implements ISimplySqlProvider.Transaction
         Private Set(value As IDbTransaction)
             _transaction = value
@@ -17,8 +26,9 @@ Public MustInherit Class ProviderBase
         End Get
     End Property
 
-    Public Sub New(connName As String)
+    Public Sub New(connName As String, providerType As Common.ProviderTypes)
         ConnectionName = connName
+        _providerType = providerType
     End Sub
 
 #Region "Overrides"
