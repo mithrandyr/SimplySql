@@ -1,5 +1,4 @@
-﻿<CmdletBinding(DefaultParameterSetName:="default")>
-<Cmdlet("New", "SQLiteConnection")>
+﻿<Cmdlet(VerbsCommon.[New], "SQLiteConnection", DefaultParameterSetName:="default")>
 Public Class NewSQLiteConnection
     Inherits PSCmdlet
 

@@ -221,11 +221,11 @@ Public MustInherit Class ProviderBase
 #End Region
 
 #Region "Transactions"
-    Sub BeginTransaction()
+    Sub BeginTransaction() Implements ISimplySqlProvider.BeginTransaction
         If Me.HasTransaction Then Throw New InvalidOperationException("Cannot BEGIN a transaction when one is already in progress.")
         Me.Transaction = Me.Connection.BeginTransaction()
     End Sub
-    Sub RollbackTransaction()
+    Sub RollbackTransaction() Implements ISimplySqlProvider.RollbackTransaction
         If Me.HasTransaction Then
             Me.Transaction.Rollback()
             Me.Transaction.Dispose()
@@ -235,7 +235,7 @@ Public MustInherit Class ProviderBase
         End If
     End Sub
 
-    Sub CommitTransaction()
+    Sub CommitTransaction() Implements ISimplySqlProvider.CommitTransaction
         If Me.HasTransaction Then
             Me.Transaction.Commit()
             Me.Transaction.Dispose()

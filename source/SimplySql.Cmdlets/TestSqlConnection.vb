@@ -1,4 +1,4 @@
-﻿<CmdletBinding(DefaultParameterSetName:="single")>
+﻿<Cmdlet(VerbsDiagnostic.Test, "SqlConnection", DefaultParameterSetName:="single")>
 Public Class TestSqlConnection
     Inherits PSCmdletWithConnectionName
 
