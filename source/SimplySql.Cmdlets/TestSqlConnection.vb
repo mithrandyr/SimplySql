@@ -16,7 +16,7 @@ Public Class TestSqlConnection
         If All.IsPresent Then
             WriteObject(Engine.Logic.Connections.Count > 0)
         Else
-            WriteObject(Engine.Logic.Connections.ContainsKey(ConnectionName))
+            WriteObject(Engine.Logic.ConnectionExists(ConnectionName))
         End If
     End Sub
 End Class

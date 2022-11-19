@@ -15,13 +15,18 @@ Public Module Logic
         End Try
     End Function
 
-    Sub RemoveConnection(connectionName As String)
+    Sub CloseAndRemoveConnection(connectionName As String)
         Try
-            Dim key = Connections.Keys.First(Function(k) k.Equals(connectionName, StringComparison.OrdinalIgnoreCase))
-            Connections.Remove(key)
+            Dim conn = Connections.First(Function(item) item.Key.Equals(connectionName, StringComparison.OrdinalIgnoreCase)).Value
+            If conn.HasTransaction Then conn.RollbackTransaction()
+            Try
+                conn.Connection.Close()
+            Finally
+                conn.Connection.Dispose()
+                Connections.Remove(conn.ConnectionName)
+            End Try
         Catch ioex As InvalidOperationException
             Throw New IndexOutOfRangeException($"No connection named '{connectionName}' exists.")
         End Try
     End Sub
-
 End Module

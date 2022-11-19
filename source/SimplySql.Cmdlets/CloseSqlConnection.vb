@@ -14,15 +14,12 @@ Public Class CloseSqlConnection
             WriteVerbose($"Cannot close the SQL Connection '{ConnectionName}' because it does not exist.")
         Else
             If Me.ShouldProcess(ConnectionName) Then
-                Dim conn = Engine.Logic.GetConnection(ConnectionName)
-                If conn.HasTransaction Then conn.RollbackTransaction()
                 Try
-                    conn.Connection.Close()
-                Finally
-                    conn.Connection.Dispose()
-                    Engine.Logic.RemoveConnection(conn.ConnectionName)
+                    Engine.Logic.CloseAndRemoveConnection(ConnectionName)
+                    WriteVerbose($"SQL Connection '{ConnectionName}' closed.")
+                Catch ex As Exception
+                    WriteError(New ErrorRecord(ex, "CloseSqlConnection.Error", ErrorCategory.CloseError, ConnectionName))
                 End Try
-                WriteVerbose($"SQL Connection '{ConnectionName}' closed.")
             End If
         End If
     End Sub
