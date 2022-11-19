@@ -18,7 +18,7 @@ Public Class CloseSqlConnection
                     Engine.Logic.CloseAndRemoveConnection(ConnectionName)
                     WriteVerbose($"SQL Connection '{ConnectionName}' closed.")
                 Catch ex As Exception
-                    WriteError(New ErrorRecord(ex, "CloseSqlConnection.Error", ErrorCategory.CloseError, ConnectionName))
+                    WriteError(New ErrorRecord(ex, MyInvocation.MyCommand.Name, ErrorCategory.CloseError, ConnectionName))
                 End Try
             End If
         End If

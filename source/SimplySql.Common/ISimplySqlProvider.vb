@@ -8,6 +8,7 @@ Public Interface ISimplySqlProvider
     Sub ChangeDatabase()
 
 #Region "DataAccess"
+    Function GetScalar(query As String, cmdTimeout As Integer, parameters As Hashtable) As Object
     Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Int64)) As Int64
 #End Region
 
