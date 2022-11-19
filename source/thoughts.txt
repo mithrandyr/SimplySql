@@ -5,3 +5,7 @@ EnumerableToDataReader -- for getting input objects to datareader to be used by 
 
 Tasks
 -Add argumentcompleted to all ConnectionName parameters
+
+
+How to solve to SQLite stupidity (across platforms and the interop)
+use subfolders for each platform and put dll + interop into the folder., then determine which one to load based upon environment.
