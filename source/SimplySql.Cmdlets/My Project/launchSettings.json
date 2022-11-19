@@ -4,6 +4,11 @@
       "commandName": "Executable",
       "executablePath": "pwsh",
       "commandLineArgs": "-noexit -nologo -noprofile -file \"..\\..\\..\\..\\ConstructModule.ps1\""
+    },
+    "Powershell": {
+      "commandName": "Executable",
+      "executablePath": "powershell",
+      "commandLineArgs": "-noexit -nologo -noprofile -file \"..\\..\\..\\..\\ConstructModule.ps1\""
     }
   }
 }

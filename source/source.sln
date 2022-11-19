@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		thoughts.txt = thoughts.txt
 	EndProjectSection
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SimplySql.Common", "SimplySql.Common\SimplySql.Common.vbproj", "{DD361E86-677C-4082-92BF-C582C03A085D}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "SimplySql.Common", "SimplySql.Common\SimplySql.Common.vbproj", "{DD361E86-677C-4082-92BF-C582C03A085D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
