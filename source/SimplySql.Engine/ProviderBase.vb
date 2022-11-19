@@ -60,7 +60,7 @@ Public MustInherit Class ProviderBase
 #End Region
 
 #Region "GetScalar"
-    Public Overridable Function GetScalar(query As String, timeout As Integer, params As Hashtable) As Object
+    Public Overridable Function GetScalar(query As String, timeout As Integer, params As Hashtable) As Object Implements ISimplySqlProvider.GetScalar
         Using cmd As IDbCommand = GetCommand(query, timeout, params)
             Try
                 Return cmd.ExecuteScalar()
@@ -242,6 +242,7 @@ Public MustInherit Class ProviderBase
             Throw New InvalidOperationException("Cannot COMMIT when there is no transaction in progress.")
         End If
     End Sub
+
 #End Region
 #End Region
 

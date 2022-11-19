@@ -9,7 +9,7 @@ Module Dry
     <Extension>
     Function ConvertToHashtable(this As PSObject, Optional ignoreNull As Boolean = True) As Hashtable
         Dim ht As New Hashtable
-        Dim propQuery = this.Properties.Where(Function(prop) prop.MemberType = PSMemberTypes.Properties).AsQueryable
+        Dim propQuery = this.Properties.Where(Function(prop) prop.MemberType = PSMemberTypes.Property Or prop.MemberType = PSMemberTypes.AliasProperty Or prop.MemberType = PSMemberTypes.NoteProperty).AsQueryable
         If ignoreNull Then propQuery = propQuery.Where(Function(prop) prop.Value IsNot Nothing)
 
         For Each prop In propQuery
