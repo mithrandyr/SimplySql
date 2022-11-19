@@ -4,8 +4,17 @@ Public Class test
 
     <Parameter(ValueFromPipeline:=True, Position:=0)>
     Public Property Name As String
+    <Parameter()>
+    Public Property ThrowError As SwitchParameter
+    <Parameter()>
+    Public Property ThrowErrorTerm As SwitchParameter
 
     Protected Overrides Sub ProcessRecord()
+        If ThrowError.IsPresent Then
+            WriteError(New ErrorRecord(New Exception("throwing an error"), Nothing, Nothing, Nothing))
+            'use this and then exit if you want it to processing to stop
+        End If
+
         WriteObject(Engine.Test.Greet(Name))
     End Sub
 
