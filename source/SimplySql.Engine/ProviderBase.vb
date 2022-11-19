@@ -3,7 +3,6 @@ Imports SimplySql.Common
 Public MustInherit Class ProviderBase
     Implements ISimplySqlProvider
     Public ReadOnly Property ConnectionName As String Implements ISimplySqlProvider.ConnectionName
-    Public ReadOnly Property Connection As IDbConnection Implements ISimplySqlProvider.Connection
 
     Private _providerType As Common.ProviderTypes
     Public ReadOnly Property ProviderType As String Implements ISimplySqlProvider.ProviderName
@@ -12,29 +11,19 @@ Public MustInherit Class ProviderBase
         End Get
     End Property
 
-    Public ReadOnly Property Messages As New Queue(Of SqlMessage) Implements ISimplySqlProvider.Messages
-    Public ReadOnly Property HasTransaction As Boolean = Me.Transaction IsNot Nothing Implements ISimplySqlProvider.HasTransaction
+    Public ReadOnly Property Connection As IDbConnection Implements ISimplySqlProvider.Connection
     Public Property CommandTimeout As Integer = 30 Implements ISimplySqlProvider.CommandTimeout
-
-    Private _transaction As IDbTransaction
-    Public Property Transaction As IDbTransaction Implements ISimplySqlProvider.Transaction
-        Private Set(value As IDbTransaction)
-            _transaction = value
-        End Set
-        Get
-            Return _transaction
-        End Get
-    End Property
-
-    Public Sub New(connName As String, providerType As Common.ProviderTypes)
+    Public Sub New(connName As String, providerType As Common.ProviderTypes, conn As IDbConnection, timeout As Integer)
         ConnectionName = connName
         _providerType = providerType
+        Connection = conn
+        CommandTimeout = timeout
     End Sub
 
 #Region "Overrides"
     Public MustOverride Function ConnectionInfo() As SortedDictionary(Of String, Object) Implements ISimplySqlProvider.ConnectionInfo
     Public MustOverride Sub ChangeDatabase() Implements ISimplySqlProvider.ChangeDatabase
-    Public MustOverride Function GetDataSet() As DataSet
+    Public MustOverride Function GetDataSet(cmd As Data.IDbCommand, Optional useProviderTypes As Boolean = False) As DataSet
 
     Public MustOverride Function CreateConnection(ht As Hashtable) As IDbConnection
 #End Region
@@ -131,8 +120,6 @@ Public MustInherit Class ProviderBase
 #End Region
 
 #Region "BulkLoad"
-    'Public Delegate Sub Notify(batchIteration As Int64)
-
     Public Overridable Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Int64)) As Int64 Implements ISimplySqlProvider.BulkLoad
         Dim batchIteration As Int64 = 0
         Dim ord As Integer = 0
@@ -205,15 +192,16 @@ Public MustInherit Class ProviderBase
 #End Region
 
 #Region "Messages"
-    Function GetMessage() As SqlMessage Implements ISimplySqlProvider.GetMessage
+    Public ReadOnly Property Messages As New Queue(Of SqlMessage) Implements ISimplySqlProvider.Messages
+    Public Overridable Function GetMessage() As SqlMessage Implements ISimplySqlProvider.GetMessage
         Return Me.Messages.Dequeue()
     End Function
 
-    Sub ClearMessages() Implements ISimplySqlProvider.ClearMessages
+    Public Overridable Sub ClearMessages() Implements ISimplySqlProvider.ClearMessages
         Me.Messages.Clear()
     End Sub
 
-    ReadOnly Property HasMessages() As Boolean Implements ISimplySqlProvider.HasMessages
+    Public ReadOnly Property HasMessages() As Boolean Implements ISimplySqlProvider.HasMessages
         Get
             Return Me.Messages.Count > 0
         End Get
@@ -221,6 +209,16 @@ Public MustInherit Class ProviderBase
 #End Region
 
 #Region "Transactions"
+    Private _transaction As IDbTransaction
+    Public Property Transaction As IDbTransaction Implements ISimplySqlProvider.Transaction
+        Private Set(value As IDbTransaction)
+            _transaction = value
+        End Set
+        Get
+            Return _transaction
+        End Get
+    End Property
+    Public ReadOnly Property HasTransaction As Boolean = Me.Transaction IsNot Nothing Implements ISimplySqlProvider.HasTransaction
     Sub BeginTransaction() Implements ISimplySqlProvider.BeginTransaction
         If Me.HasTransaction Then Throw New InvalidOperationException("Cannot BEGIN a transaction when one is already in progress.")
         Me.Transaction = Me.Connection.BeginTransaction()
