@@ -1,6 +1,6 @@
 ﻿<Cmdlet(VerbsDiagnostic.Test, "SqlConnection", DefaultParameterSetName:="single")>
 Public Class TestSqlConnection
-    Inherits PSCmdletWithConnectionName
+    Inherits PSCmdlet
 
 #Region "Parameters"
     <Parameter(ValueFromPipelineByPropertyName:=True, ParameterSetName:="single", Position:=0)>

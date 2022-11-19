@@ -1,6 +1,5 @@
-﻿<Cmdlet(VerbsCommon.Close, "SqlConnection", SupportsShouldProcess:=True)>
-<[Alias]("csc")>
-Public Class CloseSqlConnection
+﻿<Cmdlet(VerbsCommon.Clear, "SqlMessage", SupportsShouldProcess:=True)>
+Public Class ClearSqlMessage
     Inherits PSCmdlet
 #Region "Parameters"
     <Parameter(ValueFromPipelineByPropertyName:=True)>
@@ -8,19 +7,19 @@ Public Class CloseSqlConnection
     <ValidateNotNullOrEmpty()>
     Public Property ConnectionName As String = "default"
 #End Region
-
     Protected Overrides Sub ProcessRecord()
         If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            WriteVerbose($"Cannot close the SQL Connection '{ConnectionName}' because it does not exist.")
+            WriteError(ConnectionNotFoundError(ConnectionName))
         Else
             If Me.ShouldProcess(ConnectionName) Then
                 Try
-                    Engine.Logic.CloseAndRemoveConnection(ConnectionName)
-                    WriteVerbose($"SQL Connection '{ConnectionName}' closed.")
+                    Engine.Logic.GetConnection(ConnectionName).ClearMessages()
+                    WriteVerbose($"SQL Messages cleared from '{ConnectionName}'.")
                 Catch ex As Exception
-                    WriteError(New ErrorRecord(ex, "CloseSqlConnection.Error", ErrorCategory.CloseError, ConnectionName))
+                    WriteWarning($"[{ConnectionName}] {ex.Message}")
                 End Try
             End If
         End If
     End Sub
+
 End Class
