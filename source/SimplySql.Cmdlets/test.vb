@@ -8,6 +8,11 @@ Public Class test
     Public Property ThrowError As SwitchParameter
     <Parameter()>
     Public Property ThrowErrorTerm As SwitchParameter
+    <Parameter()>
+    Public Property Path As String
+
+    <Parameter(ValueFromPipeline:=True)>
+    Public ObjectToHash As PSObject
 
     Protected Overrides Sub ProcessRecord()
         If ThrowError.IsPresent Then
@@ -15,6 +20,15 @@ Public Class test
             'use this and then exit if you want it to processing to stop
         End If
 
+        If ObjectToHash IsNot Nothing Then
+            WriteObject(ObjectToHash.ConvertToHashtable)
+            Exit Sub
+        End If
+
+        If Not String.IsNullOrWhiteSpace(Path) Then
+            WriteObject($"Path: {Path}")
+            WriteObject($"Processed: {Me.GetUnresolvedProviderPathFromPSPath(Path)}")
+        End If
         WriteObject(Engine.Test.Greet(Name))
     End Sub
 

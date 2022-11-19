@@ -8,9 +8,9 @@ Public Class Test
             Case Common.ProviderTypes.PostGre
                 Return New Npgsql.NpgsqlConnection
             Case Common.ProviderTypes.MSSQL
-                Return New Microsoft.Data.SqlClient.SqlConnection
+                Return New System.Data.SqlClient.SqlConnection
             Case Common.ProviderTypes.SQLite
-                Return New Microsoft.Data.Sqlite.SqliteConnection
+                Return New System.Data.SQLite.SQLiteConnection
             Case Common.ProviderTypes.Oracle
                 Return New Oracle.ManagedDataAccess.Client.OracleConnection
             Case Common.ProviderTypes.MySql
