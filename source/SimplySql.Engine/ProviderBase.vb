@@ -34,7 +34,7 @@ Public MustInherit Class ProviderBase
         If Me.HasTransaction Then cmd.Transaction = Me.Transaction
     End Sub
 #Region "GetCommand"
-    Public Overridable Function GetCommand(query As String, timeout As Integer, params As Hashtable) As IDbCommand
+    Public Overridable Function GetCommand(query As String, timeout As Integer, params As Hashtable) As IDbCommand Implements ISimplySqlProvider.GetCommand
         Dim cmd As IDbCommand = Me.Connection.CreateCommand()
         cmd.CommandText = query
         cmd.CommandTimeout = timeout
@@ -76,6 +76,28 @@ Public MustInherit Class ProviderBase
     End Function
     Public Function GetScalar(query As String, timeout As Integer) As Object
         Return Me.GetScalar(query, timeout, Nothing)
+    End Function
+#End Region
+
+#Region "Get DataSet"
+    Public Overridable Function GetDataset(query As String, cmdTimeout As Integer, params As Hashtable, useProviderTypes As Boolean) As DataSet Implements ISimplySqlProvider.GetDataSet
+        Using cmd As IDbCommand = GetCommand(query, cmdTimeout, params)
+            Try
+                Dim ds As New DataSet
+                Using dr As IDataReader = cmd.ExecuteReader
+                    Do
+                        Dim dt As New DataTable
+                        dt.Load(dr)
+                        If dt.Rows.Count > 0 Then ds.Tables.Add(dt)
+                    Loop While dr.NextResult
+                End Using
+                Return ds
+            Catch ex As Exception
+                ex.Data.Add("Query", query)
+                ex.Data.Add("Parameters", params)
+                Throw ex
+            End Try
+        End Using
     End Function
 #End Region
 
@@ -242,7 +264,6 @@ Public MustInherit Class ProviderBase
             Throw New InvalidOperationException("Cannot COMMIT when there is no transaction in progress.")
         End If
     End Sub
-
 #End Region
 #End Region
 

@@ -18,7 +18,7 @@ Public Class ContextHandling
 
     Private Shared Function HandleResolveEvent(ByVal sender As Object, ByVal args As ResolveEventArgs) As Assembly
         Dim asmName = New AssemblyName(args.Name)
-        Dim asmPath As String
+        Dim asmPath As String = String.Empty
         If asmName.Name.Equals("SimplySql.Engine", StringComparison.OrdinalIgnoreCase) Then
             IsEngineLoaded = True
             Return Assembly.LoadFile(Path.Combine(BinPath, "SimplySql.Engine.dll"))

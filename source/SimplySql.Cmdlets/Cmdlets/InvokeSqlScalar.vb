@@ -18,7 +18,6 @@ Public Class InvokeSqlScalar
 
     <Parameter(Mandatory:=True, ParameterSetName:="object", Position:=1, ValueFromPipeline:=True)>
     Public Property ParamObject As PSObject
-
 #End Region
 
     Protected Overrides Sub ProcessRecord()
@@ -33,8 +32,6 @@ Public Class InvokeSqlScalar
                     WriteObject(Engine.Logic.GetConnection(ConnectionName).GetScalar(singleQuery, CommandTimeout, Parameters))
                     WriteVerbose($"Retrieved Scalar from '{ConnectionName}'.")
                 Catch ex As Exception
-                    ex.Data.Add("Query", singleQuery)
-                    ex.Data.Add("Parameters", Parameters)
                     WriteError(New ErrorRecord(ex, MyInvocation.MyCommand.Name, ErrorCategory.InvalidOperation, ConnectionName))
                 End Try
             End If
