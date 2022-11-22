@@ -12,3 +12,8 @@ use subfolders for each platform and put dll + interop into the folder., then de
 
 
 Handling dataReader to PSObject: https://expressiontree-tutorial.net/knowledge-base/19841120/generic-dbdatareader-to-list-t--mapping
+
+
+- https://tyrrrz.me/blog/expression-trees
+- https://www.programmerall.com/article/6642195713/
+- https://expressiontree-tutorial.net/knowledge-base/19841120/generic-dbdatareader-to-list-t--mapping
