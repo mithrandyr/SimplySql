@@ -18,4 +18,8 @@ Module Dry
         Return ht
     End Function
 
+    <Extension>
+    Function ConvertToPSObject(this As Data.IDataReader) As IEnumerable(Of PSObject)
+        Return DataReaderToPSObject.ConvertOld(this)
+    End Function
 End Module

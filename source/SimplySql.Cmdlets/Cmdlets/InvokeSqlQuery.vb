@@ -36,16 +36,17 @@ Public Class InvokeSqlQuery
                 If ParameterSetName.Equals("object", StringComparison.OrdinalIgnoreCase) Then Parameters = ParamObject.ConvertToHashtable
                 Try
                     If Stream.IsPresent Then
-                        'TODO need to implement
-                        Throw New NotImplementedException("-Stream is not implemented")
+                        'WriteObject(Engine.Logic.GetConnection(ConnectionName).GetDataReader(singleQuery, CommandTimeout, Parameters).ConvertToPSObject, True)
+                        Dim dr = Engine.Logic.GetConnection(ConnectionName).GetDataReader(singleQuery, CommandTimeout, Parameters)
+                        DataReaderToPSObject.map.CreateFunction(dr)
                     Else
                         Using ds = Engine.Logic.GetConnection(ConnectionName).GetDataSet(singleQuery, CommandTimeout, Parameters, UseTypesFromProvider.IsPresent)
                             If ds.Tables.Count = 0 Then
                                 WriteWarning("Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning.")
                             ElseIf ds.Tables.Count > 1 OrElse AsDataTable.IsPresent Then
-                                WriteObject(ds.Tables)
+                                WriteObject(ds.Tables, True)
                             Else
-                                WriteObject(ds.Tables(0).Rows)
+                                WriteObject(ds.Tables(0).Rows, True)
                             End If
                         End Using
                     End If

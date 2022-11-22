@@ -12,6 +12,7 @@ Public Interface ISimplySqlProvider
     Function GetCommand(query As String, cmdTimeout As Integer, parameters As Hashtable) As IDbCommand
     Function GetDataSet(query As String, cmdTimeout As Integer, parameters As Hashtable, useProviderTypes As Boolean) As DataSet
     Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Int64)) As Int64
+    Function GetDataReader(query As String, cmdTimeout As Integer, parameters As Hashtable) As IDataReader
 #End Region
 
 #Region "Messages"

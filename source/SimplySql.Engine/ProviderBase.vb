@@ -89,7 +89,7 @@ Public MustInherit Class ProviderBase
                         Dim dt As New DataTable
                         dt.Load(dr)
                         If dt.Rows.Count > 0 Then ds.Tables.Add(dt)
-                    Loop While dr.NextResult
+                    Loop While Not dr.IsClosed AndAlso dr.NextResult()
                 End Using
                 Return ds
             Catch ex As Exception
@@ -102,7 +102,7 @@ Public MustInherit Class ProviderBase
 #End Region
 
 #Region "GetReader"
-    Public Overridable Function GetReader(query As String, timeout As Integer, params As Hashtable) As IDataReader
+    Public Overridable Function GetReader(query As String, timeout As Integer, params As Hashtable) As IDataReader Implements ISimplySqlProvider.GetDataReader
         Using cmd As IDbCommand = Me.GetCommand(query, timeout, params)
             Try
                 Return cmd.ExecuteReader()
