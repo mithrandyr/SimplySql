@@ -12,7 +12,8 @@ Public Class ContextHandling
         RemoveHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf HandleResolveEvent
     End Sub
 
-    Private Shared ReadOnly BinPath As String = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Bin"))
+    Private Shared ReadOnly AppPath As String = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+    Private Shared ReadOnly BinPath As String = Path.Combine(AppPath, "Bin")
     Private Shared ReadOnly AssemblyList As IReadOnlyList(Of String) = Directory.EnumerateFiles(BinPath, "*.dll").Select(Function(file) file.Substring((BinPath.Length + 1), (file.Length - 5 - BinPath.Length))).ToList
     Private Shared IsEngineLoaded As Boolean = False
 
@@ -22,6 +23,8 @@ Public Class ContextHandling
         If asmName.Name.Equals("SimplySql.Engine", StringComparison.OrdinalIgnoreCase) Then
             IsEngineLoaded = True
             Return Assembly.LoadFile(Path.Combine(BinPath, "SimplySql.Engine.dll"))
+        ElseIf asmName.Name.Equals("SimplySql.Common", StringComparison.OrdinalIgnoreCase) Then
+            Return Assembly.LoadFile(Path.Combine(BinPath, "SimplySql.Common.dll"))
         End If
 
         If IsEngineLoaded Then

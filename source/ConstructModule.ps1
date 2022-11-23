@@ -1,14 +1,16 @@
+
 $outputFolder = Join-Path $PSScriptRoot "Output"
 $binFolder = Join-Path $outputFolder "bin"
 $cmdletFolder = Resolve-Path .\
 $engineFolder = $cmdletFolder -replace "\\SimplySql\.Cmdlets\\", "\SimplySql.Engine\"
-$primaryList = @("SimplySql.Common.dll", "SimplySql.Cmdlets.dll", "EnumerableToDataReader.dll", "AgileObjects.ReadableExpressions.dll","AgileObjects.NetStandardPolyfills.dll")
+$primaryList = @("SimplySql.Cmdlets.dll", "EnumerableToDataReader.dll", "AgileObjects.ReadableExpressions.dll","AgileObjects.NetStandardPolyfills.dll")
 
 if(Test-Path $outputFolder) { Remove-Item -Path $outputFolder -Force -Recurse}
 New-Item -Path $outputFolder -ItemType Directory | Out-Null
 New-Item -Path $binFolder -ItemType Directory | Out-Null
 
 Get-ChildItem -Path $engineFolder -Filter *.dll -File -Recurse |
+	Where-Object { $_.Name -notin $primaryList } |
 	Copy-Item -Destination $binFolder 
 
 Get-ChildItem -Path $cmdletFolder -Filter *.dll -File |
@@ -34,4 +36,5 @@ foreach ($p in $Platforms) {
 }
 Remove-Item -Path $SQLiteDll
 
+$PSModuleAutoLoadingPreference = "none"
 Import-Module .\Output\SimplySql.Cmdlets.dll -Verbose

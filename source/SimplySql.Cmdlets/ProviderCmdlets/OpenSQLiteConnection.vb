@@ -38,7 +38,7 @@ Public Class OpenSQLiteConnection
                 newProvider = Engine.SQLiteProvider.Create(ConnectionName, DataSource, Password, CommandTimeout)
             End If
 
-            Engine.Logic.Connections.Add(ConnectionName, newProvider)
+            Engine.Logic.OpenAndAddConnection(newProvider)
             WriteVerbose($"{ConnectionName} (SQLiteConnection) opened.")
         Catch ex As Exception
             WriteError(New ErrorRecord(ex, "NewSQLiteConnection.Error", ErrorCategory.OpenError, ConnectionName))

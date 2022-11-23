@@ -4,7 +4,7 @@ Imports System.Linq.Expressions
 Imports AgileObjects.ReadableExpressions
 
 Public Class DataReaderToPSObject
-    Shared Iterator Function ConvertOld(theDataReader As IDataReader) As IEnumerable(Of PSObject)
+    Shared Iterator Function Convert(theDataReader As IDataReader) As IEnumerable(Of PSObject)
         Do
             Dim columns = map.CreateMappings(theDataReader)
             While theDataReader.Read
@@ -49,7 +49,7 @@ Public Class DataReaderToPSObject
         Loop While theDataReader.NextResult
     End Function
 
-    Shared Iterator Function Convert(theDataReader As IDataReader) As IEnumerable(Of PSObject)
+    Shared Iterator Function ConvertUsingExpressionTree(theDataReader As IDataReader) As IEnumerable(Of PSObject)
         Do
             Dim convertFunction = map.CreateFunction(theDataReader)
             While theDataReader.Read

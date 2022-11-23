@@ -15,6 +15,11 @@ Public Module Logic
         End Try
     End Function
 
+    Sub OpenAndAddConnection(newProvider As ISimplySqlProvider)
+        newProvider.Connection.Open()
+        Connections.Add(newProvider.ConnectionName, newProvider)
+    End Sub
+
     Sub CloseAndRemoveConnection(connectionName As String)
         Try
             Dim conn = Connections.First(Function(item) item.Key.Equals(connectionName, StringComparison.OrdinalIgnoreCase)).Value

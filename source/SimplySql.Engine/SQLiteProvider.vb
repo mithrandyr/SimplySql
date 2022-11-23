@@ -66,7 +66,6 @@ Public Class SQLiteProvider
 
     Public Shared Function Create(connectionName As String, connectionString As String, commandTimeout As Integer) As SQLiteProvider
         Dim conn As New SQLiteConnection(connectionString)
-        conn.Open()
         Return New SQLiteProvider(connectionName, commandTimeout, conn)
     End Function
 End Class

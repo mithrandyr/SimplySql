@@ -23,8 +23,6 @@ Public Class InvokeSqlQuery
     <Parameter()>
     Public Property Stream As SwitchParameter
     <Parameter()>
-    Public Property StreamOld As SwitchParameter
-    <Parameter()>
     Public Property AsDataTable As SwitchParameter
     <Parameter()>
     <[Alias]("ProviderTypes")>
@@ -39,17 +37,9 @@ Public Class InvokeSqlQuery
             If Me.ShouldProcess(ConnectionName, $"Execute '{singleQuery}'") Then
                 If ParameterSetName.Equals("object", StringComparison.OrdinalIgnoreCase) Then Parameters = ParamObject.ConvertToHashtable
                 Try
-                    If StreamOld.IsPresent Then
+                    If Stream.IsPresent Then
                         Using dr = Engine.Logic.GetConnection(ConnectionName).GetDataReader(singleQuery, CommandTimeout, Parameters)
-                            For Each pso In DataReaderToPSObject.ConvertOld(dr)
-                                WriteObject(pso)
-                            Next
-                        End Using
-                    ElseIf Stream.IsPresent Then
-                        Using dr = Engine.Logic.GetConnection(ConnectionName).GetDataReader(singleQuery, CommandTimeout, Parameters)
-                            For Each pso In DataReaderToPSObject.Convert(dr)
-                                WriteObject(pso)
-                            Next
+                            WriteObject(dr.ConvertToPSObject, True)
                         End Using
                     Else
                         Using ds = Engine.Logic.GetConnection(ConnectionName).GetDataSet(singleQuery, CommandTimeout, Parameters, UseTypesFromProvider.IsPresent)
