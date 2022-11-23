@@ -1,5 +1,6 @@
 ﻿Imports System.Linq.Expressions
 Imports System.Management.Automation
+Imports System.Management.Automation.Language
 Imports AgileObjects.ReadableExpressions
 Imports EnumerableToDataReader
 
@@ -7,27 +8,32 @@ Imports EnumerableToDataReader
 Module Module1
 
     Sub Main()
-        'Dim fileDr = IO.Directory.GetFiles("c:\users\rober\").AsDataReader
+        Dim fileDr = (New IO.DirectoryInfo(Environment.CurrentDirectory)).GetFiles.AsDataReader
 
         Dim expList = New List(Of Expression)
 
-        'Dim paramDr = Expression.Parameter(GetType(IDataReader), "dr")
-        Dim paramDr = Expression.Parameter(GetType(Integer), "dr")
-
+        Dim paramDr = Expression.Parameter(GetType(IDataRecord), "dr")
         Dim varPso = Expression.Parameter(GetType(PSObject), "pso")
-        'Dim psoProperties = Expression.Property(varPso, GetType(PSObject).GetProperty("Properties"))
-
         expList.Add(Expression.Assign(varPso, Expression.[New](GetType(PSObject))))
 
-        expList.Add(Expression.Call(Nothing,
-                                    GetType(Console).GetMethod("WriteLine", {GetType(String)}),
-                                    Expression.Call(paramDr, GetType(Integer).GetMethod("ToString", {}))))
+        Dim psoProperties = Expression.Property(varPso, GetType(PSObject).GetProperty("Properties"))
+        Dim methodPsoPropertiesAdd = GetType(PSMemberInfoCollection(Of PSPropertyInfo)).GetMethod("Add", {GetType(PSNoteProperty), GetType(Boolean)})
+
+        For Each columnOrdinal In Enumerable.Range(0, fileDr.FieldCount - 1)
+            Dim psnName = Expression.Constant(fileDr.GetName(columnOrdinal))
+            'GetType(IDataRecord).GetMethod("GetValue")
+            Dim psnValue = Expression.Call(paramDr, GetType(IDataRecord).GetMethod("GetValue"), {Expression.Constant(columnOrdinal)})
+
+            Dim noteProperty = Expression.[New](GetType(PSNoteProperty).GetConstructor({GetType(String), GetType(Object)}), {psnName, psnValue})
+            expList.Add(Expression.Call(psoProperties, methodPsoPropertiesAdd, {noteProperty, Expression.Constant(True)}))
+        Next
+
         expList.Add(varPso)
         Dim block = Expression.Block({varPso}, expList) ' note the first variable in the Block(), it instantiates variables in the scope.
 
-        Dim lambda = Expression.Lambda(Of Func(Of Integer, PSObject))(block, paramDr)
+        Dim lambda = Expression.Lambda(Of Func(Of IDataRecord, PSObject))(block, paramDr)
         Console.WriteLine(lambda.ToReadableString)
-        Console.WriteLine(lambda.Compile.Invoke(1).GetType.ToString)
+        'Console.WriteLine(lambda.Compile.Invoke(15).GetType.ToString)
 
         Console.WriteLine("enter to exit")
         Console.ReadLine()

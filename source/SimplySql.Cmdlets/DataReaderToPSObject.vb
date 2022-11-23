@@ -1,6 +1,7 @@
 ﻿Imports System.Data
 Imports System.Data.Common
 Imports System.Linq.Expressions
+Imports AgileObjects.ReadableExpressions
 
 Public Class DataReaderToPSObject
     Shared Iterator Function ConvertOld(theDataReader As IDataReader) As IEnumerable(Of PSObject)
@@ -46,21 +47,18 @@ Public Class DataReaderToPSObject
                 Yield pso
             End While
         Loop While theDataReader.NextResult
-
-        'Get list of columns -- Name & Type, then get the ordinal for each column
-        'Build expression that uses the appropriate Get<Type>(forOrdinalPosition) function
-        'to construct the PSObject
-        'Invoke that function against DataReader (For each row)
-
-
     End Function
 
     Shared Iterator Function Convert(theDataReader As IDataReader) As IEnumerable(Of PSObject)
-
+        Do
+            Dim convertFunction = map.CreateFunction(theDataReader)
+            While theDataReader.Read
+                Yield convertFunction(theDataReader)
+            End While
+        Loop While theDataReader.NextResult
     End Function
 
-
-    Public Class map
+    Friend Class map
         Public Ordinal As Integer = 0
         Public Name As String
         Public Type As String
@@ -68,58 +66,27 @@ Public Class DataReaderToPSObject
             Return Linq.Enumerable.Range(0, dr.FieldCount).Select(Function(ord) New map With {.Ordinal = ord, .Name = dr.GetName(ord), .Type = dr.GetFieldType(ord).ToString}).ToList
         End Function
 
-        Shared Function CreateFunction(dr As IDataReader) As Func(Of IDataReader)
+        Shared Function CreateFunction(dr As IDataReader) As Func(Of IDataRecord, PSObject)
             Dim expList = New List(Of Expression)
             Dim columns = map.CreateMappings(dr)
 
-            Dim paramDataReader = Expression.Parameter(GetType(IDataReader), "dr")
+            Dim paramDR = Expression.Parameter(GetType(IDataRecord), "dr")
             Dim varPso = Expression.Variable(GetType(PSObject), "pso")
+            expList.Add(Expression.Assign(varPso, Expression.[New](GetType(PSObject)))) 'Dim pso = New PSObject
+
             Dim psoProperties = Expression.Property(varPso, GetType(PSObject).GetProperty("Properties"))
+            Dim methodPsoPropertiesAdd = GetType(PSMemberInfoCollection(Of PSPropertyInfo)).GetMethod("Add", {GetType(PSNoteProperty)})
 
-            expList.Add(Expression.Assign(varPso, Expression.[New](GetType(PSObject))))
-
-            Dim drGetExp As Reflection.MethodInfo
-            Dim mName As String
             For Each col In columns
-                Dim paramOrd = Expression.Constant(col.Ordinal, GetType(Integer))
-                Dim paramName = Expression.Constant(col.Name, GetType(String))
-                Select Case col.Type
-                    Case "System.Boolean"
-                        drGetExp = GetType(IDataRecord).GetMethod("GetBoolean")
-                    Case "System.Byte"
-                        drGetExp = GetType(IDataRecord).GetMethod("GetByte")
-                    Case "System.Char"
-                        drGetExp = GetType(IDataRecord).GetMethod("GetChar")
-                    Case "System.DateTime"
-                        drGetExp = GetType(IDataRecord).GetMethod("GetDateTime")
-                    Case "System.Decimal"
-                        drGetExp = GetType(IDataRecord).GetMethod("GetDecimal")
-                    Case "System.Double"
-                        drGetExp = GetType(IDataRecord).GetMethod("GetDouble")
-                    Case "System.Single"
-                        drGetExp = GetType(IDataRecord).GetMethod("GetFloat")
-                    Case "System.Guid"
-                        drGetExp = GetType(IDataRecord).GetMethod("GetGuid")
-                    Case "System.Int16"
-                        drGetExp = GetType(IDataRecord).GetMethod("GetInt16")
-                    Case "System.Int32"
-                        drGetExp = GetType(IDataRecord).GetMethod("GetInt32")
-                    Case "System.Int64"
-                        drGetExp = GetType(IDataRecord).GetMethod("GetInt64")
-                    Case "System.String"
-                        drGetExp = GetType(IDataRecord).GetMethod("GetString")
-                    Case Else
-                        drGetExp = GetType(IDataRecord).GetMethod("GetValue")
-                End Select
-                drGetExp = GetType(IDataRecord).GetMethod("GetValue")
-                Dim drGetValue = Expression.Call(paramDataReader, drGetExp, paramOrd)
-                Dim newPSNote = Expression.[New](GetType(PSNoteProperty).GetConstructor({GetType(String), GetType(Object)}), {paramName, drGetValue})
-                expList.Add(Expression.Call(psoProperties, GetType(PSMemberInfoCollection(Of PSPropertyInfo)).GetMethod("Add"), newPSNote))
+                Dim psnName = Expression.Constant(col.Name, GetType(String))
+                Dim psnValue = Expression.Call(paramDR, GetType(IDataRecord).GetMethod("GetValue"), {Expression.Constant(col.Ordinal)})
+
+                Dim noteProperty = Expression.[New](GetType(PSNoteProperty).GetConstructor({GetType(String), GetType(Object)}), {psnName, psnValue})
+                expList.Add(Expression.Call(psoProperties, methodPsoPropertiesAdd, {noteProperty})) ' pso.Members.Add(New PSNoteProperty(col.Name, dr.GetValue(col.Ordinal))
             Next
 
-            Dim lambda = Expression.Lambda(Of Func(Of IDataReader))(Expression.Block(expList), paramDataReader).Compile
-            Console.WriteLine(lambda.ToString)
-            Return lambda
+            expList.Add(varPso) ' return pso
+            Return Expression.Lambda(Of Func(Of IDataRecord, PSObject))(Expression.Block({varPso}, expList), paramDR).Compile
         End Function
     End Class
 
