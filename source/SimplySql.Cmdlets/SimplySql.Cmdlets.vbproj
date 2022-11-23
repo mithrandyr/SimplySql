@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AgileObjects.ReadableExpressions" Version="3.3.0" />
     <PackageReference Include="EnumerableToDataReader" Version="1.1.0" />
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" />
   </ItemGroup>

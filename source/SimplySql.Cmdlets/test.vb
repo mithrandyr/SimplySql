@@ -2,6 +2,7 @@
 Imports System.Linq.Expressions
 Imports EnumerableToDataReader
 Imports SimplySql.Cmdlets.DataReaderToPSObject
+Imports AgileObjects.ReadableExpressions
 
 <Cmdlet("Test", "Greeting")>
 Public Class test
@@ -97,14 +98,16 @@ Public Class testSimplySql
                     drGetExp = GetType(IDataRecord).GetMethod("GetValue")
             End Select
             drGetExp = GetType(IDataRecord).GetMethod("GetValue")
-            Dim drGetValue = Expression.Call(paramDataReader, drGetExp, paramOrd)
-            Dim newPSNote = Expression.[New](GetType(PSNoteProperty).GetConstructor({GetType(String), GetType(Object)}), {paramName, drGetValue})
+            'Dim drGetValue = Expression.Call(paramDataReader, "GetValue", paramOrd)
+            'Dim newPSNote = Expression.[New](GetType(PSNoteProperty).GetConstructor({GetType(String), GetType(Object)}), {paramName, drGetValue})
             'expList.Add(Expression.Call(psoProperties, GetType(PSMemberInfoCollection(Of PSPropertyInfo)).GetMethod("Add"), newPSNote))
         Next
+        'expList.Add(Expression.Return())
 
-        Dim lambda = Expression.Lambda(Of Func(Of IDataReader))(Expression.Block(expList), {paramDataReader}).Compile
+        Dim lambda = Expression.Lambda(Of Func(Of IDataReader, PSObject))(Expression.Block(expList), paramDataReader)
 
-        WriteObject(lambda.ToString)
+
+        WriteObject(lambda.ToReadableString)
     End Sub
 End Class
 

@@ -2,7 +2,7 @@ $outputFolder = Join-Path $PSScriptRoot "Output"
 $binFolder = Join-Path $outputFolder "bin"
 $cmdletFolder = Resolve-Path .\
 $engineFolder = $cmdletFolder -replace "\\SimplySql\.Cmdlets\\", "\SimplySql.Engine\"
-$primaryList = @("SimplySql.Common.dll", "SimplySql.Cmdlets.dll", "EnumerableToDataReader.dll")
+$primaryList = @("SimplySql.Common.dll", "SimplySql.Cmdlets.dll", "EnumerableToDataReader.dll", "AgileObjects.ReadableExpressions.dll","AgileObjects.NetStandardPolyfills.dll")
 
 if(Test-Path $outputFolder) { Remove-Item -Path $outputFolder -Force -Recurse}
 New-Item -Path $outputFolder -ItemType Directory | Out-Null
