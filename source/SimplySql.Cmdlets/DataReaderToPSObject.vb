@@ -1,7 +1,6 @@
 ﻿Imports System.Data
 Imports System.Data.Common
 Imports System.Linq.Expressions
-Imports AgileObjects.ReadableExpressions
 
 Public Class DataReaderToPSObject
     Shared Iterator Function Convert(theDataReader As IDataReader) As IEnumerable(Of PSObject)

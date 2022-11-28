@@ -22,7 +22,7 @@ Public MustInherit Class ProviderBase
 
 #Region "Overrides"
     Public MustOverride Function ConnectionInfo() As SortedDictionary(Of String, Object) Implements ISimplySqlProvider.ConnectionInfo
-    Public MustOverride Sub ChangeDatabase() Implements ISimplySqlProvider.ChangeDatabase
+    Public MustOverride Sub ChangeDatabase(databaseName As String) Implements ISimplySqlProvider.ChangeDatabase
     Public MustOverride Function GetDataSet(cmd As Data.IDbCommand, Optional useProviderTypes As Boolean = False) As DataSet
 
     Public MustOverride Function CreateConnection(ht As Hashtable) As IDbConnection
@@ -33,6 +33,7 @@ Public MustInherit Class ProviderBase
         cmd.Connection = Me.Connection
         If Me.HasTransaction Then cmd.Transaction = Me.Transaction
     End Sub
+
 #Region "GetCommand"
     Public Overridable Function GetCommand(query As String, timeout As Integer, params As Hashtable) As IDbCommand Implements ISimplySqlProvider.GetCommand
         Dim cmd As IDbCommand = Me.Connection.CreateCommand()

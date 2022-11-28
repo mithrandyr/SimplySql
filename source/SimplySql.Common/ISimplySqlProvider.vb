@@ -5,7 +5,7 @@ Public Interface ISimplySqlProvider
     ReadOnly Property ProviderName As String
     Property CommandTimeout As Integer
     Function ConnectionInfo() As SortedDictionary(Of String, Object)
-    Sub ChangeDatabase()
+    Sub ChangeDatabase(databaseName As String)
 
 #Region "DataAccess"
     Function GetScalar(query As String, cmdTimeout As Integer, parameters As Hashtable) As Object

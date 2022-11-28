@@ -7,8 +7,8 @@ Public Class SQLiteProvider
     Public Sub New(connectionName As String, commandTimeout As Integer, connection As SQLiteConnection)
         MyBase.New(connectionName, Common.ProviderTypes.SQLite, connection, commandTimeout)
     End Sub
-    Public Overrides Sub ChangeDatabase()
-        Throw New NotImplementedException()
+    Public Overrides Sub ChangeDatabase(databaseName As String)
+        Throw New NotImplementedException($"SQLite does not support databases, cannot change to {databaseName}.")
     End Sub
 
     Public Overrides Function ConnectionInfo() As SortedDictionary(Of String, Object)
