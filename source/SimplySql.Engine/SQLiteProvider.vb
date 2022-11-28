@@ -7,9 +7,6 @@ Public Class SQLiteProvider
     Public Sub New(connectionName As String, commandTimeout As Integer, connection As SQLiteConnection)
         MyBase.New(connectionName, Common.ProviderTypes.SQLite, connection, commandTimeout)
     End Sub
-    Public Overrides Sub ChangeDatabase(databaseName As String)
-        Throw New NotImplementedException($"SQLite does not support databases, cannot change to {databaseName}.")
-    End Sub
 
     Public Overrides Function ConnectionInfo() As SortedDictionary(Of String, Object)
         Dim sd As New SortedDictionary(Of String, Object)
@@ -38,10 +35,29 @@ Public Class SQLiteProvider
         End Try
     End Function
 
+#Region "Not Supported"
+    Public Overrides Sub ChangeDatabase(databaseName As String)
+        Throw New NotSupportedException($"SQLite does not support databases, cannot change to {databaseName}.")
+    End Sub
     Public Overrides Function CreateConnection(ht As Hashtable) As Data.IDbConnection
         Throw New NotImplementedException()
     End Function
 
+    Public Overrides Function GetMessage() As SqlMessage
+        Throw New NotSupportedException("SQLiteProvider does not support SqlMessages.")
+    End Function
+
+    Public Overrides Sub ClearMessages()
+        Throw New NotSupportedException("SQLiteProvider does not support SqlMessages.")
+    End Sub
+    Public Overrides ReadOnly Property HasMessages As Boolean
+        Get
+            Throw New NotSupportedException("SQLiteProvider does not support SqlMessages.")
+        End Get
+    End Property
+#End Region
+
+#Region "Shared Functions"
     Public Shared Function Create(connectionName As String, dataSource As String, password As String, commandTimeout As Integer) As SQLiteProvider
         Dim sb As New SQLiteConnectionStringBuilder
         If Not dataSource.Equals(":memory:", StringComparison.OrdinalIgnoreCase) Then
@@ -55,17 +71,9 @@ Public Class SQLiteProvider
 
         Return Create(connectionName, sb.ToString, commandTimeout)
     End Function
-
-    Public Overrides Function GetMessage() As SqlMessage
-        Throw New NotImplementedException("SQLiteProvider does not support SqlMessages.")
-    End Function
-
-    Public Overrides Sub ClearMessages()
-        Throw New NotImplementedException("SQLiteProvider does not support SqlMessages.")
-    End Sub
-
     Public Shared Function Create(connectionName As String, connectionString As String, commandTimeout As Integer) As SQLiteProvider
         Dim conn As New SQLiteConnection(connectionString)
         Return New SQLiteProvider(connectionName, commandTimeout, conn)
     End Function
+#End Region
 End Class

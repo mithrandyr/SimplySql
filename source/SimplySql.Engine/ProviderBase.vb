@@ -224,7 +224,7 @@ Public MustInherit Class ProviderBase
         Me.Messages.Clear()
     End Sub
 
-    Public ReadOnly Property HasMessages() As Boolean Implements ISimplySqlProvider.HasMessages
+    Public Overridable ReadOnly Property HasMessages() As Boolean Implements ISimplySqlProvider.HasMessages
         Get
             Return Me.Messages.Count > 0
         End Get
