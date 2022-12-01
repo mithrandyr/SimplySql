@@ -12,7 +12,7 @@ Public Class GetSqlMessage
 
     Protected Overrides Sub ProcessRecord()
         If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            WriteError(ConnectionNotFoundError(ConnectionName))
+            ErrorConnectionNotFound(ConnectionName)
         Else
             If Me.ShouldProcess(ConnectionName, "Get Sql Messages") Then
                 Dim conn = Engine.Logic.GetConnection(ConnectionName)
@@ -23,7 +23,7 @@ Public Class GetSqlMessage
                 Catch nse As NotSupportedException
                     WriteWarning(nse.Message)
                 Catch ex As Exception
-                    WriteError(New ErrorRecord(ex, MyInvocation.MyCommand.Name, ErrorCategory.InvalidOperation, ConnectionName))
+                    ErrorOperationFailed(ex, ConnectionName)
                 End Try
             End If
         End If

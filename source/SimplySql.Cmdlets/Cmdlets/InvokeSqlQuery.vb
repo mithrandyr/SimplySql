@@ -30,7 +30,7 @@ Public Class InvokeSqlQuery
 #End Region
     Protected Overrides Sub ProcessRecord()
         If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            WriteError(ConnectionNotFoundError(ConnectionName))
+            ErrorConnectionNotFound(ConnectionName)
         Else
             Dim singleQuery As String = String.Join(Environment.NewLine, Query)
 
@@ -54,7 +54,7 @@ Public Class InvokeSqlQuery
                     End If
                     WriteVerbose($"Retrieved Results from '{ConnectionName}'.")
                 Catch ex As Exception
-                    WriteError(New ErrorRecord(ex, MyInvocation.MyCommand.Name, ErrorCategory.InvalidOperation, ConnectionName))
+                    ErrorOperationFailed(ex, ConnectionName)
                 End Try
             End If
         End If

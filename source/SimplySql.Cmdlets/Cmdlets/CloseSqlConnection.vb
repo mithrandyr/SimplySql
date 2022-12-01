@@ -11,14 +11,14 @@ Public Class CloseSqlConnection
 
     Protected Overrides Sub ProcessRecord()
         If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            WriteError(ConnectionNotFoundError(ConnectionName))
+            ErrorConnectionNotFound(ConnectionName)
         Else
             If Me.ShouldProcess(ConnectionName) Then
                 Try
                     Engine.Logic.CloseAndRemoveConnection(ConnectionName)
                     WriteVerbose($"SQL Connection '{ConnectionName}' closed.")
                 Catch ex As Exception
-                    WriteError(New ErrorRecord(ex, MyInvocation.MyCommand.Name, ErrorCategory.CloseError, ConnectionName))
+                    ErrorOperationFailed(ex, ConnectionName, ErrorCategory.CloseError)
                 End Try
             End If
         End If

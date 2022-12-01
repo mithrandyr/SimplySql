@@ -22,7 +22,7 @@ Public Class InvokeSqlScalar
 
     Protected Overrides Sub ProcessRecord()
         If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            WriteError(ConnectionNotFoundError(ConnectionName))
+            ErrorConnectionNotFound(ConnectionName)
         Else
             Dim singleQuery As String = String.Join(Environment.NewLine, Query)
 
@@ -32,7 +32,7 @@ Public Class InvokeSqlScalar
                     WriteObject(Engine.Logic.GetConnection(ConnectionName).GetScalar(singleQuery, CommandTimeout, Parameters))
                     WriteVerbose($"Retrieved Scalar from '{ConnectionName}'.")
                 Catch ex As Exception
-                    WriteError(New ErrorRecord(ex, MyInvocation.MyCommand.Name, ErrorCategory.InvalidOperation, ConnectionName))
+                    ErrorOperationFailed(ex, ConnectionName)
                 End Try
             End If
         End If

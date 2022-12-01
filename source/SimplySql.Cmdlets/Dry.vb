@@ -1,10 +1,15 @@
 ﻿Imports System.Runtime.CompilerServices
 Module Dry
     <Extension>
-    Function ConnectionNotFoundError(this As PSCmdlet, connectionName As String) As ErrorRecord
+    Sub ErrorConnectionNotFound(this As PSCmdlet, connectionName As String)
         Dim ex As New ArgumentException($"'{connectionName}' does not exist as connection.", "ConnectionName")
-        Return New ErrorRecord(ex, this.MyInvocation.MyCommand.Name, ErrorCategory.ObjectNotFound, connectionName)
-    End Function
+        this.WriteError(New ErrorRecord(ex, this.MyInvocation.MyCommand.Name, ErrorCategory.ObjectNotFound, connectionName))
+    End Sub
+
+    <Extension>
+    Sub ErrorOperationFailed(this As PSCmdlet, ex As Exception, connectionName As String, Optional errCategory As ErrorCategory = ErrorCategory.InvalidOperation)
+        this.WriteError(New ErrorRecord(ex, this.MyInvocation.MyCommand.Name, errCategory, connectionName))
+    End Sub
 
     <Extension>
     Function ConvertToHashtable(this As PSObject, Optional ignoreNull As Boolean = True) As Hashtable

@@ -18,7 +18,7 @@ Public Class SetSqlConnection
 
     Protected Overrides Sub ProcessRecord()
         If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            WriteError(ConnectionNotFoundError(ConnectionName))
+            ErrorConnectionNotFound(ConnectionName)
         Else
             If CommandTimeout > 0 AndAlso Me.ShouldProcess(ConnectionName, $"Change CommandTimeout to '{CommandTimeout}'") Then
                 Engine.Logic.GetConnection(ConnectionName).CommandTimeout = CommandTimeout
@@ -28,7 +28,7 @@ Public Class SetSqlConnection
                 Try
                     Engine.Logic.GetConnection(ConnectionName).ChangeDatabase(Database)
                 Catch ex As Exception
-                    WriteError(New ErrorRecord(ex, MyInvocation.MyCommand.Name, ErrorCategory.InvalidOperation, ConnectionName))
+                    ErrorOperationFailed(ex, ConnectionName)
                 End Try
             End If
         End If
