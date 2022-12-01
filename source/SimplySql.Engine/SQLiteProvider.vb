@@ -1,4 +1,5 @@
 ﻿Imports System.Data.SQLite
+Imports NetTopologySuite.Operation.Buffer.Validate
 Imports SimplySql.Common
 
 Public Class SQLiteProvider
@@ -23,16 +24,25 @@ Public Class SQLiteProvider
         Return sd
     End Function
 
-    Public Overrides Function GetDataSet(cmd As Data.IDbCommand, Optional useProviderTypes As Boolean = False) As Data.DataSet
-        Dim ds As New Data.DataSet
-        Dim da As New SQLiteDataAdapter(cmd)
-        da.ReturnProviderSpecificTypes = useProviderTypes
-        Try
-            da.Fill(ds)
-            Return ds
-        Finally
-            da.Dispose()
-        End Try
+    Public Overrides Function GetDataSet(query As String, cmdTimeout As Integer, params As Hashtable, useProviderTypes As Boolean) As Data.DataSet
+        If Not useProviderTypes Then
+            Return MyBase.GetDataset(query, cmdTimeout, params, False)
+        Else
+            Using cmd As SQLiteCommand = GetCommand(query, cmdTimeout, params)
+                Using da As New SQLiteDataAdapter(cmd)
+                    Dim ds As New Data.DataSet
+                    da.ReturnProviderSpecificTypes = True
+                    Try
+                        da.Fill(ds)
+                        Return ds
+                    Catch ex As Exception
+                        ex.Data.Add("Query", query)
+                        ex.Data.Add("Parameters", params)
+                        Throw ex
+                    End Try
+                End Using
+            End Using
+        End If
     End Function
 
 #Region "Not Supported"
