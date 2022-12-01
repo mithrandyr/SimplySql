@@ -15,9 +15,11 @@ Public Class CompleteSqlTransaction
             ErrorConnectionNotFound(ConnectionName)
         Else
             If Me.ShouldProcess(ConnectionName, "Commit a Sql Transaction") Then
+                Dim conn = Engine.Logic.GetConnection(ConnectionName)
                 Try
-                    Engine.Logic.GetConnection(ConnectionName).CommitTransaction()
+                    conn.CommitTransaction()
                 Catch ex As Exception
+                    If conn.Connection.State = Data.ConnectionState.Closed Then conn.Connection.Open()
                     ErrorOperationFailed(ex, ConnectionName)
                 End Try
             End If

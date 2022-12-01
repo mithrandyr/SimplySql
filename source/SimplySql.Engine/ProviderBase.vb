@@ -1,4 +1,5 @@
 ﻿Imports System.Data
+Imports System.Threading
 Imports SimplySql.Common
 Public MustInherit Class ProviderBase
     Implements ISimplySqlProvider
@@ -232,15 +233,7 @@ Public MustInherit Class ProviderBase
 #End Region
 
 #Region "Transactions"
-    Private _transaction As IDbTransaction
     Public Property Transaction As IDbTransaction Implements ISimplySqlProvider.Transaction
-        Private Set(value As IDbTransaction)
-            _transaction = value
-        End Set
-        Get
-            Return _transaction
-        End Get
-    End Property
     Public ReadOnly Property HasTransaction As Boolean = Me.Transaction IsNot Nothing Implements ISimplySqlProvider.HasTransaction
     Sub BeginTransaction() Implements ISimplySqlProvider.BeginTransaction
         If Me.HasTransaction Then Throw New InvalidOperationException("Cannot BEGIN a transaction when one is already in progress.")
@@ -248,9 +241,12 @@ Public MustInherit Class ProviderBase
     End Sub
     Sub RollbackTransaction() Implements ISimplySqlProvider.RollbackTransaction
         If Me.HasTransaction Then
-            Me.Transaction.Rollback()
-            Me.Transaction.Dispose()
-            Me.Transaction = Nothing
+            Try
+                Me.Transaction.Rollback()
+            Finally
+                Me.Transaction.Dispose()
+                Me.Transaction = Nothing
+            End Try
         Else
             Throw New InvalidOperationException("Cannot ROLLBACK when there is no transaction in progress.")
         End If
@@ -258,9 +254,12 @@ Public MustInherit Class ProviderBase
 
     Sub CommitTransaction() Implements ISimplySqlProvider.CommitTransaction
         If Me.HasTransaction Then
-            Me.Transaction.Commit()
-            Me.Transaction.Dispose()
-            Me.Transaction = Nothing
+            Try
+                Me.Transaction.Commit()
+            Finally
+                Me.Transaction.Dispose()
+                Me.Transaction = Nothing
+            End Try
         Else
             Throw New InvalidOperationException("Cannot COMMIT when there is no transaction in progress.")
         End If

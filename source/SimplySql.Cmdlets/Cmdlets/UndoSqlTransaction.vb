@@ -15,9 +15,11 @@ Public Class UndoSqlTransaction
             ErrorConnectionNotFound(ConnectionName)
         Else
             If Me.ShouldProcess(ConnectionName, "Rollback a Sql Transaction") Then
+                Dim conn = Engine.Logic.GetConnection(ConnectionName)
                 Try
-                    Engine.Logic.GetConnection(ConnectionName).RollbackTransaction()
+                    conn.RollbackTransaction()
                 Catch ex As Exception
+                    If conn.Connection.State = Data.ConnectionState.Closed Then conn.Connection.Open()
                     ErrorOperationFailed(ex, ConnectionName)
                 End Try
             End If
