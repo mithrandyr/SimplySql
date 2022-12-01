@@ -1,6 +1,6 @@
-﻿<Cmdlet(VerbsDiagnostic.Test, "SqlConnection", DefaultParameterSetName:="single")>
-<[Alias]("tsc")>
-Public Class TestSqlConnection
+﻿<Cmdlet(VerbsCommon.Show, "SqlConnection", DefaultParameterSetName:="single")>
+<[Alias]("ssc")>
+Public Class ShowSqlConnection
     Inherits PSCmdlet
 
 #Region "Parameters"
@@ -15,7 +15,7 @@ Public Class TestSqlConnection
 
     Protected Overrides Sub EndProcessing()
         If All.IsPresent Then
-            WriteObject(Engine.Logic.Connections.Count > 0)
+            WriteObject(Engine.Logic.Connections, True)
         Else
             WriteObject(Engine.Logic.ConnectionExists(ConnectionName))
         End If

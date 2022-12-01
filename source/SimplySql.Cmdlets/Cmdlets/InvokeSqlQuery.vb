@@ -1,6 +1,5 @@
-﻿Imports System.Management.Automation.Language
-
-<Cmdlet(VerbsLifecycle.Invoke, "SqlQuery", SupportsShouldProcess:=True, DefaultParameterSetName:="hashtable")>
+﻿<Cmdlet(VerbsLifecycle.Invoke, "SqlQuery", SupportsShouldProcess:=True, DefaultParameterSetName:="hashtable")>
+<[Alias]("isq")>
 Public Class InvokeSqlQuery
     Inherits PSCmdlet
 #Region "Parameters"

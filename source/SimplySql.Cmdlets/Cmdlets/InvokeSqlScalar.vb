@@ -1,4 +1,5 @@
 ﻿<Cmdlet(VerbsLifecycle.Invoke, "SqlScalar", SupportsShouldProcess:=True, DefaultParameterSetName:="hashtable")>
+<[Alias]("iss")>
 Public Class InvokeSqlScalar
     Inherits PSCmdlet
 #Region "Parameters"
