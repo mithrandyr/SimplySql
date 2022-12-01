@@ -1,6 +1,4 @@
-﻿Imports System.Management.Automation.Language
-
-<Cmdlet(VerbsLifecycle.Start, "SqlTransaction", SupportsShouldProcess:=True)>
+﻿<Cmdlet(VerbsLifecycle.Start, "SqlTransaction", SupportsShouldProcess:=True)>
 Public Class StartSqlTransaction
     Inherits PSCmdlet
 #Region "Parameters"

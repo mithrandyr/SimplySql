@@ -1,6 +1,4 @@
-﻿Imports System.Management.Automation.Language
-
-<Cmdlet(VerbsLifecycle.Complete, "SqlTransaction", SupportsShouldProcess:=True)>
+﻿<Cmdlet(VerbsLifecycle.Complete, "SqlTransaction", SupportsShouldProcess:=True)>
 Public Class CompleteSqlTransaction
     Inherits PSCmdlet
 #Region "Parameters"

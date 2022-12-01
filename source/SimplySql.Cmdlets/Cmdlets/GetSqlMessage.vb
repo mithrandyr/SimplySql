@@ -1,6 +1,4 @@
-﻿Imports System.Management.Automation.Language
-
-<Cmdlet(VerbsCommon.Get, "SqlMessage", SupportsShouldProcess:=True)>
+﻿<Cmdlet(VerbsCommon.Get, "SqlMessage", SupportsShouldProcess:=True)>
 Public Class GetSqlMessage
     Inherits PSCmdlet
 #Region "Parameters"

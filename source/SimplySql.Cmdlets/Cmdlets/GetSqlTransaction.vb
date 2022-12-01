@@ -1,6 +1,4 @@
-﻿Imports System.Management.Automation.Language
-
-<Cmdlet(VerbsCommon.Get, "SqlTransaction", SupportsShouldProcess:=True)>
+﻿<Cmdlet(VerbsCommon.Get, "SqlTransaction", SupportsShouldProcess:=True)>
 Public Class GetSqlTransaction
     Inherits PSCmdlet
 #Region "Parameters"

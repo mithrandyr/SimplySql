@@ -1,6 +1,4 @@
-﻿Imports System.Management.Automation.Language
-
-<Cmdlet(VerbsCommon.Set, "SqlConnection", SupportsShouldProcess:=True)>
+﻿<Cmdlet(VerbsCommon.Set, "SqlConnection", SupportsShouldProcess:=True)>
 Public Class SetSqlConnection
     Inherits PSCmdlet
 #Region "Parameters"

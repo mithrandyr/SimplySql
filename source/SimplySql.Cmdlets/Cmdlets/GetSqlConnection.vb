@@ -1,5 +1,5 @@
-﻿<Cmdlet(VerbsCommon.Undo, "SqlTransaction", SupportsShouldProcess:=True)>
-Public Class UndoSqlTransaction
+﻿<Cmdlet(VerbsCommon.Get, "SqlConnection", SupportsShouldProcess:=True)>
+Public Class GetSqlConnection
     Inherits PSCmdlet
 #Region "Parameters"
     <Parameter(ValueFromPipelineByPropertyName:=True)>
@@ -12,12 +12,10 @@ Public Class UndoSqlTransaction
         If Not Engine.Logic.ConnectionExists(ConnectionName) Then
             ErrorConnectionNotFound(ConnectionName)
         Else
-            If Me.ShouldProcess(ConnectionName, "Rollback a Sql Transaction") Then
-                Dim conn = Engine.Logic.GetConnection(ConnectionName)
+            If Me.ShouldProcess(ConnectionName, "Get Sql Connection") Then
                 Try
-                    conn.RollbackTransaction()
+                    WriteObject(Engine.Logic.GetConnection(ConnectionName).Connection)
                 Catch ex As Exception
-                    If conn.Connection.State = Data.ConnectionState.Closed Then conn.Connection.Open()
                     ErrorOperationFailed(ex, ConnectionName)
                 End Try
             End If
