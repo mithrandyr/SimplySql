@@ -123,15 +123,19 @@ Public MustInherit Class ProviderBase
 #End Region
 
 #Region "Update"
-    Public Overridable Function Update(query As String, timeout As Integer, params As Hashtable) As Int64
+    Public Overridable Function Update(cmd As IDbCommand) As Int64 Implements ISimplySqlProvider.Update
+        If cmd.Transaction Is Nothing AndAlso HasTransaction Then cmd.Transaction = Transaction
+        Try
+            Return cmd.ExecuteNonQuery()
+        Catch ex As Exception
+            ex.Data.Add("Query", cmd.CommandText)
+            ex.Data.Add("Parameters", cmd.Parameters)
+            Throw ex
+        End Try
+    End Function
+    Public Overridable Function Update(query As String, timeout As Integer, params As Hashtable) As Int64 Implements ISimplySqlProvider.Update
         Using cmd As IDbCommand = Me.GetCommand(query, timeout, params)
-            Try
-                Return cmd.ExecuteNonQuery()
-            Catch ex As Exception
-                ex.Data.Add("Query", query)
-                ex.Data.Add("Parameters", params)
-                Throw ex
-            End Try
+            Return Update(cmd)
         End Using
     End Function
     Public Function Update(query As String, Optional params As Hashtable = Nothing) As Int64
