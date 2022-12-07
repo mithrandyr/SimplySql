@@ -6,20 +6,27 @@ task Build {
 } 
 
 task Clean {
-  remove "source\output"
-  foreach($prj in @("ConsoleTest","SimplySql.Cmdlets","SimplySql.Common","SimplySql.Engine")) {
-    remove "source\$prj\bin"
-    remove "source\$prj\obj"
+  #remove "source\output"
+  foreach($prj in @("SimplySql.Cmdlets","SimplySql.Common","SimplySql.Engine")) {
+    remove "source\$prj\bin" -verbose
+    remove "source\$prj\obj" -verbose
   }
 }
 
 task CreateModule {
-  remove "SimplySql"
-  New-Item "SimplySql" -ItemType Directory | Out-Null
-  Copy-Item "ScriptSrc\SimplySql.psd1" -Destination SimplySql
+  remove "Output\SimplySql"
+  New-Item "Output\SimplySql" -ItemType Directory | Out-Null
+  #Base Module Files
+  $baseFiles = @(
+    "SimplySql\SimplySql.psd1"
+    "Source\Output\SimplySql.Cmdlets.dll"
+    "Source\Output\EnumerableToDataReader.dll"
+  ) | Copy-Item -Destination "Output\SimplySql" -PassThru
 
-  New-Item "SimplySql\bin" -ItemType Directory | Out-Null
-
+  #Copy files for engine
+  New-Item "Output\SimplySql\bin" -ItemType Directory | Out-Null
+  Get-ChildItem "Source\Output\*.dll" -Exclude $baseFiles.Name |
+    Copy-Item -Destination "Output\SimplySql\bin"
 }
 
 task GenerateDocs {
@@ -31,4 +38,4 @@ task SQLite_Interops {
 }
 
 
-task . Build, Clean
+task . Build, CreateModule, Clean, GenerateDocs, SQLite_Interops
