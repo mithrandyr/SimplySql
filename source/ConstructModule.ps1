@@ -1,4 +1,4 @@
-
+<#
 $outputFolder = Join-Path $PSScriptRoot "Output"
 $binFolder = Join-Path $outputFolder "bin"
 $cmdletFolder = Resolve-Path .\
@@ -35,6 +35,9 @@ foreach ($p in $Platforms) {
 	Copy-Item -Path $SQLiteDll -Destination $dstPath
 }
 Remove-Item -Path $SQLiteDll
+#>
+
+Invoke-Build -DebugOnly
 
 $PSModuleAutoLoadingPreference = "none"
 Import-Module .\Output\SimplySql.Cmdlets.dll -Verbose

@@ -1,13 +1,13 @@
 task Build {
   remove "source\output"
   exec {
-    dotnet build source -c release -o "source\output"
+    dotnet publish source -c release -o "source\output"
   }
 } 
 
 task Clean {
-  #remove "source\output"
-  foreach($prj in @("SimplySql.Cmdlets","SimplySql.Common","SimplySql.Engine")) {
+  remove "source\output"
+  foreach($prj in @("SimplySql.Cmdlets","SimplySql.Common","SimplySql.Engine","SQLite")) {
     remove "source\$prj\bin" -verbose
     remove "source\$prj\obj" -verbose
   }
@@ -34,8 +34,23 @@ task GenerateDocs {
 }
 
 task SQLite_Interops {
+  $envList = "win-x64","win-x86","linux-x64","osx-x64"
 
+  foreach($env in $envlist) {
+    remove "source\output"
+    exec {
+      dotnet publish source\SQLite -c release -o "source\output" -r $env
+    }
+    
+    $dest = "output\SimplySql\bin\$env"
+    remove $dest
+    New-Item $dest -ItemType Directory | Out-Null
+    Get-ChildItem "source\output\*.dll" -exclude "SQLite.dll" |
+      Copy-Item -Destination $dest    
+  }
+  remove "output\SimplySql\bin\System.Data.SQLite.dll"
 }
 
 
-task . Build, CreateModule, Clean, GenerateDocs, SQLite_Interops
+task . Build, CreateModule, SQLite_Interops, Clean, GenerateDocs
+task Debugging Build

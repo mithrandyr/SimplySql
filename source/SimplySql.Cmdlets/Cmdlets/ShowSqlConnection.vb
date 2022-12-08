@@ -17,7 +17,7 @@ Public Class ShowSqlConnection
         If All.IsPresent Then
             WriteObject(Engine.Logic.Connections, True)
         Else
-            WriteObject(Engine.Logic.ConnectionExists(ConnectionName))
+            WriteObject(Engine.Logic.GetConnection(ConnectionName))
         End If
     End Sub
 End Class
