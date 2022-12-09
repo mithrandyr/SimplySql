@@ -14,8 +14,11 @@ task GenerateDocs {
         Set-Location $using:BuildRoot
         Import-Module ".\output\SimplySql"
         
-        if(-not (Test-Path "docs")) { New-MarkdownHelp -Module SimplySql -OutputFolder Docs }
-        else { Update-MarkdownHelp -Path "Docs" }
+        if(-not (Test-Path "docs")) {
+          New-MarkdownHelp -Module SimplySql -OutputFolder Docs -AlphabeticParamsOrder -WithModulePage
+          New-MarkdownAboutHelp -OutputFolder Docs -AboutName "SimplySql"
+        }
+        else { Update-MarkdownHelpModule -Path "Docs" -AlphabeticParamsOrder -Force -RefreshModulePage }
       } |
     Receive-Job -Wait -AutoRemoveJob |
     Select-Object -Expand Name |
