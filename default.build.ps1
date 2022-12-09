@@ -1,8 +1,8 @@
-param([version]$Version)
+param([version]$Version, [switch]$CommitRevision)
 New-Alias -Name HV -Value (Resolve-Path HandleVerbose.ps1)
 
 task Clean { remove "output" }
-task Build { Invoke-Build -File "source\source.build.ps1" -Version $Version}, incrementRevision
+task Build incrementRevision, { Invoke-Build -File "source\source.build.ps1" -Version $Version}
 
 task ComposeModule {
   if(-not (Test-Path "output\SimplySql" -PathType Container)) {
@@ -22,7 +22,7 @@ task GenerateDocs {
         else { Update-MarkdownHelpModule -Path "Docs" -AlphabeticParamsOrder -Force -RefreshModulePage }
       } |
     Receive-Job -Wait -AutoRemoveJob |
-    Select-Object -Expand Name |
+    ForEach-Object { "  $($_.Name)" } |
     HV "Generating Module Documentation" "."
 }
 
@@ -43,10 +43,13 @@ task incrementRevision {
     $Script:Version = [version]::new($version.Major, $version.Minor, $version.Build, $version.Revision + 1)
   }
   
+  Import-Module PowerShellGet -Verbose:$false
   Update-ModuleManifest -Path "ModuleManifest\SimplySql.psd1" -ModuleVersion $version
-  exec { git commit "ModuleManifest/SimplySql.psd1" -m "Updating version To $version" } | HV "Incrementing Version ($version) and Git Commit"
 }
 
+task revisionCommit {
+  exec { git commit "ModuleManifest/SimplySql.psd1" -m "Updating version To $version" } | HV "Incrementing Version ($version) and Git Commit"
+} -If $CommitRevision
 
 
-task . Build, ComposeModule
+task . Build, ComposeModule, revisionCommit
