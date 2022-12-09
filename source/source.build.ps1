@@ -1,4 +1,4 @@
-param([switch]$DebugOnly)
+param([version]$Version = "2.0.0", [switch]$DebugOnly)
 
 if(-not [bool](Get-ChildItem alias:\).where({$_.name -eq "hv"})) {
     New-Alias -Name HV -Value (Resolve-Path ..\HandleVerbose.ps1)
@@ -10,7 +10,7 @@ task Build {
     $configuration = "Release"
     if($DebugOnly) { $configuration = "debug"}
     
-    exec { dotnet publish "SimplySql.Cmdlets" -c $Configuration -o "output\bin" } | HV "Building SimplySql.Cmdlets" "."
+    exec { dotnet publish "SimplySql.Cmdlets" -c $Configuration -o "output\bin" -p:Version=$Version -p:AssemblyVersion=$version} | HV "Building SimplySql.Cmdlets ($version)" "."
     
     Move-Item "output\bin\SimplySql.Cmdlets.dll" -Destination "output"
     Move-Item "output\bin\EnumerableToDataReader.dll" -Destination "output"

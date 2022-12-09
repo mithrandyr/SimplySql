@@ -12,47 +12,47 @@ Locale: en-US
 
 ## SimplySql Cmdlets
 ### [Clear-SqlMessage](Clear-SqlMessage.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Close-SqlConnection](Close-SqlConnection.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Complete-SqlTransaction](Complete-SqlTransaction.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Get-SqlConnection](Get-SqlConnection.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Get-SqlMessage](Get-SqlMessage.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Get-SqlTransaction](Get-SqlTransaction.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Invoke-SqlQuery](Invoke-SqlQuery.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Invoke-SqlScalar](Invoke-SqlScalar.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Invoke-SqlUpdate](Invoke-SqlUpdate.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Open-SQLiteConnection](Open-SQLiteConnection.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Set-SqlConnection](Set-SqlConnection.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Show-SqlConnection](Show-SqlConnection.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Start-SqlTransaction](Start-SqlTransaction.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Test-SqlConnection](Test-SqlConnection.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Undo-SqlTransaction](Undo-SqlTransaction.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 

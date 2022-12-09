@@ -1,7 +1,8 @@
+param([version]$Version)
 New-Alias -Name HV -Value (Resolve-Path HandleVerbose.ps1)
 
 task Clean { remove "output" }
-task Build { Invoke-Build -File "source\source.build.ps1" } 
+task Build { Invoke-Build -File "source\source.build.ps1" -Version $Version} 
 
 task ComposeModule {
   if(-not (Test-Path "output\SimplySql" -PathType Container)) {
@@ -35,6 +36,15 @@ task copyBinaries {
   Copy-Item "source\output\bin" -Destination "output\SimplySql" -Recurse -Force  
 }
 
+task incrementRevision {
+  if(-not $version) {
+    $Script:Version = [Version](Import-PowerShellDataFile -Path "ModuleManifest\SimplySql.psd1")["ModuleVersion"]
+    $Script:Version = [version]::new($version.Major, $version.Minor, $version.Build, $version.Revision + 1)
+  }
+  
+  Update-ModuleManifest -Path "ModuleManifest\SimplySql.psd1" -ModuleVersion $version
+}
 
 
-task . Build, ComposeModule
+
+task . incrementRevision, Build, ComposeModule
