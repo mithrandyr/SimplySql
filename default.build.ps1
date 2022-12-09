@@ -2,7 +2,7 @@ param([version]$Version)
 New-Alias -Name HV -Value (Resolve-Path HandleVerbose.ps1)
 
 task Clean { remove "output" }
-task Build { Invoke-Build -File "source\source.build.ps1" -Version $Version} 
+task Build { Invoke-Build -File "source\source.build.ps1" -Version $Version}, incrementRevision
 
 task ComposeModule {
   if(-not (Test-Path "output\SimplySql" -PathType Container)) {
@@ -30,6 +30,7 @@ task copyManifest {
   #Base Module Files
   Copy-Item "ModuleManifest\SimplySql.psd1" -Destination "output\SimplySql" -Force
 }
+
 task copyBinaries {
   #Copy files for engine
   Copy-Item "source\output\*" -Destination "output\SimplySql" -Force
@@ -43,8 +44,9 @@ task incrementRevision {
   }
   
   Update-ModuleManifest -Path "ModuleManifest\SimplySql.psd1" -ModuleVersion $version
+  exec { git commit "ModuleManifest/SimplySql.psd1" -m "Updating version To $version" } | HV "Incrementing Version ($version) and Git Commit"
 }
 
 
 
-task . incrementRevision, Build, ComposeModule
+task . Build, ComposeModule
