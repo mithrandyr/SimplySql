@@ -1,4 +1,4 @@
-/output/
+/[Oo]utput/
 /binarysrc/packages/* 
 #packages/
 ## Ignore Visual Studio temporary files, build results, and
