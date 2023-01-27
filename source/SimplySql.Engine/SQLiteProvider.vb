@@ -49,9 +49,6 @@ Public Class SQLiteProvider
     Public Overrides Sub ChangeDatabase(databaseName As String)
         Throw New NotSupportedException($"SQLite does not support databases, cannot change to {databaseName}.")
     End Sub
-    Public Overrides Function CreateConnection(ht As Hashtable) As Data.IDbConnection
-        Throw New NotImplementedException()
-    End Function
 
     Public Overrides Function GetMessage() As SqlMessage
         Throw New NotSupportedException("SQLiteProvider does not support SqlMessages.")

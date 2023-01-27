@@ -24,7 +24,6 @@ Public MustInherit Class ProviderBase
 #Region "Overrides"
     Public MustOverride Function ConnectionInfo() As SortedDictionary(Of String, Object) Implements ISimplySqlProvider.ConnectionInfo
     Public MustOverride Sub ChangeDatabase(databaseName As String) Implements ISimplySqlProvider.ChangeDatabase
-    Public MustOverride Function CreateConnection(ht As Hashtable) As IDbConnection
 #End Region
 
 #Region "Concrete"
