@@ -1,19 +1,25 @@
 param([version]$Version, [switch]$CommitRevision)
 New-Alias -Name HV -Value (Resolve-Path HandleVerbose.ps1)
 
+if(-not $version) {
+  $Script:Version = [Version](Import-PowerShellDataFile -Path "ModuleManifest\SimplySql.psd1")["ModuleVersion"]
+  $Script:Version = [version]::new($version.Major, $version.Minor, $version.Build, $version.Revision + 1)
+}
+
+
 task Clean { remove "output" }
-task Build incrementRevision, { Invoke-Build -File "source\source.build.ps1" -Version $Version}
+task Build { Invoke-Build -File "source\source.build.ps1" -Version $Version}
 
 task ComposeModule {
   if(-not (Test-Path "output\SimplySql" -PathType Container)) {
     New-Item "Output\SimplySql" -ItemType Directory | Out-Null
   }
-}, copyManifest, copyBinaries, GenerateDocs
+}, copyManifest, copyBinaries, incrementRevision, GenerateDocs
 
 task GenerateDocs {
   Start-Job -ScriptBlock {
         Set-Location $using:BuildRoot
-        Import-Module ".\output\SimplySql"
+        Import-Module ".\output\SimplySql" -Verbose:$false
         
         if(-not (Test-Path "docs")) {
           New-MarkdownHelp -Module SimplySql -OutputFolder Docs -AlphabeticParamsOrder -WithModulePage
@@ -38,13 +44,9 @@ task copyBinaries {
 }
 
 task incrementRevision {
-  if(-not $version) {
-    $Script:Version = [Version](Import-PowerShellDataFile -Path "ModuleManifest\SimplySql.psd1")["ModuleVersion"]
-    $Script:Version = [version]::new($version.Major, $version.Minor, $version.Build, $version.Revision + 1)
-  }
-  
   Import-Module PowerShellGet -Verbose:$false
-  Update-ModuleManifest -Path "ModuleManifest\SimplySql.psd1" -ModuleVersion $version
+  Update-ModuleManifest -Path "Output\SimplySql\SimplySql.psd1" -ModuleVersion $version
+  Copy-Item -Path "Output\SimplySql\SimplySql.psd1" -Destination "ModuleManifest\SimplySql.psd1"
 }
 
 task revisionCommit {
