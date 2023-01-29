@@ -34,7 +34,7 @@ This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
 ### 1.9.1
-* Updating SQLite library (1.0.117.0) thanks @JediNite
+* Updating SQLite library.  Interop Version: 1.0.117.0 & SQLite Server Version: 3.40.0 thanks @JediNite
 ### 1.9.0
 * Updated classes to use `::new()` constructor.  thanks @joalcorn
 * Updated MySql provider to use new library (8.0.28).  thanks @twerthi
