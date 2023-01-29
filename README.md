@@ -5,6 +5,8 @@
 [![Powershell Gallery](https://img.shields.io/powershellgallery/v/SimplySql.svg)](https://www.powershellgallery.com/packages/SimplySql/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/SimplySql.svg)](https://www.powershellgallery.com/packages/SimplySql/)
 
+**Update (1/27/2023):** Work still in progress (v2) which will support PS7.
+
 Querying SQL (SQL Server, Oracle, PostgreSql, SQLite, & mySql) the PowerShell way: simple commands... powerful opportunities.
 
 SimplySql is a module that provides an intuitive set of cmdlets for talking to databases that abstracts the vendor specifics, allowing you to focus on getting work done.
@@ -31,6 +33,8 @@ It has been released to PowerShellGallery.  Installation is as simple as
 This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
+### 1.9.1
+* Updating SQLite library.  Interop Version: 1.0.117.0 & SQLite Server Version: 3.40.0 thanks @JediNite
 ### 1.9.0
 * Updated classes to use `::new()` constructor.  thanks @joalcorn
 * Updated MySql provider to use new library (8.0.28).  thanks @twerthi
