@@ -11,7 +11,7 @@ Public Module Logic
         Try
             Return Connections.First(Function(item) item.Key.Equals(connectionName, StringComparison.OrdinalIgnoreCase)).Value
         Catch ioex As InvalidOperationException
-            Throw New IndexOutOfRangeException($"No connection named '{connectionName}' exists.")
+            Throw New KeyNotFoundException($"No connection named '{connectionName}' exists.")
         End Try
     End Function
 
@@ -31,7 +31,7 @@ Public Module Logic
                 Connections.Remove(conn.ConnectionName)
             End Try
         Catch ioex As InvalidOperationException
-            Throw New IndexOutOfRangeException($"No connection named '{connectionName}' exists.")
+            Throw New KeyNotFoundException($"No connection named '{connectionName}' exists.")
         End Try
     End Sub
 End Module

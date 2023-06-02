@@ -65,7 +65,7 @@ Public Class SQLiteProvider
 #End Region
 
 #Region "Shared Functions"
-    Public Shared Function Create(connectionName As String, dataSource As String, password As String, commandTimeout As Integer) As SQLiteProvider
+    Public Shared Function Create(connectionName As String, dataSource As String, password As String, commandTimeout As Integer, Optional additionalParams As Hashtable = Nothing) As SQLiteProvider
         Dim sb As New SQLiteConnectionStringBuilder
         If Not dataSource.Equals(":memory:", StringComparison.OrdinalIgnoreCase) Then
             Dim filepath = New IO.FileInfo(dataSource)
@@ -75,6 +75,11 @@ Public Class SQLiteProvider
         sb.DataSource = dataSource
 
         If Not String.IsNullOrWhiteSpace(password) Then sb.Password = password
+
+        'Process additional parameters through the hashtable
+        For Each key In additionalParams.Keys
+            sb.Add(key, additionalParams(key))
+        Next
 
         Return Create(connectionName, sb.ToString, commandTimeout)
     End Function
