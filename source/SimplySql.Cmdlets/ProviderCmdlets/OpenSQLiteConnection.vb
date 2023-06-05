@@ -18,6 +18,9 @@ Public Class OpenSQLiteConnection
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=1)>
     Public Property Password As String
 
+    <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
+    Public Property Additional As Hashtable
+
     <Parameter(ParameterSetName:="conn", ValueFromPipelineByPropertyName:=True)>
     Public Property ConnectionString As String
 #End Region
@@ -35,7 +38,7 @@ Public Class OpenSQLiteConnection
                 If Not DataSource.Equals(":memory:", StringComparison.OrdinalIgnoreCase) Then
                     DataSource = Me.GetUnresolvedProviderPathFromPSPath(DataSource) 'handle powershell paths using psdrives
                 End If
-                newProvider = Engine.SQLiteProvider.Create(ConnectionName, DataSource, Password, CommandTimeout)
+                newProvider = Engine.SQLiteProvider.Create(ConnectionName, DataSource, Password, CommandTimeout, Additional)
             End If
 
             Engine.Logic.OpenAndAddConnection(newProvider)

@@ -1,4 +1,6 @@
-﻿Imports System.Data
+﻿Imports System.Collections.Specialized
+Imports System.Data
+Imports System.Data.SQLite
 Imports System.Threading
 Imports SimplySql.Common
 Public MustInherit Class ProviderBase
@@ -22,7 +24,18 @@ Public MustInherit Class ProviderBase
     End Sub
 
 #Region "Overrides"
-    Public MustOverride Function ConnectionInfo() As SortedDictionary(Of String, Object) Implements ISimplySqlProvider.ConnectionInfo
+    Public Overridable Function ConnectionInfo() As OrderedDictionary Implements ISimplySqlProvider.ConnectionInfo
+        Dim od As New OrderedDictionary
+        With od
+            .Add("ConnectionName", ConnectionName)
+            .Add("ProviderType", ProviderType)
+            .Add("ConnectionState", Connection.State)
+            .Add("ConnectionString", Connection.ConnectionString)
+            .Add("CommandTimeout", CommandTimeout)
+            .Add("HasTransaction", HasTransaction)
+        End With
+        Return od
+    End Function
     Public MustOverride Sub ChangeDatabase(databaseName As String) Implements ISimplySqlProvider.ChangeDatabase
 #End Region
 

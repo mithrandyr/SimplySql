@@ -1,4 +1,5 @@
-﻿Imports System.Data.SQLite
+﻿Imports System.Collections.Specialized
+Imports System.Data.SQLite
 Imports NetTopologySuite.Operation.Buffer.Validate
 Imports SimplySql.Common
 
@@ -9,19 +10,17 @@ Public Class SQLiteProvider
         MyBase.New(connectionName, Common.ProviderTypes.SQLite, connection, commandTimeout)
     End Sub
 
-    Public Overrides Function ConnectionInfo() As SortedDictionary(Of String, Object)
-        Dim sd As New SortedDictionary(Of String, Object)
-        With sd
-            .Add("ConnectionName", ConnectionName)
-            .Add("ProviderType", ProviderType)
-            .Add("ConnectionState", Connection.State)
-            .Add("ConnectionString", Connection.ConnectionString)
-            .Add("ServerVersion", DirectCast(Connection, SQLiteConnection).ServerVersion)
-            .Add("DataSource", DirectCast(Connection, SQLiteConnection).DataSource)
-            .Add("CommandTimeout", CommandTimeout)
-            .Add("HasTransaction", HasTransaction)
-        End With
-        Return sd
+    Public Overloads ReadOnly Property Connection As SQLiteConnection
+        Get
+            Return DirectCast(MyBase.Connection, SQLiteConnection)
+        End Get
+    End Property
+
+    Public Overrides Function ConnectionInfo() As OrderedDictionary
+        Dim od = MyBase.ConnectionInfo
+        od.Add("ServerVersion", Connection.ServerVersion)
+        od.Add("DataSource", Connection.DataSource)
+        Return od
     End Function
 
     Public Overrides Function GetDataSet(query As String, cmdTimeout As Integer, params As Hashtable, useProviderTypes As Boolean) As Data.DataSet
@@ -77,9 +76,11 @@ Public Class SQLiteProvider
         If Not String.IsNullOrWhiteSpace(password) Then sb.Password = password
 
         'Process additional parameters through the hashtable
-        For Each key In additionalParams.Keys
-            sb.Add(key, additionalParams(key))
-        Next
+        If additionalParams IsNot Nothing Then
+            For Each key In additionalParams.Keys
+                sb.Add(key, additionalParams(key))
+            Next
+        End If
 
         Return Create(connectionName, sb.ToString, commandTimeout)
     End Function

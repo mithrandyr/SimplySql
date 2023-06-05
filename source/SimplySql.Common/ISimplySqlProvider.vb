@@ -1,10 +1,11 @@
-﻿Imports System.Data
+﻿Imports System.Collections.Specialized
+Imports System.Data
 Public Interface ISimplySqlProvider
     ReadOnly Property ConnectionName As String
     ReadOnly Property Connection As IDbConnection
     ReadOnly Property ProviderName As String
     Property CommandTimeout As Integer
-    Function ConnectionInfo() As SortedDictionary(Of String, Object)
+    Function ConnectionInfo() As OrderedDictionary
     Sub ChangeDatabase(databaseName As String)
 
 #Region "DataAccess"

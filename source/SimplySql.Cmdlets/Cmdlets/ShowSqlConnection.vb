@@ -15,9 +15,13 @@ Public Class ShowSqlConnection
 
     Protected Overrides Sub EndProcessing()
         If All.IsPresent Then
-            WriteObject(Engine.Logic.Connections, True)
+            WriteObject(Engine.Logic.Connections.Keys, True)
         Else
-            WriteObject(Engine.Logic.GetConnection(ConnectionName))
+            Dim connInfo As New PSObject()
+            For Each de As DictionaryEntry In Engine.Logic.GetConnection(ConnectionName).ConnectionInfo
+                connInfo.Properties.Add(New PSNoteProperty(de.Key, de.Value))
+            Next
+            WriteObject(connInfo)
         End If
     End Sub
 End Class
