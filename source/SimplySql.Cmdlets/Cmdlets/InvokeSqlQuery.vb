@@ -51,7 +51,6 @@ Public Class InvokeSqlQuery
                             End If
                         End Using
                     End If
-                    WriteVerbose($"Retrieved Results from '{ConnectionName}'.")
                 Catch ex As Exception
                     ErrorOperationFailed(ex, ConnectionName)
                 End Try

@@ -25,6 +25,8 @@ Public Class SetSqlConnection
             If Not String.IsNullOrEmpty(Database) AndAlso Me.ShouldProcess(ConnectionName, $"Change Database to '{Database}'") Then
                 Try
                     Engine.Logic.GetConnection(ConnectionName).ChangeDatabase(Database)
+                Catch nse As NotSupportedException
+                    WriteWarning(nse.Message)
                 Catch ex As Exception
                     ErrorOperationFailed(ex, ConnectionName)
                 End Try

@@ -1,13 +1,11 @@
 ﻿Imports System.Collections.Specialized
 Imports System.Data.SQLite
-Imports NetTopologySuite.Operation.Buffer.Validate
-Imports SimplySql.Common
 
 Public Class SQLiteProvider
     Inherits ProviderBase
 
     Public Sub New(connectionName As String, commandTimeout As Integer, connection As SQLiteConnection)
-        MyBase.New(connectionName, Common.ProviderTypes.SQLite, connection, commandTimeout)
+        MyBase.New(connectionName, ProviderTypes.SQLite, connection, commandTimeout)
     End Sub
 
     Public Overloads ReadOnly Property Connection As SQLiteConnection

@@ -15,6 +15,8 @@ Public Class ClearSqlMessage
                 Try
                     Engine.Logic.GetConnection(ConnectionName).ClearMessages()
                     WriteVerbose($"SQL Messages cleared from '{ConnectionName}'.")
+                Catch nse As NotSupportedException
+                    WriteWarning(nse.Message)
                 Catch ex As Exception
                     WriteWarning($"[{ConnectionName}] {ex.Message}")
                 End Try

@@ -31,7 +31,6 @@ Public Class InvokeSqlScalar
                 If ParameterSetName.Equals("object", StringComparison.OrdinalIgnoreCase) Then Parameters = ParamObject.ConvertToHashtable
                 Try
                     WriteObject(Engine.Logic.GetConnection(ConnectionName).GetScalar(singleQuery, CommandTimeout, Parameters))
-                    WriteVerbose($"Retrieved Scalar from '{ConnectionName}'.")
                 Catch ex As Exception
                     ErrorOperationFailed(ex, ConnectionName)
                 End Try
