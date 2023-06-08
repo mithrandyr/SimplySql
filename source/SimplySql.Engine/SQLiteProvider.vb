@@ -74,11 +74,7 @@ Public Class SQLiteProvider
         If Not String.IsNullOrWhiteSpace(password) Then sb.Password = password
 
         'Process additional parameters through the hashtable
-        If additionalParams IsNot Nothing Then
-            For Each key In additionalParams.Keys
-                sb.Add(key, additionalParams(key))
-            Next
-        End If
+        sb.AddHashtable(additionalParams)
 
         Return Create(connectionName, sb.ToString, commandTimeout)
     End Function
