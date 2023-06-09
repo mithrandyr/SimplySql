@@ -1,8 +1,7 @@
 ﻿Imports System.Collections.Specialized
 Imports System.Data
 Imports System.Data.Common
-Imports System.Data.SqlClient
-Imports System.Data.SQLite
+Imports Microsoft.Data.SqlClient
 Imports System.Runtime.CompilerServices
 
 Public Class MSSQLProvider
@@ -70,12 +69,12 @@ Public Class MSSQLProvider
                     dataReader.
                         GetSchemaTable().
                         AsEnumerable.
-                        Select(Function(dr) dr("ColumnName")).
+                        Select(Function(dr) dr("ColumnName").ToString).
                         ToList.
                         ForEach(Function(colName) bcp.ColumnMappings.Add(colName, colName))
                 Else
-                    For Each de As DictionaryEntry In columnMap
-                        bcp.ColumnMappings.Add(de.Key, de.Value)
+                    For Each key As String In columnMap.Keys
+                        bcp.ColumnMappings.Add(key, columnMap.Item(key).ToString)
                     Next
                 End If
 
@@ -85,9 +84,9 @@ Public Class MSSQLProvider
                 End If
 
                 Dim rowcount As Long = 0
-                rowcount -= GetScalar($"SELECT COUNT(1) FROM {destinationTable}", 30)
+                rowcount -= DirectCast(GetScalar($"SELECT COUNT(1) FROM {destinationTable}", 30), Long)
                 bcp.WriteToServer(dataReader)
-                rowcount += GetScalar($"SELECT COUNT(1) FROM {destinationTable}", 30)
+                rowcount += DirectCast(GetScalar($"SELECT COUNT(1) FROM {destinationTable}", 30), Long)
                 Return rowcount
             End Using
         End Using
@@ -98,27 +97,26 @@ Public Class MSSQLProvider
     End Sub
 
 #Region "Shared Functions"
-    Public Shared Function Create(connectionName As String, server As String, database As String, commandTimeout As Integer, Optional additionalParams As Hashtable = Nothing) As MSSQLProvider
-        Dim sb As New System.Data.SqlClient.SqlConnectionStringBuilder
+    Public Shared Function Create(connectionName As String, server As String, database As String, commandTimeout As Integer, auth As AuthMSSQL, Optional additionalParams As Hashtable = Nothing) As MSSQLProvider
+        Dim sb As New SqlConnectionStringBuilder
         sb.DataSource = server
         sb.InitialCatalog = database
 
-        If Not dataSource.Equals(":memory:", StringComparison.OrdinalIgnoreCase) Then
-            Dim filepath = New IO.FileInfo(dataSource)
-            If Not filepath.Directory.Exists Then filepath.Directory.Create()
-        End If
+        Select Case auth.AuthType
+            Case AuthMSSQL.AuthMSSQLType.Windows
+                sb.IntegratedSecurity = True
+            Case AuthMSSQL.AuthMSSQLType.Azure
+                sb.Authentication = SqlAuthenticationMethod.ActiveDirectoryPassword
 
-        sb.DataSource = dataSource
-
-        If Not String.IsNullOrWhiteSpace(password) Then sb.Password = password
-
+        End Select
         'Process additional parameters through the hashtable
         sb.AddHashtable(additionalParams)
 
-        Return Create(connectionName, sb.ToString, commandTimeout)
+        Return Create(connectionName, sb.ToString, commandTimeout, auth.AzureToken)
     End Function
-    Public Shared Function Create(connectionName As String, connectionString As String, commandTimeout As Integer) As MSSQLProvider
+    Public Shared Function Create(connectionName As String, connectionString As String, commandTimeout As Integer, Optional azToken As String = Nothing) As MSSQLProvider
         Dim conn As New SqlConnection(connectionString)
+        If Not String.IsNullOrWhiteSpace(azToken) Then conn.AccessToken = azToken
         Return New MSSQLProvider(connectionName, commandTimeout, conn)
     End Function
 #End Region

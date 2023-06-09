@@ -15,7 +15,7 @@ schema: 2.0.0
 ### default (Default)
 ```
 Open-SQLiteConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [[-DataSource] <String>]
- [[-Password] <String>] [<CommonParameters>]
+ [[-Password] <String>] [-Additional <Hashtable>] [<CommonParameters>]
 ```
 
 ### conn
@@ -37,6 +37,21 @@ PS C:\> {{ Add example code here }}
 {{ Add example description here }}
 
 ## PARAMETERS
+
+### -Additional
+{{ Fill Additional Description }}
+
+```yaml
+Type: Hashtable
+Parameter Sets: default
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: True (ByPropertyName)
+Accept wildcard characters: False
+```
 
 ### -CommandTimeout
 {{ Fill CommandTimeout Description }}

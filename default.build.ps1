@@ -39,8 +39,8 @@ task copyManifest {
 
 task copyBinaries {
   #Copy files for engine
-  Copy-Item "source\output\*" -Destination "output\SimplySql" -Force
-  Copy-Item "source\output\bin" -Destination "output\SimplySql" -Recurse -Force  
+  Copy-Item "source\output\*.dll" -Destination "output\SimplySql" -Force
+  Copy-Item "source\output\bin" -Destination "output\SimplySql" -Filter "*.dll" -Recurse -Force  
 }
 
 task incrementRevision {

@@ -12,16 +12,17 @@ End Class
 
 Public Class AuthMSSQL
     Inherits AuthBase
-    Public ReadOnly Property WindowsAuth As Boolean = False
+    Public ReadOnly AuthType As AuthMSSQLType = AuthMSSQLType.UserNamePassword
     Public ReadOnly Property AzureToken As String
 
     Sub New()
         MyBase.New(Nothing, Nothing)
-        Me.WindowsAuth = True
+        Me.AuthType = AuthMSSQLType.Windows
     End Sub
 
     Sub New(azToken As String)
         MyBase.New(Nothing, Nothing)
+        Me.AuthType = AuthMSSQLType.Azure
         If azToken.StartsWith("bearer ") Then
             Me.AzureToken = azToken.Substring(7)
         Else
@@ -29,4 +30,9 @@ Public Class AuthMSSQL
         End If
     End Sub
 
+    Public Enum AuthMSSQLType
+        Windows
+        Azure
+        UserNamePassword
+    End Enum
 End Class
