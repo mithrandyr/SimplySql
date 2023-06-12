@@ -4,11 +4,8 @@ EnumerableToDataReader -- for getting input objects to datareader to be used by 
 
 
 Tasks
--Add argumentcompleted to all ConnectionName parameters
+-Add argumentcompleter to all ConnectionName parameters
 
-
-How to solve to SQLite stupidity (across platforms and the interop)
-use subfolders for each platform and put dll + interop into the folder., then determine which one to load based upon environment.
 
 
 Handling dataReader to PSObject: https://expressiontree-tutorial.net/knowledge-base/19841120/generic-dbdatareader-to-list-t--mapping

@@ -49,7 +49,7 @@ Public MustInherit Class ProviderBase
     Public Overridable Function GetCommand(query As String, timeout As Integer, params As Hashtable) As IDbCommand Implements ISimplySqlProvider.GetCommand
         Dim cmd As IDbCommand = Me.Connection.CreateCommand()
         cmd.CommandText = query
-        cmd.CommandTimeout = timeout
+        cmd.CommandTimeout = If(timeout < 0, Me.CommandTimeout, timeout)
         If Me.HasTransaction Then cmd.Transaction = Me.Transaction
 
         If params IsNot Nothing Then
@@ -82,9 +82,6 @@ Public MustInherit Class ProviderBase
                 Throw ex
             End Try
         End Using
-    End Function
-    Public Function GetScalar(query As String, Optional params As Hashtable = Nothing) As Object
-        Return Me.GetScalar(query, Me.CommandTimeout, params)
     End Function
     Public Function GetScalar(query As String, timeout As Integer) As Object
         Return Me.GetScalar(query, timeout, Nothing)
@@ -149,12 +146,6 @@ Public MustInherit Class ProviderBase
         Using cmd As IDbCommand = Me.GetCommand(query, timeout, params)
             Return Update(cmd)
         End Using
-    End Function
-    Public Function Update(query As String, Optional params As Hashtable = Nothing) As Int64
-        Return Me.Update(query, Me.CommandTimeout, params)
-    End Function
-    Public Function Update(query As String, timeout As Integer) As Int64
-        Return Me.Update(query, timeout, Nothing)
     End Function
 #End Region
 

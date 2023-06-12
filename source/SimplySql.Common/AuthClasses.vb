@@ -1,6 +1,8 @@
-﻿Imports System.Security
+﻿Imports System.Net
+Imports System.Security
+Imports System.Security.Cryptography
 
-Public Class AuthBase
+Public Class AuthClasses
     Public ReadOnly Property UserName As String
     Public ReadOnly Property Password As SecureString
 
@@ -11,9 +13,10 @@ Public Class AuthBase
 End Class
 
 Public Class AuthMSSQL
-    Inherits AuthBase
-    Public ReadOnly AuthType As AuthMSSQLType = AuthMSSQLType.UserNamePassword
+    Inherits AuthClasses
+    Public ReadOnly AuthType As AuthMSSQLType = AuthMSSQLType.Credential
     Public ReadOnly Property AzureToken As String
+    Public ReadOnly Property Credential As NetworkCredential
 
     Sub New()
         MyBase.New(Nothing, Nothing)
@@ -22,7 +25,7 @@ Public Class AuthMSSQL
 
     Sub New(azToken As String)
         MyBase.New(Nothing, Nothing)
-        Me.AuthType = AuthMSSQLType.Azure
+        Me.AuthType = AuthMSSQLType.Token
         If azToken.StartsWith("bearer ") Then
             Me.AzureToken = azToken.Substring(7)
         Else
@@ -30,9 +33,16 @@ Public Class AuthMSSQL
         End If
     End Sub
 
+    Sub New(cred As NetworkCredential, Optional isAzure As Boolean = False)
+        MyBase.New(Nothing, Nothing)
+        Me.AuthType = If(isAzure, AuthMSSQLType.AzureCredential, AuthMSSQLType.Credential)
+        Me.Credential = cred
+    End Sub
+
     Public Enum AuthMSSQLType
         Windows
-        Azure
-        UserNamePassword
+        Credential
+        AzureCredential
+        Token
     End Enum
 End Class

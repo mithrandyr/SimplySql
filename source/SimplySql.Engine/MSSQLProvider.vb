@@ -101,22 +101,32 @@ Public Class MSSQLProvider
         Dim sb As New SqlConnectionStringBuilder
         sb.DataSource = server
         sb.InitialCatalog = database
+        sb.ApplicationName = $"PowerShell (SimplySql: {connectionName})"
 
         Select Case auth.AuthType
             Case AuthMSSQL.AuthMSSQLType.Windows
+                sb.Encrypt = SqlConnectionEncryptOption.Optional
                 sb.IntegratedSecurity = True
-            Case AuthMSSQL.AuthMSSQLType.Azure
+            Case AuthMSSQL.AuthMSSQLType.Credential
+                sb.Encrypt = SqlConnectionEncryptOption.Optional
+            Case AuthMSSQL.AuthMSSQLType.AzureCredential
                 sb.Authentication = SqlAuthenticationMethod.ActiveDirectoryPassword
-
         End Select
+
         'Process additional parameters through the hashtable
         sb.AddHashtable(additionalParams)
 
-        Return Create(connectionName, sb.ToString, commandTimeout, auth.AzureToken)
+        Return Create(connectionName, sb.ToString, commandTimeout, auth)
     End Function
-    Public Shared Function Create(connectionName As String, connectionString As String, commandTimeout As Integer, Optional azToken As String = Nothing) As MSSQLProvider
+    Public Shared Function Create(connectionName As String, connectionString As String, commandTimeout As Integer, Optional auth As AuthMSSQL = Nothing) As MSSQLProvider
         Dim conn As New SqlConnection(connectionString)
-        If Not String.IsNullOrWhiteSpace(azToken) Then conn.AccessToken = azToken
+        Select Case auth.AuthType
+            Case AuthMSSQL.AuthMSSQLType.Token
+                conn.AccessToken = auth.AzureToken
+            Case AuthMSSQL.AuthMSSQLType.Credential, AuthMSSQL.AuthMSSQLType.AzureCredential
+                conn.Credential = New SqlCredential(auth.Credential.UserName, auth.Credential.SecurePassword)
+        End Select
+
         Return New MSSQLProvider(connectionName, commandTimeout, conn)
     End Function
 #End Region

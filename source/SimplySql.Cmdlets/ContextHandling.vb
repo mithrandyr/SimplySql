@@ -4,6 +4,13 @@ Imports System.Runtime.InteropServices
 Public Class ContextHandling
     Implements IModuleAssemblyInitializer, IModuleAssemblyCleanup
 
+    Shared Sub New()
+        Dim appPath As String = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+        BinPath = Path.Combine(appPath, "bin")
+        AssemblyList = Directory.EnumerateFiles(BinPath, "*.dll").Select(Function(file) IO.Path.GetFileNameWithoutExtension(file)).ToList
+        PlatformAssemblyList = Directory.GetDirectories(BinPath).SelectMany(Function(dir) Directory.EnumerateFiles(dir)).Select(Function(file) IO.Path.GetFileNameWithoutExtension(file).ToLower).Distinct.ToList
+    End Sub
+
     Public Sub OnImport() Implements IModuleAssemblyInitializer.OnImport
         AddHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf HandleResolveEvent
     End Sub
@@ -12,9 +19,9 @@ Public Class ContextHandling
         RemoveHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf HandleResolveEvent
     End Sub
 
-    Private Shared ReadOnly AppPath As String = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
-    Private Shared ReadOnly BinPath As String = Path.Combine(AppPath, "Bin")
-    Private Shared ReadOnly AssemblyList As IReadOnlyList(Of String) = Directory.EnumerateFiles(BinPath, "*.dll").Select(Function(file) file.Substring((BinPath.Length + 1), (file.Length - 5 - BinPath.Length))).ToList
+    Private Shared ReadOnly BinPath As String
+    Private Shared ReadOnly AssemblyList As IReadOnlyList(Of String)
+    Private Shared ReadOnly PlatformAssemblyList As IReadOnlyList(Of String)
     Private Shared IsEngineLoaded As Boolean = False
 
     Private Shared Function HandleResolveEvent(ByVal sender As Object, ByVal args As ResolveEventArgs) As Assembly
@@ -28,7 +35,9 @@ Public Class ContextHandling
         End If
 
         If IsEngineLoaded Then
-            If asmName.Name.Equals("System.Data.SQLite", StringComparison.OrdinalIgnoreCase) Then
+            If AssemblyList.Contains(asmName.Name.ToLower) Then
+                asmPath = Path.Combine(BinPath, $"{asmName.Name}.dll")
+            ElseIf PlatformAssemblyList.Contains(asmName.Name.ToLower) Then
                 If RuntimeInformation.IsOSPlatform(OSPlatform.OSX) Then
                     asmPath = Path.Combine(BinPath, $"osx-x64\{asmName.Name}.dll")
                 ElseIf RuntimeInformation.IsOSPlatform(OSPlatform.Linux) Then
@@ -40,11 +49,10 @@ Public Class ContextHandling
                         asmPath = Path.Combine(BinPath, $"win-x86\{asmName.Name}.dll")
                     End If
                 End If
-            ElseIf AssemblyList.Contains(asmName.Name) Then
-                asmPath = Path.Combine(BinPath, $"{asmName.Name}.dll")
             End If
             If Not String.IsNullOrWhiteSpace(asmPath) Then Return Assembly.LoadFile(asmPath)
         End If
+
         Return Nothing
     End Function
 End Class

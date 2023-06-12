@@ -30,7 +30,7 @@ Task DeDup {
         $first = $Script:envList[0]
         $safeFiles = @{}
         Get-ChildItem -Path "output\bin\$first" |
-            Where-Object Name -ne "System.Data.SQLite.dll" | #always exclude this SQLite because of native interop
+            Where-Object Name -ne "System.Data.SQLite.dll" | #always exclude this SQLite dll because of native interop binding
             Get-FileHash |
             ForEach-Object {
                 $name = $_.Path | Split-Path -Leaf
