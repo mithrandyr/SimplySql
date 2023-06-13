@@ -6,7 +6,6 @@ if(-not $version) {
   $Script:Version = [version]::new($version.Major, $version.Minor, $version.Build, $version.Revision + 1)
 }
 
-
 task Clean { remove "output" }
 task Build { Invoke-Build -File "source\source.build.ps1" -Version $Version}
 
@@ -14,7 +13,7 @@ task ComposeModule {
   if(-not (Test-Path "output\SimplySql" -PathType Container)) {
     New-Item "Output\SimplySql" -ItemType Directory | Out-Null
   }
-}, copyManifest, copyBinaries, incrementRevision, GenerateDocs
+}, copyManifest, copyBinaries, updateManifest, GenerateDocs
 
 task GenerateDocs {
   Start-Job -ScriptBlock {
@@ -33,7 +32,7 @@ task GenerateDocs {
 }
 
 task copyManifest {
-  #Base Module Files
+  #Base Module Files  
   Copy-Item "ModuleManifest\SimplySql.psd1" -Destination "output\SimplySql" -Force
 }
 
@@ -43,9 +42,18 @@ task copyBinaries {
   Copy-Item "source\output\bin" -Destination "output\SimplySql" -Filter "*.dll" -Recurse -Force  
 }
 
-task incrementRevision {
+task updateManifest {
   Import-Module PowerShellGet -Verbose:$false
-  Update-ModuleManifest -Path "Output\SimplySql\SimplySql.psd1" -ModuleVersion $version
+  $cmdlets = Start-Job -ScriptBlock {
+      Set-Location $using:BuildRoot  
+      Import-Module ".\Output\SimplySql\SimplySql.Cmdlets.dll"    
+      Get-Command -Module SimplySql.Cmdlets
+    } |
+    Receive-Job -AutoRemoveJob -wait |
+    Sort-Object name |
+    ForEach-Object name
+  
+  Update-ModuleManifest -Path "Output\SimplySql\SimplySql.psd1" -ModuleVersion $version -CmdletsToExport ($cmdlets -join ", ")
   Copy-Item -Path "Output\SimplySql\SimplySql.psd1" -Destination "ModuleManifest\SimplySql.psd1"
 }
 

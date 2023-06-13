@@ -37,7 +37,7 @@ Task DeDup {
                 $safeFiles[$name] = $_.Hash
             }
         
-        "$first > {0}" -f $safeFiles.Keys.Count
+        Write-Host "  ." -NoNewline
 
         foreach($second in $Script:envList | Select-Object -Skip 1) {
             $retain = $safeFiles.Keys | 
@@ -47,7 +47,7 @@ Task DeDup {
             $toRemove = $safeFiles.Keys | Where-Object {$_ -notin $retain}
             $toRemove | ForEach-Object { $safeFiles.remove($_) }
                 
-            "$second > {0}" -f $safeFiles.Keys.Count
+            Write-Host "." -NoNewline
         }
 
         foreach($file in $safeFiles.Keys) {
@@ -56,6 +56,7 @@ Task DeDup {
                 Remove-Item "output\bin\$second\$file"
             }
         }
+        Write-Host
     }
 }
 
