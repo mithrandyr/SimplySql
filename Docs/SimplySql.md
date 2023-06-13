@@ -8,11 +8,12 @@ Locale: en-US
 
 # SimplySql Module
 ## Description
-{{ Fill in the Description }}
+SimplySql - Talking to relational databases the PowerShell way.  
+Simple commands... Powerful opportunities.
 
 ## SimplySql Cmdlets
 ### [Clear-SqlMessage](Clear-SqlMessage.md)
-{{ Fill in the Synopsis }}
+Clears all available informational messages.
 
 ### [Close-SqlConnection](Close-SqlConnection.md)
 {{ Fill in the Synopsis }}
@@ -36,6 +37,9 @@ Locale: en-US
 {{ Fill in the Synopsis }}
 
 ### [Invoke-SqlUpdate](Invoke-SqlUpdate.md)
+{{ Fill in the Synopsis }}
+
+### [Open-SQLConnection](Open-SQLConnection.md)
 {{ Fill in the Synopsis }}
 
 ### [Open-SQLiteConnection](Open-SQLiteConnection.md)

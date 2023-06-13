@@ -8,7 +8,7 @@ schema: 2.0.0
 # Clear-SqlMessage
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Clears all available informational messages.
 
 ## SYNTAX
 
