@@ -19,6 +19,8 @@ task GenerateDocs {
   Start-Job -ScriptBlock {
         Set-Location $using:BuildRoot
         Import-Module ".\output\SimplySql" -Verbose:$false
+        Import-Module PlatyPS
+        #$PSModuleAutoLoadingPreference = "none"
         
         if(-not (Test-Path "docs")) {
           New-MarkdownHelp -Module SimplySql -OutputFolder Docs -AlphabeticParamsOrder -WithModulePage
@@ -52,8 +54,8 @@ task updateManifest {
     Receive-Job -AutoRemoveJob -wait |
     Sort-Object name |
     ForEach-Object name
-  
-  Update-ModuleManifest -Path "Output\SimplySql\SimplySql.psd1" -ModuleVersion $version -CmdletsToExport ($cmdlets -join ", ")
+
+  Update-ModuleManifest -Path "Output\SimplySql\SimplySql.psd1" -ModuleVersion $version -CmdletsToExport $cmdlets
   Copy-Item -Path "Output\SimplySql\SimplySql.psd1" -Destination "ModuleManifest\SimplySql.psd1"
 }
 

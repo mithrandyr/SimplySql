@@ -12,7 +12,7 @@
 RootModule = 'SimplySql.Cmdlets.dll'
 
 # Version number of this module.
-ModuleVersion = '2.0.0.16'
+ModuleVersion = '2.0.0.18'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -80,8 +80,12 @@ PowerShellVersion = '5.0'
 FunctionsToExport = @()
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = 
-               'Clear-SqlMessage, Close-SqlConnection, Complete-SqlTransaction, Get-SqlConnection, Get-SqlMessage, Get-SqlTransaction, Invoke-SqlQuery, Invoke-SqlScalar, Invoke-SqlUpdate, Open-SQLConnection, Open-SQLiteConnection, Set-SqlConnection, Show-SqlConnection, Start-SqlTransaction, Test-SqlConnection, Undo-SqlTransaction'
+CmdletsToExport = 'Clear-SqlMessage', 'Close-SqlConnection', 'Complete-SqlTransaction', 
+               'Get-SqlConnection', 'Get-SqlMessage', 'Get-SqlTransaction', 
+               'Invoke-SqlQuery', 'Invoke-SqlScalar', 'Invoke-SqlUpdate', 
+               'Open-SQLConnection', 'Open-SQLiteConnection', 'Set-SqlConnection', 
+               'Show-SqlConnection', 'Start-SqlTransaction', 'Test-SqlConnection', 
+               'Undo-SqlTransaction'
 
 # Variables to export from this module
 # VariablesToExport = @()
