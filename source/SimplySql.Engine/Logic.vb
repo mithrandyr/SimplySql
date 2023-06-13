@@ -16,6 +16,7 @@ Public Module Logic
     End Function
 
     Sub OpenAndAddConnection(newProvider As ISimplySqlProvider)
+        ' ideally, this should take the type and the base Connection details (abstraction) and handle provider creation and returning it.
         newProvider.Connection.Open()
         Connections.Add(newProvider.ConnectionName, newProvider)
     End Sub

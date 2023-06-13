@@ -73,7 +73,6 @@ Public Class OpenSqlConnection
                 newProvider = Engine.MSSQLProvider.Create(ConnectionName, ConnectionString, CommandTimeout, newAuth)
             End If
 
-
             Engine.Logic.OpenAndAddConnection(newProvider)
             WriteVerbose($"{ConnectionName} (SQLConnection) opened.")
         Catch ex As Exception

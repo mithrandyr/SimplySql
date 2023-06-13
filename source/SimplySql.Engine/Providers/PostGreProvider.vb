@@ -1,21 +1,21 @@
 ﻿Imports System.Collections.Specialized
 Imports System.Data
 Imports System.Data.Common
-Imports Microsoft.Data.SqlClient
 Imports System.Runtime.CompilerServices
+Imports Npgsql
 
-Public Class MSSQLProvider
+Public Class PostGreProvider
     Inherits ProviderBase
 
-    Public Sub New(connectionName As String, commandTimeout As Integer, connection As SqlConnection)
-        MyBase.New(connectionName, ProviderTypes.MSSQL, connection, commandTimeout)
+    Public Sub New(connectionName As String, commandTimeout As Integer, connection As NpgsqlConnection)
+        MyBase.New(connectionName, ProviderTypes.PostGre, connection, commandTimeout)
 
-        AddHandler Me.Connection.InfoMessage, AddressOf HandleInfoMessage
+        AddHandler Me.Connection.Notice, AddressOf HandleNoticeMessage
     End Sub
 
-    Public Overloads ReadOnly Property Connection As SqlConnection
+    Public Overloads ReadOnly Property Connection As NpgsqlConnection
         Get
-            Return DirectCast(MyBase.Connection, SqlConnection)
+            Return DirectCast(MyBase.Connection, NpgsqlConnection)
         End Get
     End Property
 
@@ -92,42 +92,40 @@ Public Class MSSQLProvider
         End Using
     End Function
 
-    Private Sub HandleInfoMessage(sender As Object, e As SqlInfoMessageEventArgs)
-        Me.Messages.Enqueue(New SqlMessage(e.Message))
+    Private Sub HandleNoticeMessage(sender As Object, e As NpgsqlNoticeEventArgs)
+        Me.Messages.Enqueue(New SqlMessage(e.Notice.MessageText))
     End Sub
 
 #Region "Shared Functions"
-    Public Shared Function Create(connectionName As String, server As String, database As String, commandTimeout As Integer, auth As AuthMSSQL, Optional additionalParams As Hashtable = Nothing) As MSSQLProvider
-        Dim sb As New SqlConnectionStringBuilder
-        sb.DataSource = server
-        sb.InitialCatalog = database
+    Public Shared Function Create(connectionName As String, host As String, database As String, port As Integer, commandTimeout As Integer, auth As AuthPostGre, Optional additionalParams As Hashtable = Nothing) As PostGreProvider
+        Dim sb As New NpgsqlConnectionStringBuilder
+
+        sb.Host = host
+        sb.Database = database
+        sb.Port = port
         sb.ApplicationName = $"PowerShell (SimplySql: {connectionName})"
 
-        Select Case auth.AuthType
-            Case AuthMSSQL.AuthMSSQLType.Windows
-                sb.Encrypt = SqlConnectionEncryptOption.Optional
-                sb.IntegratedSecurity = True
-            Case AuthMSSQL.AuthMSSQLType.Credential
-                sb.Encrypt = SqlConnectionEncryptOption.Optional
-            Case AuthMSSQL.AuthMSSQLType.AzureCredential
-                sb.Authentication = SqlAuthenticationMethod.ActiveDirectoryPassword
-        End Select
+        If auth.RequireSSL Then sb.SslMode = SslMode.Require
+        If auth.TrustServerCertificate Then sb.TrustServerCertificate = True
+        If auth.UseIntegratedSecurity Then
+            sb.IntegratedSecurity = True
+        Else
+            sb.Username = auth.UserName
+            sb.Password = auth.Password
+        End If
 
         'Process additional parameters through the hashtable
         sb.AddHashtable(additionalParams)
 
         Return Create(connectionName, sb.ToString, commandTimeout, auth)
     End Function
-    Public Shared Function Create(connectionName As String, connectionString As String, commandTimeout As Integer, auth As AuthMSSQL) As MSSQLProvider
-        Dim conn As New SqlConnection(connectionString)
-        Select Case auth.AuthType
-            Case AuthMSSQL.AuthMSSQLType.Token
-                conn.AccessToken = auth.AzureToken
-            Case AuthMSSQL.AuthMSSQLType.Credential, AuthMSSQL.AuthMSSQLType.AzureCredential
-                conn.Credential = New SqlCredential(auth.Credential.UserName, auth.Credential.SecurePassword)
-        End Select
+    Public Shared Function Create(connectionName As String, connectionString As String, commandTimeout As Integer, auth As AuthPostGre) As PostGreProvider
+        Dim dsBuilder As New NpgsqlDataSourceBuilder(connectionString)
+        dsBuilder.UseNetTopologySuite
+        dsBuilder.Build.CreateConnection()
+        Dim conn As NpgsqlConnection = dsBuilder.Build.CreateConnection()
 
-        Return New MSSQLProvider(connectionName, commandTimeout, conn)
+        Return New PostGreProvider(connectionName, commandTimeout, conn)
     End Function
 #End Region
 End Class
