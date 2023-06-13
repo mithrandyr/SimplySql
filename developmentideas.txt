@@ -1,12 +1,9 @@
-Each Provider will provide its open "Open-*Connection" cmdlet...
-    Open-OracleConnection, Open-SqlConnection, Open-SQLiteConnection, Open-PostGreConnection, Open-MySqlConnection
-
-    This will simply providing help for the provider as well as writing the providers.
-    It will add some redunant code between the Open-*Connection cmdlets, but little enough to be a problem.
-
-Providers now simply need to have a config.ps1 in their folder, that file will control setting up the provider and exporting its cmdlet.
-    If the provider requires adding types, then the provider class will need to be in a separate file (provider.ps1) and config.ps1 will need to dotsource
-    it after it has added the required types.
+Eventually make the wiki Project in github reference the /docs subfolder
+https://stackoverflow.com/a/76144369
+    EXAMPLE cmds:
+    git clone https://github.com/youName/ProjectName.wiki docs
+    git submodule add https://github.com/youName/ProjectName.wiki docs
+    git submodule update --init
 
 ORACLE
     InfoMessage
@@ -16,97 +13,10 @@ Always roll version (minor) forward by 1 when updating provider nuget packages.
 
 ---------
 TODO:
-+ ProviderBase in .NET
-+ DataReaderToPSObject in .NET
 + PSObjectDataReader in .NET
     - update sqlBulkcopy to take objects directly / andor to take datareader directly?
     - or create full fleged provider for objects? (maybe using datatable as backend?)
 + Allow invoke-SqlQuery/SqlUpdate to take objects as input (translate to parameters) -- single or multiple objects? (probably single only)
 
-------Sample Code to handle loading (Windows PowerShell 5.1) the right assemblies-----
-$SystemComponentModelAnnotations = [reflection.assembly]::LoadFrom((Join-Path $PSScriptRoot "..\Output\Seeddata\System.ComponentModel.Annotations.dll"))
-    $SystemThreadingTasksExtensions = [reflection.assembly]::LoadFrom((Join-Path $PSScriptRoot "..\Output\Seeddata\System.Threading.Tasks.Extensions.dll"))
-    $MicrosoftIdentityClient = [reflection.assembly]::LoadFrom((Join-Path $PSScriptRoot "..\Output\Seeddata\Microsoft.Identity.Client.dll"))
-    $OnAssemblyResolve = [System.ResolveEventHandler] {
-        param($sender, $e)
-        # from:System.ComponentModel.Annotations, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-        # to:  System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-        if ($e.Name -eq "System.ComponentModel.Annotations, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a") { return $SystemComponentModelAnnotations }
-        if ($e.Name.StartsWith("System.Threading.Tasks.Extensions")) { return $SystemThreadingTasksExtensions }
-        if ($e.Name.StartsWith("Microsoft.Identity.Client")) { return $MicrosoftIdentityClient }
-        foreach($a in [System.AppDomain]::CurrentDomain.GetAssemblies())
-        {
-            if ($a.FullName -eq $e.Name)
-            {
-            return $a
-            }
-        }
-        return $null
-    }
-    [System.AppDomain]::CurrentDomain.add_AssemblyResolve($OnAssemblyResolve)
-
 
 ---- Better Information : https://devblogs.microsoft.com/powershell/resolving-powershell-module-assembly-dependency-conflicts/#quick-fixes-and-their-limitations ----
-Add an AssemblyResolve event handler to create a dynamic binding redirect
-When changing your own dependency version isn’t possible, or is too hard, another way to make your module play nicely with other dependencies is to set up a dynamic binding redirect by registering an event handler for the AssemblyResolve event.
-
-As with a static binding redirect, the point here to is force all consumers of a dependency to use the same actual assembly. This means we need to intercept calls to load the dependency and always redirect them to the version we want.
-
-This looks something like this:
-
-// Register the event handler as early as you can in your code.
-// A good option is to use the IModuleAssemblyInitializer interface
-// that PowerShell provides to run code early on when your module is loaded.
-
-// This class will be instantiated on module import and the OnImport() method run.
-// Make sure that:
-//  - the class is public
-//  - the class has a public, parameterless constructor
-//  - the class implements IModuleAssemblyInitializer
-public class MyModuleInitializer : IModuleAssemblyInitializer
-{
-    public void OnImport()
-    {
-        AppDomain.CurrentDomain.AssemblyResolve += DependencyResolution.ResolveNewtonsoftJson;
-    }
-}
-
-// Clean up the event handler when the the module is removed
-// to prevent memory leaks.
-//
-// Like IModuleAssemblyInitializer, IModuleAssemblyCleanup allows
-// you to register code to run when a module is removed (with Remove-Module).
-// Make sure it is also public with a public parameterless contructor
-// and implements IModuleAssemblyCleanup.
-public class MyModuleCleanup : IModuleAssemblyCleanup
-{
-    public void OnRemove()
-    {
-        AppDomain.CurrentDomain.AssemblyResolve -= DependencyResolution.ResolveNewtonsoftJson;
-    }
-}
-
-internal static class DependencyResolution
-{
-    private static readonly string s_modulePath = Path.GetDirectoryName(
-        Assembly.GetExecutingAssembly().Location);
-
-    public static Assembly ResolveNewtonsoftJson(object sender, ResolveEventArgs args)
-    {
-        // Parse the assembly name
-        var assemblyName = new AssemblyName(args.Name);
-
-        // We only want to handle the dependency we care about.
-        // In this example it's Newtonsoft.Json.
-        if (!assemblyName.Name.Equals("Newtonsoft.Json"))
-        {
-            return null;
-        }
-
-        // Generally the version of the dependency you want to load is the higher one,
-        // since it's the most likely to be compatible with all dependent assemblies.
-        // The logic here assumes our module always has the version we want to load.
-        // Also note the use of Assembly.LoadFrom() here rather than Assembly.LoadFile().
-        return Assembly.LoadFrom(Path.Combine(s_modulePath, "Newtonsoft.Json.dll"));
-    }
-}
