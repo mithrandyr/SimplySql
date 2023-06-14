@@ -15,6 +15,20 @@ Public Module Logic
         End Try
     End Function
 
+    Sub OpenAndAddConnection(connDetail As baseConnectionDetail)
+        Dim provider As ISimplySqlProvider
+        Select Case connDetail.ConnectionType
+            Case ProviderTypes.MSSQL
+            Case ProviderTypes.MySql
+            Case ProviderTypes.Oracle
+            Case ProviderTypes.PostGre
+            Case ProviderTypes.SQLite
+                provider = SQLiteProvider.Create(connDetail)
+        End Select
+        provider.Connection.Open()
+        Connections.Add(connDetail.ConnectionName, provider)
+    End Sub
+
     Sub OpenAndAddConnection(newProvider As ISimplySqlProvider)
         ' ideally, this should take the type and the base Connection details (abstraction) and handle provider creation and returning it.
         newProvider.Connection.Open()

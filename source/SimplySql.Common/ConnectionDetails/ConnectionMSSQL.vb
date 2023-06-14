@@ -2,27 +2,36 @@
 
 Public Class ConnectionMSSQL
     Inherits baseConnectionDetail
-    Public ReadOnly AuthType As AuthMSSQLType = AuthMSSQLType.Credential
-    Public ReadOnly Property AzureToken As String
+    Public ReadOnly Property AuthType As AuthMSSQLType = AuthMSSQLType.Credential
+    Public ReadOnly Property Token As String
+        Get
+            If AuthType = AuthMSSQLType.Token Then
+                Return Credential.Password
+            Else
+                Throw New InvalidOperationException($"Cannot return {NameOf(Token)} when {NameOf(AuthType)} is not 'Token'.")
+            End If
+        End Get
+    End Property
 
-    Sub New(connName As String)
-        MyBase.New(connName)
-        Me.AuthType = AuthMSSQLType.Windows
+    Public Property Server As String
+    Public Property Database As String
+
+    Sub New(connName As String, cmdTimeout As Integer)
+        MyBase.New(connName, ProviderTypes.MSSQL, cmdTimeout)
+        SetAuthWindows()
     End Sub
 
-    Sub New(connName As String, azToken As String)
-        MyBase.New(Nothing, Nothing)
-        Me.AuthType = AuthMSSQLType.Token
-        If azToken.StartsWith("bearer ") Then
-            Me.AzureToken = azToken.Substring(7)
-        Else
-            Me.AzureToken = azToken
-        End If
+    Sub SetAuthWindows()
+        _AuthType = AuthMSSQLType.Windows
     End Sub
-
-    Sub New(cred As NetworkCredential, Optional isAzure As Boolean = False)
-        MyBase.New(cred)
-        Me.AuthType = If(isAzure, AuthMSSQLType.AzureCredential, AuthMSSQLType.Credential)
+    Sub SetAuthToken(tkn As String)
+        _AuthType = AuthMSSQLType.Token
+        If tkn.StartsWith("bearer ") Then tkn = tkn.Substring(7)
+        Credential = New NetworkCredential(Nothing, tkn)
+    End Sub
+    Sub SetAuthCredential(cred As NetworkCredential, Optional isAzure As Boolean = False)
+        _AuthType = If(isAzure, AuthMSSQLType.AzureCredential, AuthMSSQLType.Credential)
+        Credential = cred
     End Sub
 
     Public Enum AuthMSSQLType

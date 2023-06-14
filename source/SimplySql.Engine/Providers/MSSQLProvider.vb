@@ -3,6 +3,7 @@ Imports System.Data
 Imports System.Data.Common
 Imports Microsoft.Data.SqlClient
 Imports System.Runtime.CompilerServices
+Imports System.Data.SQLite
 
 Public Class MSSQLProvider
     Inherits ProviderBase
@@ -97,37 +98,37 @@ Public Class MSSQLProvider
     End Sub
 
 #Region "Shared Functions"
-    Public Shared Function Create(connectionName As String, server As String, database As String, commandTimeout As Integer, auth As AuthMSSQL, Optional additionalParams As Hashtable = Nothing) As MSSQLProvider
-        Dim sb As New SqlConnectionStringBuilder
-        sb.DataSource = server
-        sb.InitialCatalog = database
-        sb.ApplicationName = $"PowerShell (SimplySql: {connectionName})"
 
-        Select Case auth.AuthType
-            Case AuthMSSQL.AuthMSSQLType.Windows
-                sb.Encrypt = SqlConnectionEncryptOption.Optional
-                sb.IntegratedSecurity = True
-            Case AuthMSSQL.AuthMSSQLType.Credential
-                sb.Encrypt = SqlConnectionEncryptOption.Optional
-            Case AuthMSSQL.AuthMSSQLType.AzureCredential
-                sb.Authentication = SqlAuthenticationMethod.ActiveDirectoryPassword
+    Public Shared Function Create(connDetail As ConnectionMSSQL) As MSSQLProvider
+        Dim connString As String
+        If connDetail.HasConnectionString Then
+            connString = connDetail.ConnectionString
+        Else
+            Dim sb As New SqlConnectionStringBuilder With {.ApplicationName = connDetail.ApplicationName, .DataSource = connDetail.Server, .InitialCatalog = connDetail.Database}
+            Select Case connDetail.AuthType
+                Case ConnectionMSSQL.AuthMSSQLType.Windows
+                    sb.Encrypt = SqlConnectionEncryptOption.Optional
+                    sb.IntegratedSecurity = True
+                Case ConnectionMSSQL.AuthMSSQLType.Credential
+                    sb.Encrypt = SqlConnectionEncryptOption.Optional
+                Case ConnectionMSSQL.AuthMSSQLType.AzureCredential
+                    sb.Authentication = SqlAuthenticationMethod.ActiveDirectoryPassword
+            End Select
+
+            'Process additional parameters through the hashtable
+            sb.AddHashtable(connDetail.Additional)
+            connString = sb.ToString
+        End If
+
+        Dim conn As New SqlConnection(connString)
+        Select Case connDetail.AuthType
+            Case ConnectionMSSQL.AuthMSSQLType.Token
+                conn.AccessToken = connDetail.Token
+            Case ConnectionMSSQL.AuthMSSQLType.AzureCredential, ConnectionMSSQL.AuthMSSQLType.Credential
+                conn.Credential = New SqlCredential(connDetail.UserName, connDetail.SecurePassword)
         End Select
 
-        'Process additional parameters through the hashtable
-        sb.AddHashtable(additionalParams)
-
-        Return Create(connectionName, sb.ToString, commandTimeout, auth)
-    End Function
-    Public Shared Function Create(connectionName As String, connectionString As String, commandTimeout As Integer, auth As AuthMSSQL) As MSSQLProvider
-        Dim conn As New SqlConnection(connectionString)
-        Select Case auth.AuthType
-            Case AuthMSSQL.AuthMSSQLType.Token
-                conn.AccessToken = auth.AzureToken
-            Case AuthMSSQL.AuthMSSQLType.Credential, AuthMSSQL.AuthMSSQLType.AzureCredential
-                conn.Credential = New SqlCredential(auth.Credential.UserName, auth.Credential.SecurePassword)
-        End Select
-
-        Return New MSSQLProvider(connectionName, commandTimeout, conn)
+        Return New MSSQLProvider(connDetail.ConnectionName, connDetail.CommandTimeout, conn)
     End Function
 #End Region
 End Class

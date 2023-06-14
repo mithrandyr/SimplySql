@@ -1,4 +1,6 @@
-﻿<Cmdlet(VerbsCommon.Open, "SQLiteConnection", DefaultParameterSetName:="default")>
+﻿Imports SimplySql.Common
+
+<Cmdlet(VerbsCommon.Open, "SQLiteConnection", DefaultParameterSetName:="default")>
 Public Class OpenSQLiteConnection
     Inherits PSCmdlet
 
@@ -31,20 +33,21 @@ Public Class OpenSQLiteConnection
                 Engine.Logic.CloseAndRemoveConnection(ConnectionName)
             End If
 
-            Dim newProvider As Engine.SQLiteProvider
+            Dim connDetail As New ConnectionSQLite(ConnectionName, CommandTimeout)
             If Me.ParameterSetName = "conn" Then
-                newProvider = Engine.SQLiteProvider.Create(ConnectionName, ConnectionString, CommandTimeout)
+                connDetail.ConnectionString = ConnectionString
             Else
                 If Not DataSource.Equals(":memory:", StringComparison.OrdinalIgnoreCase) Then
                     DataSource = Me.GetUnresolvedProviderPathFromPSPath(DataSource) 'handle powershell paths using psdrives
                 End If
-                newProvider = Engine.SQLiteProvider.Create(ConnectionName, DataSource, Password, CommandTimeout, Additional)
+                connDetail.Database = DataSource
+                If Not String.IsNullOrWhiteSpace(Password) Then connDetail.Credential = New Net.NetworkCredential(Nothing, Password)
             End If
 
-            Engine.Logic.OpenAndAddConnection(newProvider)
+            Engine.Logic.OpenAndAddConnection(connDetail)
             WriteVerbose($"{ConnectionName} (SQLiteConnection) opened.")
         Catch ex As Exception
-            WriteError(New ErrorRecord(ex, "NewSQLiteConnection.Error", ErrorCategory.OpenError, ConnectionName))
+            WriteError(New ErrorRecord(ex, "OpenSQLiteConnection.Error", ErrorCategory.OpenError, ConnectionName))
         End Try
     End Sub
 End Class

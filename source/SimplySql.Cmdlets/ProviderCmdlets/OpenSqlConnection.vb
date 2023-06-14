@@ -4,6 +4,7 @@ Imports System.Runtime.InteropServices.ComTypes
 Imports Azure.Identity
 Imports Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos
 Imports NetTopologySuite.Operation.Distance
+Imports SimplySql.Common
 
 <Cmdlet(VerbsCommon.Open, "SQLConnection", DefaultParameterSetName:="default")>
 Public Class OpenSqlConnection
@@ -56,27 +57,27 @@ Public Class OpenSqlConnection
                 Engine.Logic.CloseAndRemoveConnection(ConnectionName)
             End If
 
-            Dim newProvider As Engine.MSSQLProvider
-            Dim newAuth As Common.AuthMSSQL
+            Dim connDetail As New ConnectionMSSQL(ConnectionName, CommandTimeout)
             Select Case Me.ParameterSetName
                 Case "credential"
-                    newAuth = New Common.AuthMSSQL(Credential, AzureAD.IsPresent)
-                Case "Token"
-                    newAuth = New Common.AuthMSSQL(AzureToken)
-                Case Else
-                    newAuth = New Common.AuthMSSQL
+                    connDetail.SetAuthCredential(Credential, AzureAD.IsPresent)
+                Case "token"
+                    connDetail.SetAuthToken(AzureToken)
             End Select
 
-            If String.IsNullOrWhiteSpace(ConnectionString) Then
-                newProvider = Engine.MSSQLProvider.Create(ConnectionName, Server, Database, CommandTimeout, newAuth, Additional)
+            If Me.ParameterSetName = "conn" Then
+                connDetail.ConnectionString = ConnectionString
             Else
-                newProvider = Engine.MSSQLProvider.Create(ConnectionName, ConnectionString, CommandTimeout, newAuth)
+                With connDetail
+                    .Server = Server
+                    .Database = Database
+                End With
             End If
 
-            Engine.Logic.OpenAndAddConnection(newProvider)
+            Engine.Logic.OpenAndAddConnection(connDetail)
             WriteVerbose($"{ConnectionName} (SQLConnection) opened.")
         Catch ex As Exception
-            WriteError(New ErrorRecord(ex, "NewSQLConnection.Error", ErrorCategory.OpenError, ConnectionName))
+            WriteError(New ErrorRecord(ex, "OpenSQLConnection.Error", ErrorCategory.OpenError, ConnectionName))
         End Try
     End Sub
 End Class

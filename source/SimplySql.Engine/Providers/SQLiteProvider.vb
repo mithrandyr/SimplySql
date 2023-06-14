@@ -4,7 +4,7 @@ Imports System.Data.SQLite
 Public Class SQLiteProvider
     Inherits ProviderBase
 
-    Public Sub New(connectionName As String, commandTimeout As Integer, connection As SQLiteConnection)
+    Private Sub New(connectionName As String, commandTimeout As Integer, connection As SQLiteConnection)
         MyBase.New(connectionName, ProviderTypes.SQLite, connection, commandTimeout)
     End Sub
 
@@ -62,25 +62,27 @@ Public Class SQLiteProvider
 #End Region
 
 #Region "Shared Functions"
-    Public Shared Function Create(connectionName As String, dataSource As String, password As String, commandTimeout As Integer, Optional additionalParams As Hashtable = Nothing) As SQLiteProvider
-        Dim sb As New SQLiteConnectionStringBuilder
-        If Not dataSource.Equals(":memory:", StringComparison.OrdinalIgnoreCase) Then
-            Dim filepath = New IO.FileInfo(dataSource)
-            If Not filepath.Directory.Exists Then filepath.Directory.Create()
+    Public Shared Function Create(connDetail As ConnectionSQLite) As SQLiteProvider
+        Dim connString As String
+        If connDetail.HasConnectionString Then
+            connString = connDetail.ConnectionString
+        Else
+            Dim sb As New SQLiteConnectionStringBuilder
+            If Not connDetail.Database.Equals(":memory:", StringComparison.OrdinalIgnoreCase) Then
+                Dim filepath = New IO.FileInfo(connDetail.Database)
+                If Not filepath.Directory.Exists Then filepath.Directory.Create()
+            End If
+
+            sb.DataSource = connDetail.Database
+
+            If Not String.IsNullOrWhiteSpace(connDetail.Password) Then sb.Password = connDetail.Password
+
+            'Process additional parameters through the hashtable
+            sb.AddHashtable(connDetail.Additional)
+            connString = sb.ToString
         End If
 
-        sb.DataSource = dataSource
-
-        If Not String.IsNullOrWhiteSpace(password) Then sb.Password = password
-
-        'Process additional parameters through the hashtable
-        sb.AddHashtable(additionalParams)
-
-        Return Create(connectionName, sb.ToString, commandTimeout)
-    End Function
-    Public Shared Function Create(connectionName As String, connectionString As String, commandTimeout As Integer) As SQLiteProvider
-        Dim conn As New SQLiteConnection(connectionString)
-        Return New SQLiteProvider(connectionName, commandTimeout, conn)
+        Return New SQLiteProvider(connDetail.ConnectionName, connDetail.CommandTimeout, New SQLiteConnection(connString))
     End Function
 #End Region
 End Class
