@@ -23,15 +23,18 @@ Public Class ConnectionMSSQL
 
     Sub SetAuthWindows()
         _AuthType = AuthMSSQLType.Windows
+        Me.UseIntegratedSecurity = True
     End Sub
     Sub SetAuthToken(tkn As String)
         _AuthType = AuthMSSQLType.Token
         If tkn.StartsWith("bearer ") Then tkn = tkn.Substring(7)
         Credential = New NetworkCredential(Nothing, tkn)
+        Me.UseIntegratedSecurity = False
     End Sub
     Sub SetAuthCredential(cred As NetworkCredential, Optional isAzure As Boolean = False)
         _AuthType = If(isAzure, AuthMSSQLType.AzureCredential, AuthMSSQLType.Credential)
         Credential = cred
+        Me.UseIntegratedSecurity = False
     End Sub
 
     Public Enum AuthMSSQLType

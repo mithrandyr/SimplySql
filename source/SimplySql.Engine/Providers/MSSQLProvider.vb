@@ -31,7 +31,7 @@ Public Class MSSQLProvider
     End Function
 
     Public Overrides Sub ChangeDatabase(databaseName As String)
-        Me.Connection.ChangeDatabase(databaseName)
+        Connection.ChangeDatabase(databaseName)
     End Sub
 
     Public Overrides Function GetDataset(query As String, cmdTimeout As Integer, params As Hashtable, useProviderTypes As Boolean) As DataSet
@@ -98,7 +98,6 @@ Public Class MSSQLProvider
     End Sub
 
 #Region "Shared Functions"
-
     Public Shared Function Create(connDetail As ConnectionMSSQL) As MSSQLProvider
         Dim connString As String
         If connDetail.HasConnectionString Then

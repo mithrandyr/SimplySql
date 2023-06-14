@@ -2,6 +2,9 @@
 Imports System.Data
 Imports System.Data.Common
 Imports System.Runtime.CompilerServices
+Imports System.Security.Cryptography
+Imports Microsoft.Data.SqlClient
+Imports NetTopologySuite.Geometries
 Imports Npgsql
 
 Public Class PostGreProvider
@@ -23,22 +26,23 @@ Public Class PostGreProvider
         Dim od = MyBase.ConnectionInfo
         With od
             .Add("ServerVersion", Connection.ServerVersion)
-            .Add("Server", Connection.DataSource)
+            .Add("Host", Connection.Host)
+            .Add("Port", Connection.Port)
             .Add("Database", Connection.Database)
         End With
         Return od
     End Function
 
     Public Overrides Sub ChangeDatabase(databaseName As String)
-        Me.Connection.ChangeDatabase(databaseName)
+        Connection.ChangeDatabase(databaseName)
     End Sub
 
     Public Overrides Function GetDataset(query As String, cmdTimeout As Integer, params As Hashtable, useProviderTypes As Boolean) As DataSet
         If Not useProviderTypes Then
             Return MyBase.GetDataset(query, cmdTimeout, params, False)
         Else
-            Using cmd As SqlCommand = GetCommand(query, cmdTimeout, params)
-                Using da As New SqlDataAdapter(cmd)
+            Using cmd As NpgsqlCommand = GetCommand(query, cmdTimeout, params)
+                Using da As New NpgsqlDataAdapter(cmd)
                     Dim ds As New Data.DataSet
                     da.ReturnProviderSpecificTypes = True
                     Try
@@ -55,39 +59,32 @@ Public Class PostGreProvider
     End Function
 
     Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
-        Dim bcpOption = SqlBulkCopyOptions.KeepIdentity + SqlBulkCopyOptions.CheckConstraints + SqlBulkCopyOptions.FireTriggers
         Using dataReader
-            Using bcp As New SqlBulkCopy(Connection, bcpOption, Transaction)
-                With bcp
-                    .EnableStreaming = True
-                    .BulkCopyTimeout = batchTimeout
-                    .BatchSize = batchSize
-                    .DestinationTableName = destinationTable
-                End With
+            Dim schemaMap As New List(Of SchemaMapItem)
+            Dim ord As Integer = 0
+            For Each dr In dataReader.GetSchemaTable().Rows.Cast(Of DataRow).OrderBy(Function(x) x("ColumnOrdinal"))
+                schemaMap.Add(New SchemaMapItem With {.Ordinal = ord, .SourceName = dr("ColumnName"), .DestinationName = dr("ColumnName")})
+                ord += 1
+            Next
 
-                If columnMap Is Nothing OrElse columnMap.Count = 0 Then
-                    dataReader.
-                        GetSchemaTable().
-                        AsEnumerable.
-                        Select(Function(dr) dr("ColumnName").ToString).
-                        ToList.
-                        ForEach(Function(colName) bcp.ColumnMappings.Add(colName, colName))
-                Else
-                    For Each key As String In columnMap.Keys
-                        bcp.ColumnMappings.Add(key, columnMap.Item(key).ToString)
+            If columnMap IsNot Nothing AndAlso columnMap.Count > 0 Then
+                Dim columnMapDictionary As Dictionary(Of String, String) = columnMap.Cast(Of DictionaryEntry).ToDictionary(Function(x) x.Key.ToString, Function(x) x.Value.ToString)
+                schemaMap = schemaMap.Where(Function(x) columnMapDictionary.ContainsKey(x.SourceName)).Select(Function(x) New SchemaMapItem With {.Ordinal = x.Ordinal, .SourceName = x.SourceName, .DestinationName = columnMapDictionary(x.SourceName)})
+            End If
+
+            Dim copyFromSql As String = $"COPY {destinationTable} ({String.Join(", ", schemaMap.Select(Function(x) x.DestinationName))}) FROM STDIN (FORMAT BINARY)"
+            Using bulk = Connection.BeginBinaryImport(copyFromSql)
+                While dataReader.Read()
+                    bulk.StartRow()
+                    For Each field In schemaMap
+                        If dataReader.IsDBNull(field.Ordinal) Then
+                            bulk.WriteNull()
+                        Else
+                            bulk.Write(dataReader.GetValue(field.Ordinal))
+                        End If
                     Next
-                End If
-
-                If notify IsNot Nothing Then
-                    bcp.NotifyAfter = batchSize
-                    AddHandler bcp.SqlRowsCopied, Sub(sender As Object, e As SqlRowsCopiedEventArgs) notify.Invoke(e.RowsCopied)
-                End If
-
-                Dim rowcount As Long = 0
-                rowcount -= DirectCast(GetScalar($"SELECT COUNT(1) FROM {destinationTable}", 30), Long)
-                bcp.WriteToServer(dataReader)
-                rowcount += DirectCast(GetScalar($"SELECT COUNT(1) FROM {destinationTable}", 30), Long)
-                Return rowcount
+                End While
+                Return bulk.Complete()
             End Using
         End Using
     End Function
@@ -97,35 +94,35 @@ Public Class PostGreProvider
     End Sub
 
 #Region "Shared Functions"
-    Public Shared Function Create(connectionName As String, host As String, database As String, port As Integer, commandTimeout As Integer, auth As AuthPostGre, Optional additionalParams As Hashtable = Nothing) As PostGreProvider
-        Dim sb As New NpgsqlConnectionStringBuilder
-
-        sb.Host = host
-        sb.Database = database
-        sb.Port = port
-        sb.ApplicationName = $"PowerShell (SimplySql: {connectionName})"
-
-        If auth.RequireSSL Then sb.SslMode = SslMode.Require
-        If auth.TrustServerCertificate Then sb.TrustServerCertificate = True
-        If auth.UseIntegratedSecurity Then
-            sb.IntegratedSecurity = True
+    Public Shared Function Create(connDetail As ConnectionPostGre) As PostGreProvider
+        Dim sb As NpgsqlConnectionStringBuilder
+        If connDetail.HasConnectionString Then
+            sb = New NpgsqlConnectionStringBuilder(connDetail.ConnectionString)
         Else
-            sb.Username = auth.UserName
-            sb.Password = auth.Password
+            sb = New NpgsqlConnectionStringBuilder() With {
+                    .ApplicationName = connDetail.ApplicationName,
+                    .Host = connDetail.Host,
+                    .Port = connDetail.Port,
+                    .Database = connDetail.Database,
+                    .MaxAutoPrepare = connDetail.MaxAutoPrepare,
+                    .TrustServerCertificate = connDetail.TrustServerCertificate,
+                    .SslMode = If(connDetail.RequireSSL, SslMode.Require, SslMode.Prefer)
+                }
+            If connDetail.UseIntegratedSecurity Then sb.IntegratedSecurity = True
+
+            'Process additional parameters through the hashtable
+            sb.AddHashtable(connDetail.Additional)
         End If
 
-        'Process additional parameters through the hashtable
-        sb.AddHashtable(additionalParams)
+        If connDetail.Credential IsNot Nothing Then
+            sb.Username = connDetail.UserName
+            sb.Password = connDetail.Password
+        End If
 
-        Return Create(connectionName, sb.ToString, commandTimeout, auth)
-    End Function
-    Public Shared Function Create(connectionName As String, connectionString As String, commandTimeout As Integer, auth As AuthPostGre) As PostGreProvider
-        Dim dsBuilder As New NpgsqlDataSourceBuilder(connectionString)
-        dsBuilder.UseNetTopologySuite
-        dsBuilder.Build.CreateConnection()
-        Dim conn As NpgsqlConnection = dsBuilder.Build.CreateConnection()
+        Dim dsBuilder As New NpgsqlDataSourceBuilder(sb.ToString)
+        dsBuilder.UseNetTopologySuite()
 
-        Return New PostGreProvider(connectionName, commandTimeout, conn)
+        Return New PostGreProvider(connDetail.ConnectionName, connDetail.CommandTimeout, dsBuilder.Build.CreateConnection())
     End Function
 #End Region
 End Class

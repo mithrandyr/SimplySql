@@ -88,7 +88,7 @@ Public MustInherit Class ProviderBase
     End Function
 #End Region
 
-#Region "Get DataSet"
+#Region "GetDataSet"
     Public Overridable Function GetDataset(query As String, cmdTimeout As Integer, params As Hashtable, useProviderTypes As Boolean) As DataSet Implements ISimplySqlProvider.GetDataSet
         If useProviderTypes Then Throw New NotSupportedException($"{ProviderType} does not support -UseTypesFromProvider.")
         Using cmd As IDbCommand = GetCommand(query, cmdTimeout, params)
@@ -156,13 +156,13 @@ Public MustInherit Class ProviderBase
         Dim hasPrepared As Boolean = False
         Dim schemaMap As New List(Of SchemaMapItem)
         For Each dr In dataReader.GetSchemaTable().Rows.Cast(Of DataRow).OrderBy(Function(x) x("ColumnOrdinal"))
-            schemaMap.Add(New SchemaMapItem(ord, dr("ColumnName"), dr("ColumnName")))
+            schemaMap.Add(New SchemaMapItem With {.Ordinal = ord, .SourceName = dr("ColumnName"), .DestinationName = dr("ColumnName")})
             ord += 1
         Next
 
         If columnMap IsNot Nothing AndAlso columnMap.Count > 0 Then
             Dim columnMapDictionary As Dictionary(Of String, String) = columnMap.Cast(Of DictionaryEntry).ToDictionary(Function(x) x.Key.ToString, Function(x) x.Value.ToString)
-            schemaMap = schemaMap.Where(Function(x) columnMapDictionary.ContainsKey(x.SourceName)).Select(Function(x) New SchemaMapItem(x.Ordinal, x.SourceName, columnMapDictionary(x.SourceName)))
+            schemaMap = schemaMap.Where(Function(x) columnMapDictionary.ContainsKey(x.SourceName)).Select(Function(x) New SchemaMapItem With {.Ordinal = x.Ordinal, .SourceName = x.SourceName, .DestinationName = columnMapDictionary(x.SourceName)})
         End If
 
         Dim insertSql As String = String.Format("INSERT INTO {0} ([{1}]) VALUES (@Param{2})", destinationTable,
@@ -273,16 +273,11 @@ Public MustInherit Class ProviderBase
 #End Region
 #End Region
 
-    Private Class SchemaMapItem
-        Public ReadOnly Ordinal As Integer
-        Public ReadOnly SourceName As String
-        Public ReadOnly DestinationName As String
-        Public Sub New(ord As Integer, src As String, dst As String)
-            Me.Ordinal = ord
-            Me.SourceName = src
-            Me.DestinationName = dst
-        End Sub
-    End Class
+    Friend Structure SchemaMapItem
+        Public Ordinal As Integer
+        Public SourceName As String
+        Public DestinationName As String
+    End Structure
 End Class
 
 
