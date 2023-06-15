@@ -10,17 +10,17 @@ Imports Npgsql
 Public Class PostGreProvider
     Inherits ProviderBase
 
-    Public Sub New(connectionName As String, commandTimeout As Integer, connection As NpgsqlConnection)
-        MyBase.New(connectionName, ProviderTypes.PostGre, connection, commandTimeout)
-
-        AddHandler Me.Connection.Notice, AddressOf HandleNoticeMessage
-    End Sub
-
     Public Overloads ReadOnly Property Connection As NpgsqlConnection
         Get
             Return DirectCast(MyBase.Connection, NpgsqlConnection)
         End Get
     End Property
+
+    Private Sub New(connectionName As String, commandTimeout As Integer, connection As NpgsqlConnection)
+        MyBase.New(connectionName, ProviderTypes.PostGre, connection, commandTimeout)
+
+        AddHandler Me.Connection.Notice, AddressOf HandleNoticeMessage
+    End Sub
 
     Public Overrides Function ConnectionInfo() As OrderedDictionary
         Dim od = MyBase.ConnectionInfo

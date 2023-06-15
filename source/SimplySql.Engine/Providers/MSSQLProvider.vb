@@ -8,17 +8,17 @@ Imports System.Data.SQLite
 Public Class MSSQLProvider
     Inherits ProviderBase
 
-    Public Sub New(connectionName As String, commandTimeout As Integer, connection As SqlConnection)
-        MyBase.New(connectionName, ProviderTypes.MSSQL, connection, commandTimeout)
-
-        AddHandler Me.Connection.InfoMessage, AddressOf HandleInfoMessage
-    End Sub
-
     Public Overloads ReadOnly Property Connection As SqlConnection
         Get
             Return DirectCast(MyBase.Connection, SqlConnection)
         End Get
     End Property
+
+    Private Sub New(connectionName As String, commandTimeout As Integer, connection As SqlConnection)
+        MyBase.New(connectionName, ProviderTypes.MSSQL, connection, commandTimeout)
+
+        AddHandler Me.Connection.InfoMessage, AddressOf HandleInfoMessage
+    End Sub
 
     Public Overrides Function ConnectionInfo() As OrderedDictionary
         Dim od = MyBase.ConnectionInfo

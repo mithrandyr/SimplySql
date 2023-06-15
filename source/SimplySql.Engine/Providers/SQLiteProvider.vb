@@ -3,16 +3,15 @@ Imports System.Data.SQLite
 
 Public Class SQLiteProvider
     Inherits ProviderBase
-
-    Private Sub New(connectionName As String, commandTimeout As Integer, connection As SQLiteConnection)
-        MyBase.New(connectionName, ProviderTypes.SQLite, connection, commandTimeout)
-    End Sub
-
     Public Overloads ReadOnly Property Connection As SQLiteConnection
         Get
             Return DirectCast(MyBase.Connection, SQLiteConnection)
         End Get
     End Property
+
+    Private Sub New(connectionName As String, commandTimeout As Integer, connection As SQLiteConnection)
+        MyBase.New(connectionName, ProviderTypes.SQLite, connection, commandTimeout)
+    End Sub
 
     Public Overrides Function ConnectionInfo() As OrderedDictionary
         Dim od = MyBase.ConnectionInfo
@@ -44,19 +43,19 @@ Public Class SQLiteProvider
 
 #Region "Not Supported"
     Public Overrides Sub ChangeDatabase(databaseName As String)
-        Throw New NotSupportedException($"SQLite does not support databases, cannot change to {databaseName}.")
+        Throw New NotSupportedException($"{NameOf(SQLiteProvider)} does not support databases, cannot change to {databaseName}.")
     End Sub
 
     Public Overrides Function GetMessage() As SqlMessage
-        Throw New NotSupportedException("SQLiteProvider does not support SqlMessages.")
+        Throw New NotSupportedException($"{NameOf(SQLiteProvider)} does not support SqlMessages.")
     End Function
 
     Public Overrides Sub ClearMessages()
-        Throw New NotSupportedException("SQLiteProvider does not support SqlMessages.")
+        Throw New NotSupportedException($"{NameOf(SQLiteProvider)} does not support SqlMessages.")
     End Sub
     Public Overrides ReadOnly Property HasMessages As Boolean
         Get
-            Throw New NotSupportedException("SQLiteProvider does not support SqlMessages.")
+            Throw New NotSupportedException($"{NameOf(SQLiteProvider)} does not support SqlMessages.")
         End Get
     End Property
 #End Region

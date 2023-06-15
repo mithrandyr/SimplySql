@@ -19,9 +19,13 @@ Public Module Logic
         Dim provider As ISimplySqlProvider
         Select Case connDetail.ConnectionType
             Case ProviderTypes.MSSQL
+                provider = MSSQLProvider.Create(connDetail)
             Case ProviderTypes.MySql
+
             Case ProviderTypes.Oracle
+                provider = OracleProvider.Create(connDetail)
             Case ProviderTypes.PostGre
+                provider = PostGreProvider.Create(connDetail)
             Case ProviderTypes.SQLite
                 provider = SQLiteProvider.Create(connDetail)
         End Select

@@ -1,10 +1,4 @@
-﻿Imports System.Management.Automation.Language
-Imports System.Net.Http.Headers
-Imports System.Runtime.InteropServices.ComTypes
-Imports Azure.Identity
-Imports Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos
-Imports NetTopologySuite.Operation.Distance
-Imports SimplySql.Common
+﻿Imports SimplySql.Common
 
 <Cmdlet(VerbsCommon.Open, "SQLConnection", DefaultParameterSetName:="default")>
 Public Class OpenSqlConnection

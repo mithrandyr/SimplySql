@@ -32,5 +32,4 @@ Public Interface ISimplySqlProvider
     Sub CommitTransaction()
     Sub RollbackTransaction()
 #End Region
-
 End Interface

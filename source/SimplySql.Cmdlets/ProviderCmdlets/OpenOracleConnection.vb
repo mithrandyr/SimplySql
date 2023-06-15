@@ -1,7 +1,9 @@
-﻿Imports SimplySql.Common
+﻿Imports System.DirectoryServices.ActiveDirectory
+Imports System.Runtime.InteropServices.ComTypes
+Imports SimplySql.Common
 
-<Cmdlet(VerbsCommon.Open, "PostGreConnection", DefaultParameterSetName:="default")>
-Public Class OpenPostGreConnection
+<Cmdlet(VerbsCommon.Open, "OracleConnection", DefaultParameterSetName:="default")>
+Public Class OpenOracleConnection
     Inherits PSCmdlet
 
 #Region "Cmdlet Parameters"
@@ -18,26 +20,24 @@ Public Class OpenPostGreConnection
     Public Property Server As String = "localhost"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=1)>
-    <[Alias]("InitialCatalog")>
-    Public Property Database As String = "postgres"
+    Public Property ServiceName As String
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
-    Public Property Port As Integer = 5432
+    Public Property Port As Integer = 1521
 
-    <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
-    Public Property MaxAutoPrepare As Integer = 25
+    <Parameter(Mandatory:=True, ParameterSetName:="tns", ValueFromPipelineByPropertyName:=True)>
+    Public Property TnsName As String
 
-    <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
-    Public Property RequireSSL As SwitchParameter
-
-    <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
-    Public Property TrustSSL As SwitchParameter
+    <Parameter(ValueFromPipelineByPropertyName:=True)>
+    Public Property Privilege As SimplySql.Common.ConnectionOracle.OraclePrivilege = ConnectionOracle.OraclePrivilege.None
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=2)>
     <Parameter(ParameterSetName:="conn", ValueFromPipelineByPropertyName:=True)>
+    <Parameter(ParameterSetName:="tns", ValueFromPipelineByPropertyName:=True)>
     Public Property Credential As PSCredential
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
+    <Parameter(ParameterSetName:="tns", ValueFromPipelineByPropertyName:=True)>
     Public Property Additional As Hashtable
 
     <Parameter(Mandatory:=True, ParameterSetName:="conn", ValueFromPipelineByPropertyName:=True)>
@@ -50,21 +50,22 @@ Public Class OpenPostGreConnection
                 Engine.Logic.CloseAndRemoveConnection(ConnectionName)
             End If
 
-            Dim connDetail As New ConnectionPostGre(ConnectionName, CommandTimeout)
+            Dim connDetail As New ConnectionOracle(ConnectionName, CommandTimeout)
             If Credential IsNot Nothing Then connDetail.SetAuthCredential(Credential)
 
-            If Me.ParameterSetName = "conn" Then
-                connDetail.ConnectionString = ConnectionString
-            Else
-                With connDetail
-                    .Host = Server
-                    .Database = Database
-                    .Port = Port
-                    .MaxAutoPrepare = MaxAutoPrepare
-                    .RequireSSL = RequireSSL.IsPresent
-                    .TrustServerCertificate = TrustSSL.IsPresent
-                End With
-            End If
+            Select Case ParameterSetName
+                Case "conn"
+                    connDetail.ConnectionString = ConnectionString
+                Case "tns"
+                    connDetail.TNSName = TnsName
+                Case Else
+                    With connDetail
+                        .Host = Server
+                        .ServiceName = ServiceName
+                        .Port = Port
+                        .Privilege = Privilege
+                    End With
+            End Select
 
             Engine.Logic.OpenAndAddConnection(connDetail)
             WriteVerbose($"{ConnectionName} (SQLConnection) opened.")
