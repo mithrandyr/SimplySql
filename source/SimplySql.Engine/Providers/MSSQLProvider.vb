@@ -84,11 +84,8 @@ Public Class MSSQLProvider
                     AddHandler bcp.SqlRowsCopied, Sub(sender As Object, e As SqlRowsCopiedEventArgs) notify.Invoke(e.RowsCopied)
                 End If
 
-                Dim rowcount As Long = 0
-                rowcount -= DirectCast(GetScalar($"SELECT COUNT(1) FROM {destinationTable}", 30), Long)
                 bcp.WriteToServer(dataReader)
-                rowcount += DirectCast(GetScalar($"SELECT COUNT(1) FROM {destinationTable}", 30), Long)
-                Return rowcount
+                Return bcp.RowsCopied
             End Using
         End Using
     End Function
