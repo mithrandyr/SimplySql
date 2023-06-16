@@ -87,7 +87,54 @@ Public Class OracleProvider
         End Using
     End Function
     Private Function OracleArrayParam(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
+        Dim batchIteration As Long = 0
+        Dim schemaMap = GenerateSchemaMap(dataReader, columnMap)
+        Dim destColNames = """" + String.Join(""", """, schemaMap.Select(Function(x) x.DestinationName)) + """"
+        Dim paramNames = ":Param" + String.Join(", :Param", schemaMap.Select(Function(x) x.Ordinal.ToString))
 
+        Using dataReader
+            Using bulkcmd As OracleCommand = GetCommand($"INSERT INTO {destinationTable} ({destColNames}) VALUES ({paramNames})")
+                For Each sm In schemaMap
+
+                Next
+                bulkcmd.ArrayBindCount = batchSize
+
+            End Using
+        End Using
+    End Function
+
+    Private Function MapOracleType(netType As String) As OracleDbType
+        'FROM: https://docs.oracle.com/en/database/oracle///oracle-database/23/odpnt/featOraCommand.html#GUID-BBEF52D9-E4E3-4A9C-93F5-3E408A83FC04
+        Select Case netType.ToLower
+            Case "system.boolean"
+                Return OracleDbType.Boolean
+            Case "system.byte"
+                Return OracleDbType.Byte
+            Case "system.byte[]"
+                Return OracleDbType.Raw
+            Case "system.datetime"
+                Return OracleDbType.TimeStamp
+            Case "system.datetimeoffset"
+                Return OracleDbType.TimeStampTZ
+            Case "system.decimal"
+                Return OracleDbType.Decimal
+            Case "system.double"
+                Return OracleDbType.Double
+            Case "system.float", "system.single"
+                Return OracleDbType.Single
+            Case "system.guid"
+                Return OracleDbType.Blob
+            Case "system.int16"
+                Return OracleDbType.Int16
+            Case "system.int32"
+                Return OracleDbType.Int32
+            Case "system.int64"
+                Return OracleDbType.Int64
+            Case "system.timespan"
+                Return OracleDbType.IntervalDS
+            Case Else
+                Return OracleDbType.Varchar2
+        End Select
     End Function
 
     Private Sub HandleInfoMessage(sender As Object, e As OracleInfoMessageEventArgs)
