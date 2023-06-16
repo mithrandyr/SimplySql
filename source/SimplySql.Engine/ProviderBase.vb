@@ -1,6 +1,6 @@
 ﻿Imports System.Collections.Specialized
 Imports System.Data
-Imports System.Data.SQLite
+Imports System.Data.Common
 Imports System.Threading
 Imports SimplySql.Common
 Public MustInherit Class ProviderBase
@@ -65,9 +65,6 @@ Public MustInherit Class ProviderBase
     End Function
     Public Function GetCommand(query As String, Optional params As Hashtable = Nothing) As IDbCommand
         Return Me.GetCommand(query, Me.CommandTimeout, params)
-    End Function
-    Public Function GetCommand(query As String, timeout As Integer) As IDbCommand
-        Return Me.GetCommand(query, timeout, Nothing)
     End Function
 #End Region
 
@@ -219,6 +216,20 @@ Public MustInherit Class ProviderBase
         Return batchIteration
     End Function
 
+    Friend Function GenerateSchemaMap(dr As IDataReader, columnMap As Hashtable) As List(Of SchemaMapItem)
+        Dim schemaMap As New List(Of SchemaMapItem)
+        Dim ord As Integer = 0
+        For Each dr In dr.GetSchemaTable().Rows.Cast(Of DataRow).OrderBy(Function(x) x("ColumnOrdinal"))
+            schemaMap.Add(New SchemaMapItem With {.Ordinal = ord, .SourceName = dr("ColumnName"), .DestinationName = dr("ColumnName"), .DataType = dr("DataType")})
+            ord += 1
+        Next
+
+        If columnMap IsNot Nothing AndAlso columnMap.Count > 0 Then
+            Dim columnMapDictionary As Dictionary(Of String, String) = columnMap.Cast(Of DictionaryEntry).ToDictionary(Function(x) x.Key.ToString, Function(x) x.Value.ToString)
+            schemaMap = schemaMap.Where(Function(x) columnMapDictionary.ContainsKey(x.SourceName)).Select(Function(x) New SchemaMapItem With {.Ordinal = x.Ordinal, .SourceName = x.SourceName, .DestinationName = columnMapDictionary(x.SourceName)})
+        End If
+        Return schemaMap
+    End Function
 #End Region
 
 #Region "Messages"
@@ -277,6 +288,7 @@ Public MustInherit Class ProviderBase
         Public Ordinal As Integer
         Public SourceName As String
         Public DestinationName As String
+        Public DataType As String
     End Structure
 End Class
 

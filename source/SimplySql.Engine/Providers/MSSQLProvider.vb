@@ -2,8 +2,6 @@
 Imports System.Data
 Imports System.Data.Common
 Imports Microsoft.Data.SqlClient
-Imports System.Runtime.CompilerServices
-Imports System.Data.SQLite
 
 Public Class MSSQLProvider
     Inherits ProviderBase
@@ -58,26 +56,8 @@ Public Class MSSQLProvider
     Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
         Dim bcpOption = SqlBulkCopyOptions.KeepIdentity + SqlBulkCopyOptions.CheckConstraints + SqlBulkCopyOptions.FireTriggers
         Using dataReader
-            Using bcp As New SqlBulkCopy(Connection, bcpOption, Transaction)
-                With bcp
-                    .EnableStreaming = True
-                    .BulkCopyTimeout = batchTimeout
-                    .BatchSize = batchSize
-                    .DestinationTableName = destinationTable
-                End With
-
-                If columnMap Is Nothing OrElse columnMap.Count = 0 Then
-                    dataReader.
-                        GetSchemaTable().
-                        AsEnumerable.
-                        Select(Function(dr) dr("ColumnName").ToString).
-                        ToList.
-                        ForEach(Function(colName) bcp.ColumnMappings.Add(colName, colName))
-                Else
-                    For Each key As String In columnMap.Keys
-                        bcp.ColumnMappings.Add(key, columnMap.Item(key).ToString)
-                    Next
-                End If
+            Using bcp As New SqlBulkCopy(Connection, bcpOption, Transaction) With {.BulkCopyTimeout = batchTimeout, .BatchSize = batchSize, .DestinationTableName = destinationTable, .EnableStreaming = True}
+                GenerateSchemaMap(dataReader, columnMap).ForEach(Sub(x) bcp.ColumnMappings.Add(x.SourceName, x.DestinationName))
 
                 If notify IsNot Nothing Then
                     bcp.NotifyAfter = batchSize

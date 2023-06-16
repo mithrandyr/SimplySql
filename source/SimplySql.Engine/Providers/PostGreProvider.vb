@@ -60,17 +60,7 @@ Public Class PostGreProvider
 
     Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
         Using dataReader
-            Dim schemaMap As New List(Of SchemaMapItem)
-            Dim ord As Integer = 0
-            For Each dr In dataReader.GetSchemaTable().Rows.Cast(Of DataRow).OrderBy(Function(x) x("ColumnOrdinal"))
-                schemaMap.Add(New SchemaMapItem With {.Ordinal = ord, .SourceName = dr("ColumnName"), .DestinationName = dr("ColumnName")})
-                ord += 1
-            Next
-
-            If columnMap IsNot Nothing AndAlso columnMap.Count > 0 Then
-                Dim columnMapDictionary As Dictionary(Of String, String) = columnMap.Cast(Of DictionaryEntry).ToDictionary(Function(x) x.Key.ToString, Function(x) x.Value.ToString)
-                schemaMap = schemaMap.Where(Function(x) columnMapDictionary.ContainsKey(x.SourceName)).Select(Function(x) New SchemaMapItem With {.Ordinal = x.Ordinal, .SourceName = x.SourceName, .DestinationName = columnMapDictionary(x.SourceName)})
-            End If
+            Dim schemaMap = GenerateSchemaMap(dataReader, columnMap)
 
             Dim copyFromSql As String = $"COPY {destinationTable} ({String.Join(", ", schemaMap.Select(Function(x) x.DestinationName))}) FROM STDIN (FORMAT BINARY)"
             Using bulk = Connection.BeginBinaryImport(copyFromSql)
