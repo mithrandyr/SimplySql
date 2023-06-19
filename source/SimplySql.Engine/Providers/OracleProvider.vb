@@ -59,11 +59,6 @@ Public Class OracleProvider
     End Function
 
     Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
-        'use logic to determine if there is an existing transaction.  IF so, then use existing logic.  If no transaction, then use oraclebulkcopy class.
-
-
-
-
         If Me.HasTransaction Then
             Return OracleArrayParam(dataReader, destinationTable, columnMap, batchSize, batchTimeout, notify)
         Else
@@ -94,11 +89,33 @@ Public Class OracleProvider
 
         Using dataReader
             Using bulkcmd As OracleCommand = GetCommand($"INSERT INTO {destinationTable} ({destColNames}) VALUES ({paramNames})")
+                'adding parameters
                 For Each sm In schemaMap
-
+                    Dim p As New OracleParameter($"Param{sm.Ordinal}", MapOracleType(sm.DataType)) With {.Value = New ArrayList(batchSize)}
+                    bulkcmd.Parameters.Add(p)
                 Next
+
                 bulkcmd.ArrayBindCount = batchSize
 
+                While dataReader.Read
+                    batchIteration += 1
+                    For Each sm In schemaMap
+                        DirectCast(bulkcmd.Parameters(sm.Ordinal).Value, ArrayList).Add(dataReader.GetValue(sm.Ordinal))
+                    Next
+
+                    If batchIteration Mod batchSize = 0 Then
+                        bulkcmd.ExecuteNonQuery()
+                        If notify IsNot Nothing Then notify.Invoke(batchIteration)
+                        schemaMap.ForEach(Sub(sm) bulkcmd.Parameters(sm.Ordinal).Value = New ArrayList(batchSize))
+                    End If
+                End While
+
+                Dim remaining = batchIteration Mod batchSize
+                If remaining > 0 Then
+                    bulkcmd.ArrayBindCount = remaining
+                    bulkcmd.ExecuteNonQuery()
+                    If notify IsNot Nothing Then notify.Invoke(batchIteration)
+                End If
             End Using
         End Using
     End Function
