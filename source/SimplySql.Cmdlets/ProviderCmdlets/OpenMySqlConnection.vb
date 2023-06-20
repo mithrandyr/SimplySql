@@ -1,9 +1,7 @@
-﻿Imports System.DirectoryServices.ActiveDirectory
-Imports System.Runtime.InteropServices.ComTypes
-Imports SimplySql.Common
+﻿Imports SimplySql.Common
 
-<Cmdlet(VerbsCommon.Open, "OracleConnection", DefaultParameterSetName:="default")>
-Public Class OpenOracleConnection
+<Cmdlet(VerbsCommon.Open, "MySqlConnection", DefaultParameterSetName:="default")>
+Public Class OpenMySqlConnection
     Inherits PSCmdlet
 
 #Region "Cmdlet Parameters"
@@ -20,24 +18,20 @@ Public Class OpenOracleConnection
     Public Property Server As String = "localhost"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=1)>
-    Public Property ServiceName As String
+    <[Alias]("InitialCatalog")>
+    Public Property Database As String = "mysql"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
-    Public Property Port As Integer = 1521
+    Public Property Port As Integer = 3306
 
-    <Parameter(Mandatory:=True, ParameterSetName:="tns", ValueFromPipelineByPropertyName:=True)>
-    Public Property TnsName As String
-
-    <Parameter(ValueFromPipelineByPropertyName:=True)>
-    Public Property Privilege As SimplySql.Common.ConnectionOracle.OraclePrivilege = ConnectionOracle.OraclePrivilege.None
+    <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
+    Public Property SSLMode As Common.SslMode = SslMode.Preferred
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=2)>
     <Parameter(ParameterSetName:="conn", ValueFromPipelineByPropertyName:=True)>
-    <Parameter(ParameterSetName:="tns", ValueFromPipelineByPropertyName:=True)>
     Public Property Credential As PSCredential
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
-    <Parameter(ParameterSetName:="tns", ValueFromPipelineByPropertyName:=True)>
     Public Property Additional As Hashtable
 
     <Parameter(Mandatory:=True, ParameterSetName:="conn", ValueFromPipelineByPropertyName:=True)>
@@ -50,27 +44,24 @@ Public Class OpenOracleConnection
                 Engine.Logic.CloseAndRemoveConnection(ConnectionName)
             End If
 
-            Dim connDetail As New ConnectionOracle(ConnectionName, CommandTimeout)
+            Dim connDetail As New ConnectionMySql(ConnectionName, CommandTimeout)
             If Credential IsNot Nothing Then connDetail.SetAuthCredential(Credential)
 
-            Select Case ParameterSetName
-                Case "conn"
-                    connDetail.ConnectionString = ConnectionString
-                Case "tns"
-                    connDetail.TNSName = TnsName
-                Case Else
-                    With connDetail
-                        .Host = Server
-                        .ServiceName = ServiceName
-                        .Port = Port
-                        .Privilege = Privilege
-                    End With
-            End Select
+            If Me.ParameterSetName = "conn" Then
+                connDetail.ConnectionString = ConnectionString
+            Else
+                With connDetail
+                    .Server = Server
+                    .Database = Database
+                    .Port = Port
+                    .SslMode = SSLMode
+                End With
+            End If
 
             Engine.Logic.OpenAndAddConnection(connDetail)
-            WriteVerbose($"{ConnectionName} (OracleConnection) opened.")
+            WriteVerbose($"{ConnectionName} (MySqlConnection) opened.")
         Catch ex As Exception
-            WriteError(New ErrorRecord(ex, "OpenOracleConnection.Error", ErrorCategory.OpenError, ConnectionName))
+            WriteError(New ErrorRecord(ex, "OpenMySQLConnection.Error", ErrorCategory.OpenError, ConnectionName))
         End Try
     End Sub
 End Class

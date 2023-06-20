@@ -42,3 +42,11 @@ Public Class baseConnectionDetail
         Return $"PowerShell (SimplySql: {ConnectionName})"
     End Function
 End Class
+
+Public Enum SslMode
+    Disabled
+    Preferred
+    Required
+    VerifyCA
+    VerifyFull
+End Enum

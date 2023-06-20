@@ -29,6 +29,7 @@ Public Class PostGreProvider
             .Add("Host", Connection.Host)
             .Add("Port", Connection.Port)
             .Add("Database", Connection.Database)
+            .Add("User", Connection.UserName)
         End With
         Return od
     End Function
@@ -96,7 +97,7 @@ Public Class PostGreProvider
                     .Database = connDetail.Database,
                     .MaxAutoPrepare = connDetail.MaxAutoPrepare,
                     .TrustServerCertificate = connDetail.TrustServerCertificate,
-                    .SslMode = If(connDetail.RequireSSL, SslMode.Require, SslMode.Prefer)
+                    .SslMode = MapSslMode(connDetail.SslMode)
                 }
             If connDetail.UseIntegratedSecurity Then sb.IntegratedSecurity = True
 
@@ -113,6 +114,22 @@ Public Class PostGreProvider
         dsBuilder.UseNetTopologySuite()
 
         Return New PostGreProvider(connDetail.ConnectionName, connDetail.CommandTimeout, dsBuilder.Build.CreateConnection())
+    End Function
+    Private Shared Function MapSslMode(input As Common.SslMode) As SslMode
+        Select Case input
+            Case Common.SslMode.Disabled
+                Return SslMode.Disable
+            Case Common.SslMode.Preferred
+                Return SslMode.Prefer
+            Case Common.SslMode.Required
+                Return SslMode.Require
+            Case Common.SslMode.VerifyCA
+                Return SslMode.VerifyCA
+            Case Common.SslMode.VerifyFull
+                Return SslMode.VerifyFull
+            Case Else
+                Throw New InvalidOperationException($"'{input}' is not a valid SSLMode option for the PostGre provider (npgsql).")
+        End Select
     End Function
 #End Region
 End Class

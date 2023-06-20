@@ -116,6 +116,7 @@ Public Class OracleProvider
                     bulkcmd.ExecuteNonQuery()
                     If notify IsNot Nothing Then notify.Invoke(batchIteration)
                 End If
+                Return batchIteration
             End Using
         End Using
     End Function
