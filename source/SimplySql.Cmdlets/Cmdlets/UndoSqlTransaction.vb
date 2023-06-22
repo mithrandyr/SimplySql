@@ -9,9 +9,7 @@ Public Class UndoSqlTransaction
 #End Region
 
     Protected Overrides Sub ProcessRecord()
-        If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            ErrorConnectionNotFound(ConnectionName)
-        Else
+        If ValidateConnection(ConnectionName) Then
             If Me.ShouldProcess(ConnectionName, "Rollback a Sql Transaction") Then
                 Dim conn = Engine.Logic.GetConnection(ConnectionName)
                 Try

@@ -8,9 +8,7 @@ Public Class ClearSqlMessage
     Public Property ConnectionName As String = "default"
 #End Region
     Protected Overrides Sub ProcessRecord()
-        If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            ErrorConnectionNotFound(ConnectionName)
-        Else
+        If ValidateConnection(ConnectionName) Then
             If Me.ShouldProcess(ConnectionName) Then
                 Try
                     Engine.Logic.GetConnection(ConnectionName).ClearMessages()

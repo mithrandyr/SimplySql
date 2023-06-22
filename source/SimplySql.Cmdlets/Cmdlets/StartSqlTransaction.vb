@@ -9,9 +9,7 @@ Public Class StartSqlTransaction
 #End Region
 
     Protected Overrides Sub ProcessRecord()
-        If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            ErrorConnectionNotFound(ConnectionName)
-        Else
+        If ValidateConnection(ConnectionName) Then
             If Me.ShouldProcess(ConnectionName, "Begin a Sql Transaction") Then
                 Try
                     Engine.Logic.GetConnection(ConnectionName).BeginTransaction()

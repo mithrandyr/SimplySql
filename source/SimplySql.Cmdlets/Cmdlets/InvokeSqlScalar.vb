@@ -22,9 +22,7 @@ Public Class InvokeSqlScalar
 #End Region
 
     Protected Overrides Sub ProcessRecord()
-        If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            ErrorConnectionNotFound(ConnectionName)
-        Else
+        If ValidateConnection(ConnectionName) Then
             Dim singleQuery As String = String.Join(Environment.NewLine, Query)
 
             If Me.ShouldProcess(ConnectionName, $"Execute '{singleQuery}'") Then

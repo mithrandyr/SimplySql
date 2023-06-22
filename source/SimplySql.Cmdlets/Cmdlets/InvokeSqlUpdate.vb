@@ -28,9 +28,7 @@ Public Class InvokeSqlUpdate
 #End Region
 
     Protected Overrides Sub ProcessRecord()
-        If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            ErrorConnectionNotFound(ConnectionName)
-        Else
+        If ValidateConnection(ConnectionName) Then
             Dim conn = Engine.Logic.GetConnection(ConnectionName)
             If ParameterSetName = "cmd" AndAlso Me.ShouldProcess(ConnectionName, $"Execute '{Command.CommandText}'") Then
                 Try

@@ -3,10 +3,21 @@
 Public Module Logic
     ReadOnly Property Connections As New Dictionary(Of String, ISimplySqlProvider)
 
-    Function ConnectionExists(connectionName As String) As Boolean
-        Return Connections.Keys.Any(Function(key) key.Equals(connectionName, StringComparison.OrdinalIgnoreCase))
+    Function ConnectionExists(connectionName As String, Optional checkIsOpen As Boolean = True) As ValidateConnectionResult
+        If Not Connections.Keys.Any(Function(key) key.Equals(connectionName, StringComparison.OrdinalIgnoreCase)) Then
+            Return ValidateConnectionResult.NotFound
+        Else
+            If Not checkIsOpen Then
+                Return ValidateConnectionResult.Found
+            Else
+                If Not GetConnection(connectionName).Connection.State = Data.ConnectionState.Open Then
+                    Return ValidateConnectionResult.NotOpen
+                Else
+                    Return ValidateConnectionResult.Open
+                End If
+            End If
+        End If
     End Function
-
     Function GetConnection(connectionName As String) As ISimplySqlProvider
         Try
             Return Connections.First(Function(item) item.Key.Equals(connectionName, StringComparison.OrdinalIgnoreCase)).Value

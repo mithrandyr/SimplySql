@@ -15,9 +15,7 @@ Public Class SetSqlConnection
 #End Region
 
     Protected Overrides Sub ProcessRecord()
-        If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            ErrorConnectionNotFound(ConnectionName)
-        Else
+        If ValidateConnection(ConnectionName) Then
             If CommandTimeout > 0 AndAlso Me.ShouldProcess(ConnectionName, $"Change CommandTimeout to '{CommandTimeout}'") Then
                 Engine.Logic.GetConnection(ConnectionName).CommandTimeout = CommandTimeout
             End If

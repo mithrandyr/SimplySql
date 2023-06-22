@@ -44,11 +44,7 @@ Public Class InvokeSqlBulkCopy
             Dim ex As New ArgumentException($"You cannot use the same connection for both the source and destination ({SourceConnectionName}).", NameOf(DestinationConnectionName))
             WriteError(New ErrorRecord(ex, MyInvocation.MyCommand.Name, ErrorCategory.InvalidArgument, DestinationConnectionName))
         Else
-            If Not Engine.Logic.ConnectionExists(SourceConnectionName) Then
-                ErrorConnectionNotFound(SourceConnectionName)
-            ElseIf Not Engine.Logic.ConnectionExists(DestinationConnectionName) Then
-                ErrorConnectionNotFound(DestinationConnectionName)
-            Else
+            If ValidateConnection(SourceConnectionName) And ValidateConnection(DestinationConnectionName) Then
                 If Me.ShouldProcess(DestinationConnectionName, $"Execute bulkloading into '{DestinationTable}'") Then
                     Dim singleQuery As String
 
