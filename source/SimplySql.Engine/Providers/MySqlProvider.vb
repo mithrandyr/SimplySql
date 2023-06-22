@@ -53,8 +53,9 @@ Public Class MySqlProvider
     End Sub
 
     Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
+        If batchTimeout < 0 Then batchTimeout = CommandTimeout
         Using dataReader
-            Dim bcp As New MySqlBulkCopy(Connection, Transaction)
+            Dim bcp As New MySqlBulkCopy(Connection, Transaction) With {.BulkCopyTimeout = batchTimeout, .DestinationTableName = destinationTable}
             GenerateSchemaMap(dataReader, columnMap).ForEach(Sub(x) bcp.ColumnMappings.Add(New MySqlBulkCopyColumnMapping(x.Ordinal, x.DestinationName)))
 
             If notify IsNot Nothing Then

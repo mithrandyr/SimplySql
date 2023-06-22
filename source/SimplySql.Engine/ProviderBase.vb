@@ -109,7 +109,7 @@ Public MustInherit Class ProviderBase
 #End Region
 
 #Region "GetReader"
-    Public Overridable Function GetReader(query As String, timeout As Integer, params As Hashtable) As IDataReader Implements ISimplySqlProvider.GetDataReader
+    Public Overridable Function GetReader(query As String, params As Hashtable, Optional timeout As Integer = -1) As IDataReader Implements ISimplySqlProvider.GetDataReader
         Using cmd As IDbCommand = Me.GetCommand(query, timeout, params)
             Try
                 Return cmd.ExecuteReader()
@@ -119,12 +119,6 @@ Public MustInherit Class ProviderBase
                 Throw ex
             End Try
         End Using
-    End Function
-    Public Function GetReader(query As String, Optional params As Hashtable = Nothing) As IDataReader
-        Return Me.GetReader(query, Me.CommandTimeout, params)
-    End Function
-    Public Function GetReader(query As String, timeout As Integer) As IDataReader
-        Return Me.GetReader(query, timeout, Nothing)
     End Function
 #End Region
 
@@ -148,6 +142,7 @@ Public MustInherit Class ProviderBase
 
 #Region "BulkLoad"
     Public Overridable Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Int64)) As Int64 Implements ISimplySqlProvider.BulkLoad
+        If batchTimeout < 0 Then batchTimeout = CommandTimeout
         Dim batchIteration As Int64 = 0
         Dim ord As Integer = 0
         Dim hasPrepared As Boolean = False
@@ -197,7 +192,7 @@ Public MustInherit Class ProviderBase
                         If batchIteration Mod batchSize = 0 Then
                             bulkCmd.Transaction.Commit()
                             bulkCmd.Transaction.Dispose()
-                            If notify IsNot Nothing Then notify(batchIteration)
+                            If notify IsNot Nothing Then notify.Invoke(batchIteration)
                             bulkCmd.Transaction = Me.Connection.BeginTransaction()
                             sw.Restart()
                         End If

@@ -54,6 +54,7 @@ Public Class MSSQLProvider
     End Function
 
     Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
+        If batchTimeout < 0 Then batchTimeout = CommandTimeout
         Dim bcpOption = SqlBulkCopyOptions.KeepIdentity + SqlBulkCopyOptions.CheckConstraints + SqlBulkCopyOptions.FireTriggers
         Using dataReader
             Using bcp As New SqlBulkCopy(Connection, bcpOption, Transaction) With {.BulkCopyTimeout = batchTimeout, .BatchSize = batchSize, .DestinationTableName = destinationTable, .EnableStreaming = True}

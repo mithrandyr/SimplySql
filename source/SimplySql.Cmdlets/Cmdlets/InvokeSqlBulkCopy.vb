@@ -1,66 +1,78 @@
-﻿<Cmdlet(VerbsLifecycle.Invoke, "SqlBulkCopy", SupportsShouldProcess:=True, DefaultParameterSetName:="hashtable")>
+﻿Imports System.Numerics
+
+<Cmdlet(VerbsLifecycle.Invoke, "SqlBulkCopy", SupportsShouldProcess:=True, DefaultParameterSetName:="hashtable")>
 <[Alias]("isq")>
 Public Class InvokeSqlBulkCopy
     Inherits PSCmdlet
 #Region "Parameters"
     <Parameter(ValueFromPipelineByPropertyName:=True)>
-    <[Alias]("cn")>
+    <ValidateNotNullOrEmpty()> <[Alias]("SrcCN")>
+    Public Property SourceConnectionName As String = "default"
+
+    <Parameter(ValueFromPipelineByPropertyName:=True)>
+    <ValidateNotNullOrEmpty()> <[Alias]("DstCN")>
+    Public Property DestinationConnectionName As String = "default"
+
+    <Parameter(ParameterSetName:="table", ValueFromPipelineByPropertyName:=True)>
+    <Parameter(ParameterSetName:="query", Mandatory:=True, ValueFromPipelineByPropertyName:=True)>
     <ValidateNotNullOrEmpty()>
-    Public Property ConnectionName As String = "default"
+    Public Property DestinationTable As String
 
-    <Parameter(Mandatory:=True, Position:=0)>
-    <ValidateNotNullOrEmpty>
-    Public Property Query As String()
+    <Parameter(ParameterSetName:="table", Mandatory:=True, ValueFromPipelineByPropertyName:=True)>
+    <ValidateNotNullOrEmpty()>
+    Public Property SourceTable As String
 
-    <Parameter(ParameterSetName:="hashtable", Position:=1)>
-    <Parameter(ParameterSetName:="providertype")>
-    Public Property Parameters As Hashtable
+    <Parameter(ParameterSetName:="query", Mandatory:=True, ValueFromPipelineByPropertyName:=True)>
+    <ValidateNotNullOrEmpty()>
+    Public Property SourceQuery As String()
 
-    Public Property CommandTimeout As Integer = -1
+    <Parameter(ParameterSetName:="query", ValueFromPipelineByPropertyName:=True)>
+    Public Property SourceParameters As Hashtable
 
-    <Parameter(Mandatory:=True, ParameterSetName:="object", Position:=1, ValueFromPipeline:=True)>
-    <Parameter(ParameterSetName:="providertype")>
-    Public Property ParamObject As PSObject
+    Public Property ColumnMap As Hashtable
 
-    <Parameter(ParameterSetName:="hashtable")>
-    <Parameter(ParameterSetName:="object")>
-    Public Property Stream As SwitchParameter
+    <ValidateRange(1, 50000)>
+    Public Property BatchSize As Integer = 500
 
-    <Parameter()>
-    Public Property AsDataTable As SwitchParameter
+    Public Property BatchTimeout As Integer = -1
 
-    <Parameter(ParameterSetName:="providertype")>
-    <[Alias]("ProviderTypes")>
-    Public Property UseTypesFromProvider As SwitchParameter
+    Public Property Notify As SwitchParameter
 #End Region
-    Protected Overrides Sub ProcessRecord()
-        If Not Engine.Logic.ConnectionExists(ConnectionName) Then
-            ErrorConnectionNotFound(ConnectionName)
-        Else
-            Dim singleQuery As String = String.Join(Environment.NewLine, Query)
 
-            If Me.ShouldProcess(ConnectionName, $"Execute '{singleQuery}'") Then
-                'rewrite all of this
-                'If ParameterSetName.Equals("object", StringComparison.OrdinalIgnoreCase) Then Parameters = ParamObject.ConvertToHashtable
-                Try
-                    '    If Stream.IsPresent Then
-                    '        Using dr = Engine.Logic.GetConnection(ConnectionName).GetDataReader(singleQuery, CommandTimeout, Parameters)
-                    '            WriteObject(dr.ConvertToPSObject, True)
-                    '        End Using
-                    '    Else
-                    '        Using ds = Engine.Logic.GetConnection(ConnectionName).GetDataSet(singleQuery, CommandTimeout, Parameters, UseTypesFromProvider.IsPresent)
-                    '            If ds.Tables.Count = 0 Then
-                    '                WriteWarning("Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning.")
-                    '            ElseIf ds.Tables.Count > 1 OrElse AsDataTable.IsPresent Then
-                    '                WriteObject(ds.Tables, True)
-                    '            Else
-                    '                WriteObject(ds.Tables(0).Rows, True)
-                    '            End If
-                    '        End Using
-                    '    End If
-                Catch ex As Exception
-                    ErrorOperationFailed(ex, ConnectionName)
-                End Try
+    Protected Overrides Sub ProcessRecord()
+        If SourceConnectionName.Equals(DestinationConnectionName, StringComparison.OrdinalIgnoreCase) Then
+            Dim ex As New ArgumentException($"You cannot use the same connection for both the source and destination ({SourceConnectionName}).", NameOf(DestinationConnectionName))
+            WriteError(New ErrorRecord(ex, MyInvocation.MyCommand.Name, ErrorCategory.InvalidArgument, DestinationConnectionName))
+        Else
+            If Not Engine.Logic.ConnectionExists(SourceConnectionName) Then
+                ErrorConnectionNotFound(SourceConnectionName)
+            ElseIf Not Engine.Logic.ConnectionExists(DestinationConnectionName) Then
+                ErrorConnectionNotFound(DestinationConnectionName)
+            Else
+                If Me.ShouldProcess(DestinationConnectionName, $"Execute bulkloading into '{DestinationTable}'") Then
+                    Dim singleQuery As String
+
+                    If ParameterSetName = "table" Then
+                        Dim queryColumns As String = "*"
+                        If ColumnMap IsNot Nothing Then queryColumns = String.Join(", ", ColumnMap.Keys)
+                        singleQuery = $"SELECT {queryColumns} FROM {SourceTable}"
+
+                        If String.IsNullOrWhiteSpace(DestinationTable) Then DestinationTable = SourceTable
+                    Else
+                        singleQuery = String.Join(Environment.NewLine, SourceQuery)
+                    End If
+
+                    Try
+                        Dim srcReader = Engine.GetConnection(SourceConnectionName).GetDataReader(singleQuery, SourceParameters)
+                        Dim notifyAction As Action(Of Long) = Nothing
+                        If Notify Then notifyAction = Sub(x) WriteProgress(New ProgressRecord(0, "SimplySql BulkCopy", DestinationTable) With {.CurrentOperation = $"Insert {x} rows."})
+                        Engine.GetConnection(DestinationConnectionName).BulkLoad(srcReader, DestinationTable, ColumnMap, BatchSize, BatchTimeout, notifyAction)
+                    Catch ex As Exception
+                        ErrorOperationFailed(ex, DestinationConnectionName)
+                    Finally
+                        If Notify Then WriteProgress(New ProgressRecord(0, "SimplySql BulkCopy", DestinationTable) With {.RecordType = ProgressRecordType.Completed})
+                    End Try
+                End If
             End If
         End If
     End Sub

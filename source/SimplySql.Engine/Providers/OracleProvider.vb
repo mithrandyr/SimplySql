@@ -59,6 +59,7 @@ Public Class OracleProvider
     End Function
 
     Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
+        If batchTimeout < 0 Then batchTimeout = CommandTimeout
         If Me.HasTransaction Then
             Return OracleArrayParam(dataReader, destinationTable, columnMap, batchSize, batchTimeout, notify)
         Else

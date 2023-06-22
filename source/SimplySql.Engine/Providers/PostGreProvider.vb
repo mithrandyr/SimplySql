@@ -60,12 +60,14 @@ Public Class PostGreProvider
     End Function
 
     Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
+        Dim iteration As Long = 0
         Using dataReader
             Dim schemaMap = GenerateSchemaMap(dataReader, columnMap)
 
             Dim copyFromSql As String = $"COPY {destinationTable} ({String.Join(", ", schemaMap.Select(Function(x) x.DestinationName))}) FROM STDIN (FORMAT BINARY)"
             Using bulk = Connection.BeginBinaryImport(copyFromSql)
                 While dataReader.Read()
+                    iteration += 1
                     bulk.StartRow()
                     For Each field In schemaMap
                         If dataReader.IsDBNull(field.Ordinal) Then
@@ -74,6 +76,12 @@ Public Class PostGreProvider
                             bulk.Write(dataReader.GetValue(field.Ordinal))
                         End If
                     Next
+
+                    If notify IsNot Nothing Then
+                        If iteration Mod batchSize = 0 Then
+                            notify.Invoke(iteration)
+                        End If
+                    End If
                 End While
                 Return bulk.Complete()
             End Using

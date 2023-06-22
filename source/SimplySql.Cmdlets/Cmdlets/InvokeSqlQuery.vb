@@ -43,7 +43,7 @@ Public Class InvokeSqlQuery
                 If ParameterSetName.Equals("object", StringComparison.OrdinalIgnoreCase) Then Parameters = ParamObject.ConvertToHashtable
                 Try
                     If Stream.IsPresent Then
-                        Using dr = Engine.Logic.GetConnection(ConnectionName).GetDataReader(singleQuery, CommandTimeout, Parameters)
+                        Using dr = Engine.Logic.GetConnection(ConnectionName).GetDataReader(singleQuery, Parameters, CommandTimeout)
                             WriteObject(dr.ConvertToPSObject, True)
                         End Using
                     Else
