@@ -13,13 +13,11 @@ Public Class InvokeSqlQuery
     Public Property Query As String()
 
     <Parameter(ParameterSetName:="hashtable", Position:=1)>
-    <Parameter(ParameterSetName:="providertype")>
     Public Property Parameters As Hashtable
 
     Public Property CommandTimeout As Integer = -1
 
     <Parameter(Mandatory:=True, ParameterSetName:="object", Position:=1, ValueFromPipeline:=True)>
-    <Parameter(ParameterSetName:="providertype")>
     Public Property ParamObject As PSObject
 
     <Parameter(ParameterSetName:="hashtable")>
@@ -29,7 +27,7 @@ Public Class InvokeSqlQuery
     <Parameter()>
     Public Property AsDataTable As SwitchParameter
 
-    <Parameter(ParameterSetName:="providertype")>
+    <Parameter()>
     <[Alias]("ProviderTypes")>
     Public Property UseTypesFromProvider As SwitchParameter
 #End Region

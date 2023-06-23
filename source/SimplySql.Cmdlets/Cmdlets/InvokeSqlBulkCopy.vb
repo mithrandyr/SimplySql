@@ -1,6 +1,4 @@
-﻿Imports System.Numerics
-
-<Cmdlet(VerbsLifecycle.Invoke, "SqlBulkCopy", SupportsShouldProcess:=True, DefaultParameterSetName:="hashtable")>
+﻿<Cmdlet(VerbsLifecycle.Invoke, "SqlBulkCopy", SupportsShouldProcess:=True, DefaultParameterSetName:="hashtable")>
 <[Alias]("isq")>
 Public Class InvokeSqlBulkCopy
     Inherits PSCmdlet
@@ -39,7 +37,7 @@ Public Class InvokeSqlBulkCopy
     Public Property Notify As SwitchParameter
 #End Region
 
-    Protected Overrides Sub ProcessRecord()
+    Protected Overrides Sub EndProcessing()
         If SourceConnectionName.Equals(DestinationConnectionName, StringComparison.OrdinalIgnoreCase) Then
             Dim ex As New ArgumentException($"You cannot use the same connection for both the source and destination ({SourceConnectionName}).", NameOf(DestinationConnectionName))
             WriteError(New ErrorRecord(ex, MyInvocation.MyCommand.Name, ErrorCategory.InvalidArgument, DestinationConnectionName))
