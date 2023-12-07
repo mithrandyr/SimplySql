@@ -11,13 +11,20 @@ Public Class TestSqlConnection
 
     <Parameter(Mandatory:=True, ParameterSetName:="all")>
     Public Property All As SwitchParameter
+
+    <Parameter(ParameterSetName:="single")>
+    Public Property Detailed As SwitchParameter
 #End Region
 
     Protected Overrides Sub EndProcessing()
         If All.IsPresent Then
             WriteObject(Engine.Logic.Connections.Count > 0)
         Else
-            WriteObject(Engine.Logic.ConnectionExists(ConnectionName))
+            If Detailed Then
+                WriteObject(Engine.Logic.ConnectionExists(ConnectionName))
+            Else
+                WriteObject(Engine.Logic.ConnectionExists(ConnectionName, False) = Common.ValidateConnectionResult.Found)
+            End If
         End If
     End Sub
 End Class

@@ -64,7 +64,7 @@ Public Class InvokeSqlBulkCopy
                         Dim srcReader = Engine.GetConnection(SourceConnectionName).GetDataReader(singleQuery, SourceParameters)
                         Dim notifyAction As Action(Of Long) = Nothing
                         If Notify Then notifyAction = Sub(x) WriteProgress(New ProgressRecord(0, "SimplySql BulkCopy", DestinationTable) With {.CurrentOperation = $"Insert {x} rows."})
-                        Engine.GetConnection(DestinationConnectionName).BulkLoad(srcReader, DestinationTable, ColumnMap, BatchSize, BatchTimeout, notifyAction)
+                        WriteObject(Engine.GetConnection(DestinationConnectionName).BulkLoad(srcReader, DestinationTable, ColumnMap, BatchSize, BatchTimeout, notifyAction))
                     Catch ex As Exception
                         ErrorOperationFailed(ex, DestinationConnectionName)
                     Finally

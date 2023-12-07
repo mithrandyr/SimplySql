@@ -177,7 +177,7 @@ Public MustInherit Class ProviderBase
                             bulkCmd.Prepare()
                             hasPrepared = True
                         Else
-                            schemaMap.ForEach(Sub(x) bulkCmd.Parameters(x.Ordinal) = dataReader.GetValue(x.Ordinal))
+                            schemaMap.ForEach(Sub(x) DirectCast(bulkCmd.Parameters(x.Ordinal), IDataParameter).Value = dataReader.GetValue(x.Ordinal))
                         End If
                         batchIteration += 1
                         bulkCmd.ExecuteNonQuery()
@@ -246,7 +246,11 @@ Public MustInherit Class ProviderBase
 
 #Region "Transactions"
     Public Property Transaction As IDbTransaction Implements ISimplySqlProvider.Transaction
-    Public ReadOnly Property HasTransaction As Boolean = Me.Transaction IsNot Nothing Implements ISimplySqlProvider.HasTransaction
+    Public ReadOnly Property HasTransaction As Boolean Implements ISimplySqlProvider.HasTransaction
+        Get
+            Return Me.Transaction IsNot Nothing
+        End Get
+    End Property
     Sub BeginTransaction() Implements ISimplySqlProvider.BeginTransaction
         If Me.HasTransaction Then Throw New InvalidOperationException("Cannot BEGIN a transaction when one is already in progress.")
         Me.Transaction = Me.Connection.BeginTransaction()

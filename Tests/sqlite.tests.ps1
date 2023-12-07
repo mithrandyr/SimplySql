@@ -106,9 +106,9 @@ Describe "SQLite" {
 
     It "Transaction: Invoke-SqlUpdate" {
         Start-SqlTransaction
-        { Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)" } | Should -Not -Throw
+        { Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)" -ea Stop} | Should -Not -Throw
         Undo-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1 FROM transactionTest" } | Should -Throw
+        { Invoke-SqlScalar "SELECT 1 FROM transactionTest" -ea Stop} | Should -Throw
     }
 
     It "Remove File" { { Remove-Item "$home\temp.db" } | Should -Not -Throw }

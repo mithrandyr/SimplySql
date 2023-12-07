@@ -3,7 +3,7 @@
 Public Class CloseSqlConnection
     Inherits PSCmdlet
 #Region "Parameters"
-    <Parameter(ValueFromPipelineByPropertyName:=True, ValueFromPipeline:=True)>
+    <Parameter(ValueFromPipelineByPropertyName:=True, ValueFromPipeline:=True, Position:=0)>
     <[Alias]("cn")>
     <ValidateNotNullOrEmpty()>
     Public Property ConnectionName As String = "default"

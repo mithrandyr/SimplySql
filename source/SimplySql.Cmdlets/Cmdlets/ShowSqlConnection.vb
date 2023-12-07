@@ -17,11 +17,13 @@ Public Class ShowSqlConnection
         If All.IsPresent Then
             WriteObject(Engine.Logic.Connections.Keys, True)
         Else
-            Dim connInfo As New PSObject()
-            For Each de As DictionaryEntry In Engine.Logic.GetConnection(ConnectionName).ConnectionInfo
-                connInfo.Properties.Add(New PSNoteProperty(de.Key, de.Value))
-            Next
-            WriteObject(connInfo)
+            If Engine.Logic.ConnectionExists(ConnectionName) = Common.ValidateConnectionResult.Found Then
+                Dim connInfo As New PSObject()
+                For Each de As DictionaryEntry In Engine.Logic.GetConnection(ConnectionName).ConnectionInfo
+                    connInfo.Properties.Add(New PSNoteProperty(de.Key, de.Value))
+                Next
+                WriteObject(connInfo)
+            End If
         End If
     End Sub
 End Class

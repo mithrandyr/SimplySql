@@ -14,7 +14,7 @@ schema: 2.0.0
 
 ### single (Default)
 ```
-Test-SqlConnection [[-ConnectionName] <String>] [<CommonParameters>]
+Test-SqlConnection [[-ConnectionName] <String>] [-Detailed] [<CommonParameters>]
 ```
 
 ### all
@@ -63,6 +63,21 @@ Required: False
 Position: 0
 Default value: None
 Accept pipeline input: True (ByPropertyName)
+Accept wildcard characters: False
+```
+
+### -Detailed
+{{ Fill Detailed Description }}
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: single
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
