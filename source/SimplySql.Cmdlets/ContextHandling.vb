@@ -5,8 +5,8 @@ Public Class ContextHandling
     Implements IModuleAssemblyInitializer, IModuleAssemblyCleanup
 
     Shared Sub New()
-        Dim appPath As String = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
-        BinPath = Path.Combine(appPath, "bin")
+        AppPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+        BinPath = Path.Combine(AppPath, "bin")
         AssemblyList = Directory.EnumerateFiles(BinPath, "*.dll").Select(Function(file) IO.Path.GetFileNameWithoutExtension(file)).ToList
         PlatformAssemblyList = Directory.GetDirectories(BinPath).SelectMany(Function(dir) Directory.EnumerateFiles(dir)).Select(Function(file) IO.Path.GetFileNameWithoutExtension(file).ToLower).Distinct.ToList
     End Sub
@@ -19,6 +19,7 @@ Public Class ContextHandling
         RemoveHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf HandleResolveEvent
     End Sub
 
+    Private Shared ReadOnly AppPath As String
     Private Shared ReadOnly BinPath As String
     Private Shared ReadOnly AssemblyList As IReadOnlyList(Of String)
     Private Shared ReadOnly PlatformAssemblyList As IReadOnlyList(Of String)
@@ -31,7 +32,7 @@ Public Class ContextHandling
             IsEngineLoaded = True
             Return Assembly.LoadFile(Path.Combine(BinPath, "SimplySql.Engine.dll"))
         ElseIf asmName.Name.Equals("SimplySql.Common", StringComparison.OrdinalIgnoreCase) Then
-            Return Assembly.LoadFile(Path.Combine(BinPath, "SimplySql.Common.dll"))
+            Return Assembly.LoadFile(Path.Combine(AppPath, "SimplySql.Common.dll"))
         End If
 
         If IsEngineLoaded Then
