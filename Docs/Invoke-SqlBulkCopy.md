@@ -14,21 +14,23 @@ schema: 2.0.0
 
 ### hashtable (Default)
 ```
-Invoke-SqlBulkCopy [-SourceConnectionName <String>] [-DestinationConnectionName <String>] [-WhatIf] [-Confirm]
+Invoke-SqlBulkCopy [-SourceConnectionName <String>] [-DestinationConnectionName <String>]
+ [-ColumnMap <Hashtable>] [-BatchSize <Int32>] [-BatchTimeout <Int32>] [-Notify] [-WhatIf] [-Confirm]
  [<CommonParameters>]
 ```
 
 ### table
 ```
 Invoke-SqlBulkCopy [-SourceConnectionName <String>] [-DestinationConnectionName <String>]
- [-DestinationTable <String>] -SourceTable <String> [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-DestinationTable <String>] -SourceTable <String> [-ColumnMap <Hashtable>] [-BatchSize <Int32>]
+ [-BatchTimeout <Int32>] [-Notify] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### query
 ```
 Invoke-SqlBulkCopy [-SourceConnectionName <String>] [-DestinationConnectionName <String>]
- -DestinationTable <String> -SourceQuery <String[]> [-SourceParameters <Hashtable>] [-WhatIf] [-Confirm]
- [<CommonParameters>]
+ -DestinationTable <String> -SourceQuery <String[]> [-SourceParameters <Hashtable>] [-ColumnMap <Hashtable>]
+ [-BatchSize <Int32>] [-BatchTimeout <Int32>] [-Notify] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -44,6 +46,51 @@ PS C:\> {{ Add example code here }}
 {{ Add example description here }}
 
 ## PARAMETERS
+
+### -BatchSize
+{{ Fill BatchSize Description }}
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -BatchTimeout
+{{ Fill BatchTimeout Description }}
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ColumnMap
+{{ Fill ColumnMap Description }}
+
+```yaml
+Type: Hashtable
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### -DestinationConnectionName
 {{ Fill DestinationConnectionName Description }}
@@ -84,6 +131,21 @@ Required: True
 Position: Named
 Default value: None
 Accept pipeline input: True (ByPropertyName)
+Accept wildcard characters: False
+```
+
+### -Notify
+{{ Fill Notify Description }}
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 

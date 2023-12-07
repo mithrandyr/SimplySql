@@ -17,6 +17,7 @@ Public Class InvokeSqlUpdate
     <Parameter(ParameterSetName:="hashtable", Position:=1)>
     Public Property Parameters As Hashtable
 
+    <Parameter()>
     Public Property CommandTimeout As Integer = -1
 
     <Parameter(Mandatory:=True, ParameterSetName:="object", Position:=1, ValueFromPipeline:=True)>

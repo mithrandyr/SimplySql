@@ -14,20 +14,20 @@ schema: 2.0.0
 
 ### hashtable (Default)
 ```
-Invoke-SqlUpdate [-ConnectionName <String>] [-Query] <String[]> [[-Parameters] <Hashtable>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+Invoke-SqlUpdate [-ConnectionName <String>] [-Query] <String[]> [[-Parameters] <Hashtable>]
+ [-CommandTimeout <Int32>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### object
 ```
-Invoke-SqlUpdate [-ConnectionName <String>] [-Query] <String[]> [-ParamObject] <PSObject> [-WhatIf] [-Confirm]
- [<CommonParameters>]
+Invoke-SqlUpdate [-ConnectionName <String>] [-Query] <String[]> [-CommandTimeout <Int32>]
+ [-ParamObject] <PSObject> [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### cmd
 ```
-Invoke-SqlUpdate [-ConnectionName <String>] [-Query] <String[]> -Command <IDbCommand> [-WhatIf] [-Confirm]
- [<CommonParameters>]
+Invoke-SqlUpdate [-ConnectionName <String>] [-Query] <String[]> [-CommandTimeout <Int32>] -Command <IDbCommand>
+ [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -53,6 +53,21 @@ Parameter Sets: cmd
 Aliases:
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -CommandTimeout
+{{ Fill CommandTimeout Description }}
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

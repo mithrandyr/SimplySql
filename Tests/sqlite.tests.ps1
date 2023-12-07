@@ -14,11 +14,9 @@ Describe "SQLite" {
 
     It "Invoke-SqlQuery (No ResultSet Warning)" {
         Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
-        $WarningPreference = "stop"
-        Try { Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" }
-        Catch { $val = $_.ToString() }
-        Finally { Invoke-SqlUpdate -Query "DROP TABLE temp" }
-        $val | Should -Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
+        Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
+        Invoke-SqlUpdate -Query "DROP TABLE temp"
+        $w | Should -BeLike "Query returned no resultset.*"
     }
 
     It "Invoke-SqlUpdate" {

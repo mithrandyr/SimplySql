@@ -14,14 +14,16 @@ schema: 2.0.0
 
 ### hashtable (Default)
 ```
-Invoke-SqlQuery [-ConnectionName <String>] [-Query] <String[]> [[-Parameters] <Hashtable>] [-Stream]
- [-AsDataTable] [-UseTypesFromProvider] [-WhatIf] [-Confirm] [<CommonParameters>]
+Invoke-SqlQuery [-ConnectionName <String>] [-Query] <String[]> [[-Parameters] <Hashtable>]
+ [-CommandTimeout <Int32>] [-Stream] [-AsDataTable] [-UseTypesFromProvider] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
 ```
 
 ### object
 ```
-Invoke-SqlQuery [-ConnectionName <String>] [-Query] <String[]> [-ParamObject] <PSObject> [-Stream]
- [-AsDataTable] [-UseTypesFromProvider] [-WhatIf] [-Confirm] [<CommonParameters>]
+Invoke-SqlQuery [-ConnectionName <String>] [-Query] <String[]> [-CommandTimeout <Int32>]
+ [-ParamObject] <PSObject> [-Stream] [-AsDataTable] [-UseTypesFromProvider] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -43,6 +45,21 @@ PS C:\> {{ Add example code here }}
 
 ```yaml
 Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -CommandTimeout
+{{ Fill CommandTimeout Description }}
+
+```yaml
+Type: Int32
 Parameter Sets: (All)
 Aliases:
 

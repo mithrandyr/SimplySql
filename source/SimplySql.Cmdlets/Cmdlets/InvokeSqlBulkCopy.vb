@@ -27,13 +27,17 @@ Public Class InvokeSqlBulkCopy
     <Parameter(ParameterSetName:="query", ValueFromPipelineByPropertyName:=True)>
     Public Property SourceParameters As Hashtable
 
+    <Parameter()>
     Public Property ColumnMap As Hashtable
 
+    <Parameter()>
     <ValidateRange(1, 50000)>
     Public Property BatchSize As Integer = 500
 
+    <Parameter()>
     Public Property BatchTimeout As Integer = -1
 
+    <Parameter()>
     Public Property Notify As SwitchParameter
 #End Region
 

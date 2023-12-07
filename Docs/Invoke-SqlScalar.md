@@ -14,14 +14,14 @@ schema: 2.0.0
 
 ### hashtable (Default)
 ```
-Invoke-SqlScalar [-ConnectionName <String>] [-Query] <String[]> [[-Parameters] <Hashtable>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+Invoke-SqlScalar [-ConnectionName <String>] [-Query] <String[]> [[-Parameters] <Hashtable>]
+ [-CommandTimeout <Int32>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### object
 ```
-Invoke-SqlScalar [-ConnectionName <String>] [-Query] <String[]> [-ParamObject] <PSObject> [-WhatIf] [-Confirm]
- [<CommonParameters>]
+Invoke-SqlScalar [-ConnectionName <String>] [-Query] <String[]> [-CommandTimeout <Int32>]
+ [-ParamObject] <PSObject> [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -37,6 +37,21 @@ PS C:\> {{ Add example code here }}
 {{ Add example description here }}
 
 ## PARAMETERS
+
+### -CommandTimeout
+{{ Fill CommandTimeout Description }}
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### -ConnectionName
 {{ Fill ConnectionName Description }}
