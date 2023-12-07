@@ -8,8 +8,8 @@ Locale: en-US
 
 # SimplySql Module
 ## Description
-SimplySql - Talking to relational databases the PowerShell way.  
-Simple commands... Powerful opportunities.
+SimplySql - Talking to relational databases the PowerShell way. 
+ Simple commands... Powerful opportunities.
 
 ## SimplySql Cmdlets
 ### [Clear-SqlMessage](Clear-SqlMessage.md)
