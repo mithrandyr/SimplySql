@@ -8,6 +8,7 @@ Describe "SQLite" {
             Close-SqlConnection -ConnectionName Test
         } | Should -Not -Throw
     }
+    
     It "Invoke-SqlScalar" {
         Invoke-SqlScalar -Query "SELECT 1" | Should -BeOfType System.Int64
     }

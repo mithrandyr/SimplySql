@@ -20,11 +20,11 @@
 
   <ItemGroup>
     <PackageReference Include="EnumerableToDataReader" Version="1.1.0" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
-    <PackageReference Include="MySqlConnector" Version="2.2.6" />
-    <PackageReference Include="Npgsql" Version="7.0.4" />
-    <PackageReference Include="Npgsql.NetTopologySuite" Version="7.0.4" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.190" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2" />
+    <PackageReference Include="MySqlConnector" Version="2.3.1" />
+    <PackageReference Include="Npgsql" Version="7.0.6" />
+    <PackageReference Include="Npgsql.NetTopologySuite" Version="7.0.6" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.210" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.118" />
   </ItemGroup>

@@ -7,7 +7,7 @@ Public Class ContextHandling
     Shared Sub New()
         AppPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
         BinPath = Path.Combine(AppPath, "bin")
-        AssemblyList = Directory.EnumerateFiles(BinPath, "*.dll").Select(Function(file) IO.Path.GetFileNameWithoutExtension(file)).ToList
+        AssemblyList = Directory.EnumerateFiles(BinPath, "*.dll").Select(Function(file) IO.Path.GetFileNameWithoutExtension(file).ToLower).ToList
         PlatformAssemblyList = Directory.GetDirectories(BinPath).SelectMany(Function(dir) Directory.EnumerateFiles(dir)).Select(Function(file) IO.Path.GetFileNameWithoutExtension(file).ToLower).Distinct.ToList
     End Sub
 

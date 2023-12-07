@@ -1,5 +1,4 @@
 ﻿<Cmdlet(VerbsLifecycle.Invoke, "SqlBulkCopy", SupportsShouldProcess:=True, DefaultParameterSetName:="hashtable")>
-<[Alias]("isq")>
 Public Class InvokeSqlBulkCopy
     Inherits PSCmdlet
 #Region "Parameters"
