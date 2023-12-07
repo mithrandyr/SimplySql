@@ -8,8 +8,7 @@ Locale: en-US
 
 # SimplySql Module
 ## Description
-SimplySql - Talking to relational databases the PowerShell way. 
- Simple commands... Powerful opportunities.
+SimplySql - Talking to relational databases the PowerShell way.   Simple commands... Powerful opportunities.
 
 ## SimplySql Cmdlets
 ### [Clear-SqlMessage](Clear-SqlMessage.md)
@@ -30,6 +29,9 @@ Clears all available informational messages.
 ### [Get-SqlTransaction](Get-SqlTransaction.md)
 {{ Fill in the Synopsis }}
 
+### [Invoke-SqlBulkCopy](Invoke-SqlBulkCopy.md)
+{{ Fill in the Synopsis }}
+
 ### [Invoke-SqlQuery](Invoke-SqlQuery.md)
 {{ Fill in the Synopsis }}
 
@@ -37,6 +39,15 @@ Clears all available informational messages.
 {{ Fill in the Synopsis }}
 
 ### [Invoke-SqlUpdate](Invoke-SqlUpdate.md)
+{{ Fill in the Synopsis }}
+
+### [Open-MySqlConnection](Open-MySqlConnection.md)
+{{ Fill in the Synopsis }}
+
+### [Open-OracleConnection](Open-OracleConnection.md)
+{{ Fill in the Synopsis }}
+
+### [Open-PostGreConnection](Open-PostGreConnection.md)
 {{ Fill in the Synopsis }}
 
 ### [Open-SQLConnection](Open-SQLConnection.md)

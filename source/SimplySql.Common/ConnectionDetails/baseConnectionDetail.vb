@@ -7,17 +7,17 @@ Public Class baseConnectionDetail
     Public ReadOnly Property ConnectionType As ProviderTypes
     Public ReadOnly Property UserName As String
         Get
-            Return Credential.UserName
+            Return Credential?.UserName
         End Get
     End Property
     Public ReadOnly Property Password As String
         Get
-            Return Credential.Password
+            Return Credential?.Password
         End Get
     End Property
     Public ReadOnly Property SecurePassword As SecureString
         Get
-            Return Credential.SecurePassword
+            Return Credential?.SecurePassword
         End Get
     End Property
     Public ReadOnly Property HasConnectionString As Boolean
