@@ -22,6 +22,9 @@ The basic pattern is to connect to a database, invoke one or more sql statements
 
 See the [Wiki](https://github.com/mithrandyr/SimplySql/wiki) for more details
 
+## Breaking Changes for 2.0
+- UserName/Password parameters are no longer present on `Open-*Connection` cmdlets.  Instead, provide a PSCredential object.
+
 ## Status
 
 It has been released to PowerShellGallery.  Installation is as simple as
