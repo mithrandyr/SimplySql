@@ -1,12 +1,13 @@
 Describe "MSSQL" {
     BeforeAll {
         Open-SqlConnection -DataSource "(localdb)\MSSQLLocalDB"
-        Invoke-SqlUpdate "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'test') BEGIN CREATE DATABASE test; END" | Should -Be -1
+        Invoke-SqlUpdate "IF EXISTS (SELECT * FROM sys.databases WHERE name = 'test') DROP DATABASE test; CREATE DATABASE test" | Should -Be -1
         Close-SqlConnection
     }
     AfterAll {
         Open-SqlConnection -DataSource "(localdb)\MSSQLLocalDB" -Database master
-        Invoke-SqlUpdate "drop Database Test" | Should -Be -1
+        @(isq "sp_who2" | ? dbname -eq test |% spid).foreach({ isu "KILL $_"})
+        Invoke-SqlUpdate "DROP Database Test" | Should -Be -1
         Close-SqlConnection
     }
     BeforeEach { Open-SqlConnection -DataSource "(localdb)\MSSQLLocalDB" }
@@ -89,8 +90,8 @@ Describe "MSSQL" {
 
     It "Transaction: Invoke-SqlUpdate" {
         Start-SqlTransaction
-        { Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)" } | Should -Not -Throw
+        { Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)" -ea Stop } | Should -Not -Throw
         Undo-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1 FROM transactionTest" } | Should -Throw
+        { Invoke-SqlScalar "SELECT 1 FROM transactionTest" -ea Stop } | Should -Throw
     }
 }

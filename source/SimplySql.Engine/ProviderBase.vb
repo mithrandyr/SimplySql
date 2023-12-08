@@ -214,8 +214,14 @@ Public MustInherit Class ProviderBase
     Friend Function GenerateSchemaMap(dr As IDataReader, columnMap As Hashtable) As List(Of SchemaMapItem)
         Dim schemaMap As New List(Of SchemaMapItem)
         Dim ord As Integer = 0
-        For Each dr In dr.GetSchemaTable().Rows.Cast(Of DataRow).OrderBy(Function(x) x("ColumnOrdinal"))
-            schemaMap.Add(New SchemaMapItem With {.Ordinal = ord, .SourceName = dr("ColumnName"), .DestinationName = dr("ColumnName"), .DataType = dr("DataType")})
+        For Each row In dr.GetSchemaTable().Select().OrderBy(Function(x) x("ColumnOrdinal"))
+            Dim smi = New SchemaMapItem With {.Ordinal = ord}
+            smi.SourceName = row("ColumnName")
+            smi.DestinationName = row("ColumnName")
+            smi.DataType = row("DataType").ToString
+
+            'schemaMap.Add(New SchemaMapItem With {.Ordinal = ord, .SourceName = row("ColumnName"), .DestinationName = row("ColumnName"), .DataType = row("DataType")})
+            schemaMap.Add(smi)
             ord += 1
         Next
 
