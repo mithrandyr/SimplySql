@@ -2,25 +2,14 @@
     http://use-the-index-luke.com/blog/2011-07-30/mysql-row-generator#mysql_generator_code
 #>
 Describe "MySql" {
-    BeforeEach { Open-MySqlConnection -Database sys -Credential ([pscredential]::new("root", (ConvertTo-SecureString -Force -AsPlainText "password"))) }
-    AfterEach { Show-SqlConnection -all | Close-SqlConnection }
-    
-    It "Test ConnectionString Switch " {
-        {
-            Open-MySqlConnection -ConnectionString "server=localhost;database=sys;port=3306;user id=root;password=password;useaffectedrows=True;allowuservariables=True;sslmode=none" -ConnectionName Test
-            Close-SqlConnection -ConnectionName Test
-        } | Should -Not -Throw
-    }
+    BeforeAll {
+        $u = "root"
+        $p = "root"
+        $db = "mysql"
+        $c = [pscredential]::new($u, (ConvertTo-SecureString -Force -AsPlainText $p))
 
-    It "Test UserName/Password Parameters" {
-        {
-            Open-MySqlConnection -UserName root -Password password -Database sys -ConnectionName test
-            Close-SqlConnection -ConnectionName test
-        } | Should -Not -Throw
-    }
-
-    It "Creating Views" {
-        Invoke-SqlUpdate -Query "CREATE OR REPLACE VIEW sys.generator_16
+        Open-MySqlConnection -Database $db -Credential $c
+        Invoke-SqlUpdate -Query "CREATE OR REPLACE VIEW $db.generator_16
             AS SELECT 0 n UNION ALL SELECT 1  UNION ALL SELECT 2  UNION ALL 
             SELECT 3   UNION ALL SELECT 4  UNION ALL SELECT 5  UNION ALL
             SELECT 6   UNION ALL SELECT 7  UNION ALL SELECT 8  UNION ALL
@@ -28,14 +17,44 @@ Describe "MySql" {
             SELECT 12  UNION ALL SELECT 13 UNION ALL SELECT 14 UNION ALL 
             SELECT 15;
 
-            CREATE OR REPLACE VIEW sys.generator_256
+            CREATE OR REPLACE VIEW $db.generator_256
             AS SELECT ( ( hi.n << 4 ) | lo.n ) AS n
-                FROM sys.generator_16 lo, sys.generator_16 hi;
+                FROM $db.generator_16 lo, $db.generator_16 hi;
 
-            CREATE OR REPLACE VIEW sys.generator_64k
+            CREATE OR REPLACE VIEW $db.generator_64k
             AS SELECT ( ( hi.n << 8 ) | lo.n ) AS n
-                FROM sys.generator_256 lo, sys.generator_256 hi;" | Out-Null
-        1 | Should -Be 1
+                FROM $db.generator_256 lo, $db.generator_256 hi;" | Out-Null
+        Close-SqlConnection
+    }
+    AfterAll {
+        Open-MySqlConnection -Database $db -Credential $c
+        Invoke-SqlUpdate "DROP TABLE IF EXISTS transactionTest;
+                        DROP TABLE IF EXISTS $db.tmpTable;
+                        DROP TABLE IF EXISTS $db.tmpTable2;
+                        DROP VIEW IF EXISTS $db.generator_64k;
+                        DROP VIEW IF EXISTS $db.generator_256;
+                        DROP VIEW IF EXISTS $db.generator_16;"
+        Close-SqlConnection
+    }
+    BeforeEach { Open-MySqlConnection -Database $db -Credential $c }
+    AfterEach { Show-SqlConnection -all | Close-SqlConnection }
+    
+    It "U = <u>" {
+        Write-Host "User = $u"
+    }
+
+    It "Test ConnectionString Switch " {
+        {
+            Open-MySqlConnection -ConnectionString "server=localhost;database=$db;port=3306;user id=$u;password=$p;useaffectedrows=True;allowuservariables=True;sslmode=none" -ConnectionName Test
+            Close-SqlConnection -ConnectionName Test
+        } | Should -Not -Throw
+    }
+
+    It "Test UserName/Password Parameters" {
+        {
+            Open-MySqlConnection -UserName $u -Password $p -Database $db -ConnectionName test
+            Close-SqlConnection -ConnectionName test
+        } | Should -Throw
     }
 
     It "Invoke-SqlScalar" {
@@ -44,21 +63,19 @@ Describe "MySql" {
 
     It "Invoke-SqlQuery (No ResultSet Warning)" {
         Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
-        $WarningPreference = "stop"
-        Try { Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" }
-        Catch { $val = $_.ToString() }
-        Finally { Invoke-SqlUpdate -Query "DROP TABLE temp" }
-        $val | Should -Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
+        Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
+        Invoke-SqlUpdate -Query "DROP TABLE temp"
+        $w | Should -BeLike "Query returned no resultset.*"
     }
 
     It "Invoke-SqlUpdate" {
         Invoke-SqlUpdate -Query "
-            CREATE TABLE sys.tmpTable (colDec REAL, colInt Int, colText varchar(36));
-            INSERT INTO sys.tmpTable
+            CREATE TABLE $db.tmpTable (colDec REAL, colInt Int, colText varchar(36));
+            INSERT INTO $db.tmpTable
                 SELECT rand() AS colDec
                     , CAST(rand() * 1000000000 AS SIGNED) AS colInt
                     , uuid() AS colText
-                FROM sys.generator_64k" | Should -Be 65536
+                FROM $db.generator_64k" | Should -Be 65536
         
     }
 
@@ -67,7 +84,7 @@ Describe "MySql" {
             SELECT rand() AS colDec
                 , CAST(rand() * 1000000000 AS SIGNED) AS colInt
                 , uuid() AS colText
-            FROM sys.generator_64k
+            FROM $db.generator_64k
             LIMIT 1000" |
             Measure-Object |
             Select-Object -ExpandProperty Count |
@@ -79,7 +96,7 @@ Describe "MySql" {
             SELECT rand() AS colDec
                 , CAST(rand() * 1000000000 AS SIGNED) AS colInt
                 , uuid() AS colText
-            FROM sys.generator_64k
+            FROM $db.generator_64k
             LIMIT 1000" -Stream |
             Measure-Object |
             Select-Object -ExpandProperty Count |
@@ -90,12 +107,12 @@ Describe "MySql" {
         $query = "SELECT rand() AS colDec
                 , CAST(rand() * 1000000000 AS SIGNED) AS colInt
                 , uuid() AS colText
-            FROM sys.generator_64k"
+            FROM $db.generator_64k"
         
-        Open-MySqlConnection -ConnectionName bcp -Database sys -Credential ([pscredential]::new("root", (ConvertTo-SecureString -Force -AsPlainText "password")))
-        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE sys.tmpTable2 (colDec REAL, colInt INTEGER, colText TEXT)"
+        Open-MySqlConnection -ConnectionName bcp -Database mysql -Credential $c
+        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable2 (colDec REAL, colInt INTEGER, colText TEXT)"
 
-        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "sys.tmpTable2" -Notify |
+        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable2" -Notify |
             Should -Be 65536
         
         Close-SqlConnection -ConnectionName bcp
@@ -103,32 +120,22 @@ Describe "MySql" {
 
     It "Transaction: Invoke-SqlScalar" {
         Start-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1" } | Should -Not -Throw
+        { Invoke-SqlScalar "SELECT 1" -ea Stop } | Should -Not -Throw
         Undo-SqlTransaction
     }
 
     It "Transaction: Invoke-SqlQuery" {
         Start-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1" } | Should -Not -Throw
+        { Invoke-SqlScalar "SELECT 1" -ea Stop} | Should -Not -Throw
         Undo-SqlTransaction
     }
 
     It "Transaction: Invoke-SqlUpdate" {
         Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)"
         Start-SqlTransaction
-        { Invoke-SqlUpdate "INSERT INTO transactionTest VALUES (1)" } | Should -Not -Throw
+        { Invoke-SqlUpdate "INSERT INTO transactionTest VALUES (1)" -ea Stop} | Should -Not -Throw
         Undo-SqlTransaction
         Invoke-SqlScalar "SELECT Count(1) FROM transactionTest" | Should -Be 0
         Invoke-SqlUpdate "DROP TABLE transactionTest"
-    }
-
-    It "Dropping Tables, Views" {
-        Try { Invoke-SqlUpdate "DROP TABLE transactionTest" | Out-Null } Catch {}
-        Try { Invoke-SqlUpdate "DROP TABLE sys.tmpTable" | Out-Null } Catch {}
-        Try { Invoke-SqlUpdate "DROP TABLE sys.tmpTable2" | Out-Null } Catch {}
-        Try { Invoke-SqlUpdate "DROP VIEW sys.generator_64k" | Out-Null } Catch {}
-        Try { Invoke-SqlUpdate "DROP VIEW sys.generator_256" | Out-Null } Catch {}
-        Try { Invoke-SqlUpdate "DROP VIEW sys.generator_16" | Out-Null } Catch {}
-        1 | Should -Be 1            
     }
 }

@@ -32,7 +32,7 @@ Public Module Logic
             Case ProviderTypes.MSSQL
                 provider = MSSQLProvider.Create(connDetail)
             Case ProviderTypes.MySql
-
+                provider = MySqlProvider.Create(connDetail)
             Case ProviderTypes.Oracle
                 provider = OracleProvider.Create(connDetail)
             Case ProviderTypes.PostGre

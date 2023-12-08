@@ -77,13 +77,13 @@ Describe "PostGre" {
 
     It "Transaction: Invoke-SqlScalar" {
         Start-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1" } | Should -Not -Throw
+        { Invoke-SqlScalar "SELECT 1" -ea Stop} | Should -Not -Throw
         Undo-SqlTransaction
     }
 
     It "Transaction: Invoke-SqlQuery" {
         Start-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1" } | Should -Not -Throw
+        { Invoke-SqlScalar "SELECT 1" -ea Stop} | Should -Not -Throw
         Undo-SqlTransaction
     }
 
