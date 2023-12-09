@@ -13,19 +13,15 @@ Public Class ConnectionOracle
     Public Property Host As String
     Public Property ServiceName As String
     Public Property Port As Integer
-    Public Property Privilege As OraclePrivilege
+    Public Property Privilege As OraclePrivilege = OraclePrivilege.None
 
     Sub New(connName As String, cmdTimeout As Integer)
         MyBase.New(connName, ProviderTypes.Oracle, cmdTimeout)
-        SetAuthIntegrated()
     End Sub
 
     Sub SetAuthCredential(cred As NetworkCredential)
         Me.UseIntegratedSecurity = False
         Me.Credential = cred
-    End Sub
-    Sub SetAuthIntegrated()
-        Me.UseIntegratedSecurity = True
     End Sub
 
     Public Enum OraclePrivilege

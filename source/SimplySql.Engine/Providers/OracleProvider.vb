@@ -9,15 +9,16 @@ Imports Oracle.ManagedDataAccess.Client
 Public Class OracleProvider
     Inherits ProviderBase
 
+    Private Privilege As OracleDBAPrivilege
     Public Overloads ReadOnly Property Connection As OracleConnection
         Get
             Return DirectCast(MyBase.Connection, OracleConnection)
         End Get
     End Property
 
-    Private Sub New(connName As String, timeout As Integer, conn As OracleConnection)
+    Private Sub New(connName As String, timeout As Integer, conn As OracleConnection, priv As OracleDBAPrivilege)
         MyBase.New(connName, ProviderTypes.Oracle, conn, timeout)
-
+        Privilege = priv
         AddHandler Me.Connection.InfoMessage, AddressOf HandleInfoMessage
     End Sub
 
@@ -27,8 +28,7 @@ Public Class OracleProvider
             .Add("ServerVersion", Connection.ServerVersion)
             .Add("HostName", Connection.HostName)
             .Add("ServiceName", Connection.ServiceName)
-            .Add("Privilege", Connection.Credential.DBAPrivilege)
-            .Add("Database", Connection.Database)
+            .Add("Privilege", Privilege)
         End With
         Return od
     End Function
@@ -72,13 +72,20 @@ Public Class OracleProvider
             Using bcp As New OracleBulkCopy(Me.Connection) With {.BatchSize = batchSize, .BulkCopyTimeout = batchTimeout, .DestinationTableName = destinationTable}
                 GenerateSchemaMap(dataReader, columnMap).ForEach(Sub(x) bcp.ColumnMappings.Add(x.SourceName, x.DestinationName))
 
-                If notify IsNot Nothing Then
-                    bcp.NotifyAfter = batchSize
-                    AddHandler bcp.OracleRowsCopied, Sub(sender As Object, e As OracleRowsCopiedEventArgs) notify.Invoke(e.RowsCopied)
-                End If
-
+                'If notify IsNot Nothing Then
+                '    bcp.NotifyAfter = batchSize
+                '    AddHandler bcp.OracleRowsCopied, Sub(sender As Object, e As OracleRowsCopiedEventArgs) notify.Invoke(e.RowsCopied)
+                'End If
+                bcp.NotifyAfter = 1
+                Dim rowsCopied As Long = 0
+                AddHandler bcp.OracleRowsCopied, Sub(sender As Object, e As OracleRowsCopiedEventArgs)
+                                                     rowsCopied += 1
+                                                     If rowsCopied Mod batchSize = 0 Then
+                                                         notify.Invoke(rowsCopied)
+                                                     End If
+                                                 End Sub
                 bcp.WriteToServer(dataReader)
-                Return RowsCopiedCount(bcp) 'using reflection to get an internal value... not ideal
+                Return rowsCopied
             End Using
         End Using
     End Function
@@ -92,22 +99,24 @@ Public Class OracleProvider
             Using bulkcmd As OracleCommand = GetCommand($"INSERT INTO {destinationTable} ({destColNames}) VALUES ({paramNames})")
                 'adding parameters
                 For Each sm In schemaMap
-                    Dim p As New OracleParameter($"Param{sm.Ordinal}", MapOracleType(sm.DataType)) With {.Value = New ArrayList(batchSize)}
+                    Dim p As New OracleParameter($"Param{sm.Ordinal}", MapOracleType(sm.DataType)) With {.Value = Array.CreateInstance(Type.GetType(sm.DataType), batchSize)}
                     bulkcmd.Parameters.Add(p)
                 Next
 
                 bulkcmd.ArrayBindCount = batchSize
-
+                Dim index As Integer = 0
                 While dataReader.Read
                     batchIteration += 1
                     For Each sm In schemaMap
-                        DirectCast(bulkcmd.Parameters(sm.Ordinal).Value, ArrayList).Add(dataReader.GetValue(sm.Ordinal))
+                        index = (batchIteration - 1) Mod batchSize
+                        DirectCast(bulkcmd.Parameters(sm.Ordinal).Value, Array).SetValue(dataReader.GetValue(sm.Ordinal), index)
                     Next
 
                     If batchIteration Mod batchSize = 0 Then
                         bulkcmd.ExecuteNonQuery()
                         If notify IsNot Nothing Then notify.Invoke(batchIteration)
-                        schemaMap.ForEach(Sub(sm) bulkcmd.Parameters(sm.Ordinal).Value = New ArrayList(batchSize))
+                        'schemaMap.ForEach(Sub(sm) bulkcmd.Parameters(sm.Ordinal).Value = Array.CreateInstance(Type.GetType(sm.DataType), batchSize))
+                        schemaMap.ForEach(Sub(sm) DirectCast(bulkcmd.Parameters(sm.Ordinal).Value, Array).Initialize())
                     End If
                 End While
 
@@ -163,7 +172,11 @@ Public Class OracleProvider
     Private Shared _rowsCopiedField As FieldInfo
     Private Shared Function RowsCopiedCount(this As OracleBulkCopy) As Integer
         If _rowsCopiedField Is Nothing Then _rowsCopiedField = GetType(OracleBulkCopy).GetField("_rowsCopied", BindingFlags.NonPublic Or BindingFlags.GetField Or BindingFlags.Instance)
-        Return DirectCast(_rowsCopiedField.GetValue(this), Integer)
+        Dim fieldList = GetType(OracleBulkCopy).GetFields(BindingFlags.NonPublic Or BindingFlags.GetField Or BindingFlags.Instance Or BindingFlags.GetProperty)
+
+        Console.Write($"FieldCount = {fieldList.Count}")
+        'Return DirectCast(_rowsCopiedField.GetValue(this), Integer)
+        Return 0
     End Function
     Shared Sub New()
         OracleConfiguration.BindByName = True 'otherwise oracle commands will bind parameters by position
@@ -182,15 +195,21 @@ Public Class OracleProvider
             End If
         End If
 
-        If connDetail.UseIntegratedSecurity Then
-            sb.UserID = "/"
-            sb.DBAPrivilege = ConvertToOracleDBAPrivilege(connDetail.Privilege)
-            conn = New OracleConnection(sb.ConnectionString)
+        Dim oraPrivilege = ConvertToOracleDBAPrivilege(connDetail.Privilege)
+
+        If connDetail.Credential IsNot Nothing Then
+            Dim sp = connDetail.SecurePassword
+            sp.MakeReadOnly()
+            conn = New OracleConnection(sb.ConnectionString, New OracleCredential(connDetail.UserName, sp, oraPrivilege))
         Else
-            conn = New OracleConnection(sb.ConnectionString, New OracleCredential(connDetail.UserName, connDetail.SecurePassword, ConvertToOracleDBAPrivilege(connDetail.Privilege)))
+            If (sb.UserID = "/" Or String.IsNullOrWhiteSpace(sb.UserID)) Then
+                sb.UserID = "/"
+                sb.DBAPrivilege = oraPrivilege
+            End If
+            conn = New OracleConnection(sb.ConnectionString)
         End If
 
-        Return New OracleProvider(connDetail.ConnectionName, connDetail.CommandTimeout, conn)
+        Return New OracleProvider(connDetail.ConnectionName, connDetail.CommandTimeout, conn, oraPrivilege)
     End Function
     Private Shared Function ConvertToOracleDBAPrivilege(priv As ConnectionOracle.OraclePrivilege) As OracleDBAPrivilege
         Select Case priv

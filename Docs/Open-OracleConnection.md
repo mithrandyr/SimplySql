@@ -28,7 +28,7 @@ Open-OracleConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] -TnsN
 ### conn
 ```
 Open-OracleConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [-Privilege <OraclePrivilege>]
- [[-Credential] <PSCredential>] -ConnectionString <String> [<CommonParameters>]
+ -ConnectionString <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -110,7 +110,7 @@ Accept wildcard characters: False
 
 ```yaml
 Type: PSCredential
-Parameter Sets: (All)
+Parameter Sets: default, tns
 Aliases:
 
 Required: False

@@ -5,6 +5,21 @@
 Describe "Oracle" {
     BeforeEach { Open-OracleConnection -ServiceName xe -Credential ([pscredential]::new("hr", (ConvertTo-SecureString -Force -AsPlainText "hr"))) }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
+    AfterAll {
+        Open-OracleConnection -ServiceName xe -Credential ([pscredential]::new("hr", (ConvertTo-SecureString -Force -AsPlainText "hr")))
+        foreach($tbl in @("transactionTest", "tmpTable", "tmpTable2")) {
+            $query = "BEGIN
+                    EXECUTE IMMEDIATE 'DROP TABLE $tbl';
+                EXCEPTION
+                    WHEN OTHERS THEN
+                    IF SQLCODE != -942 THEN
+                        RAISE;
+                    END IF;
+                END;"
+            Invoke-SqlUpdate $query | Out-Null
+        }
+        Close-SqlConnection
+    }
 
     It "Test ConnectionString Switch" {
         {
@@ -13,12 +28,11 @@ Describe "Oracle" {
         } | Should -Not -Throw
     }
 
-    It "Test UserName/Password Parameters" {
-        Write-Warning "starting test"
+    It "UserName/Password Are Removed" {
         {
             Open-OracleConnection -ServiceName xe -UserName hr -Password hr -ConnectionName test
             Close-SqlConnection -ConnectionName test
-        } | Should -Not -Throw
+        } | Should -Throw
     }
 
     It "Invoke-SqlScalar" {
@@ -34,11 +48,9 @@ Describe "Oracle" {
 
     It "Invoke-SqlQuery (No ResultSet Warning)" {
         Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
-        $WarningPreference = "stop"
-        Try { Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" }
-        Catch { $val = $_.ToString() }
-        Finally { Invoke-SqlUpdate -Query "DROP TABLE temp" }
-        $val | Should -Be "The running command stopped because the preference variable `"WarningPreference`" or common parameter is set to Stop: Query returned no resultset.  This occurs when the query has no select statement or invokes a stored procedure that does not return a resultset.  Use 'Invoke-SqlUpdate' to avoid this warning."
+        Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
+        Invoke-SqlUpdate -Query "DROP TABLE temp"
+        $w | Should -BeLike "Query returned no resultset.*"
     }
 
     It "Invoke-SqlUpdate" {
@@ -75,7 +87,7 @@ Describe "Oracle" {
             Should -Be 1000
     }
 
-    It "Invoke-SqlBulkCopy" {
+    It "Invoke-SqlBulkCopy" -Tag bulkcopy {
         $query = "SELECT dbms_random.random /1000000000000. AS colDec
                 , dbms_random.random AS colInt
                 , dbms_random.string('x',20) AS colText
@@ -83,7 +95,7 @@ Describe "Oracle" {
             CONNECT BY ROWNUM <= 65536"
         
         Open-OracleConnection -ConnectionName bcp -ServiceName xe -Credential ([pscredential]::new("hr", (ConvertTo-SecureString -Force -AsPlainText "hr")))
-        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec REAL, colInt INTEGER, colText varchar(20))"
+        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
 
         Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
             Should -Be 65536
@@ -92,31 +104,42 @@ Describe "Oracle" {
         Close-SqlConnection -ConnectionName bcp
     }
 
+    It "Invoke-SqlBulkCopy (with transaction)" -Tag bulkcopytransaction {
+        $query = "SELECT dbms_random.random /1000000000000. AS colDec
+                , dbms_random.random AS colInt
+                , dbms_random.string('x',20) AS colText
+            FROM dual
+            CONNECT BY ROWNUM <= 65536"
+        
+        Open-OracleConnection -ConnectionName bcp -ServiceName xe -Credential ([pscredential]::new("hr", (ConvertTo-SecureString -Force -AsPlainText "hr")))
+        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
+        Start-SqlTransaction -ConnectionName bcp
+        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
+            Should -Be 65536
+        Complete-SqlTransaction -ConnectionName bcp
+
+        Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"
+        Close-SqlConnection -ConnectionName bcp
+    }
+
     It "Transaction: Invoke-SqlScalar" {
         Start-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1 FROM dual" } | Should -Not -Throw
+        { Invoke-SqlScalar "SELECT 1 FROM dual" -ea Stop} | Should -Not -Throw
         Undo-SqlTransaction
     }
 
     It "Transaction: Invoke-SqlQuery" {
         Start-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1 FROM dual" } | Should -Not -Throw
+        { Invoke-SqlScalar "SELECT 1 FROM dual" -ea Stop} | Should -Not -Throw
         Undo-SqlTransaction
     }
 
     It "Transaction: Invoke-SqlUpdate" {
         Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)"
         Start-SqlTransaction
-        { Invoke-SqlUpdate "INSERT INTO transactionTest VALUES (1)" } | Should -Not -Throw
+        { Invoke-SqlUpdate "INSERT INTO transactionTest VALUES (1)" -ea Stop } | Should -Not -Throw
         Undo-SqlTransaction
         Invoke-SqlScalar "SELECT Count(1) FROM transactionTest" | Should -Be 0
         Invoke-SqlUpdate "DROP TABLE transactionTest"
-    }
-
-    It "Dropping Tables" {
-        Try { Invoke-SqlUpdate "DROP TABLE transactionTest" | Out-Null } Catch {}
-        Try { Invoke-SqlUpdate "DROP TABLE tmpTable" | Out-Null } Catch {}
-        Try { Invoke-SqlUpdate "DROP TABLE tmpTable2" | Out-Null } Catch {}
-        1 | Should -Be 1            
     }
 }

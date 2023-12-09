@@ -38,10 +38,6 @@ Describe "MySql" {
     }
     BeforeEach { Open-MySqlConnection -Database $db -Credential $c }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
-    
-    It "U = <u>" {
-        Write-Host "User = $u"
-    }
 
     It "Test ConnectionString Switch " {
         {
@@ -50,7 +46,7 @@ Describe "MySql" {
         } | Should -Not -Throw
     }
 
-    It "Test UserName/Password Parameters" {
+    It "UserName/Password Are Removed" {
         {
             Open-MySqlConnection -UserName $u -Password $p -Database $db -ConnectionName test
             Close-SqlConnection -ConnectionName test

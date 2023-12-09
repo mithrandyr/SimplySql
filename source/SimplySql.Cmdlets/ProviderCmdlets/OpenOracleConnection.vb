@@ -32,7 +32,6 @@ Public Class OpenOracleConnection
     Public Property Privilege As SimplySql.Common.ConnectionOracle.OraclePrivilege = ConnectionOracle.OraclePrivilege.None
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=2)>
-    <Parameter(ParameterSetName:="conn", ValueFromPipelineByPropertyName:=True)>
     <Parameter(ParameterSetName:="tns", ValueFromPipelineByPropertyName:=True)>
     Public Property Credential As PSCredential
 
