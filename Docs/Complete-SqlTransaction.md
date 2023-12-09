@@ -8,7 +8,7 @@ schema: 2.0.0
 # Complete-SqlTransaction
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Complete a SQL transaction.
 
 ## SYNTAX
 
@@ -17,7 +17,7 @@ Complete-SqlTransaction [-ConnectionName <String>] [-WhatIf] [-Confirm] [<Common
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Complete (COMMIT) a SQL transaction.
 
 ## EXAMPLES
 

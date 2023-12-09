@@ -40,7 +40,7 @@ Aliases: cn
 
 Required: False
 Position: Named
-Default value: None
+Default value: default
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```

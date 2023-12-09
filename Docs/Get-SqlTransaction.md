@@ -8,7 +8,7 @@ schema: 2.0.0
 # Get-SqlTransaction
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Gets the underlying provider transaction object.
 
 ## SYNTAX
 
@@ -17,7 +17,7 @@ Get-SqlTransaction [-ConnectionName <String>] [-WhatIf] [-Confirm] [<CommonParam
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Gets the underlying provider transaction object for the current connection or for the connection name specified.
 
 ## EXAMPLES
 
@@ -40,7 +40,7 @@ Aliases: cn
 
 Required: False
 Position: Named
-Default value: None
+Default value: default
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```

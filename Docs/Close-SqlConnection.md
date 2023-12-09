@@ -17,8 +17,7 @@ Close-SqlConnection [[-ConnectionName] <String>] [-WhatIf] [-Confirm] [<CommonPa
 ```
 
 ## DESCRIPTION
-Closes the SqlConnection.  Can specify which SqlConnection with the -ConnectionName
-parameter.  Can pipe connectionNames to cmdlet to close those SqlConnections.
+Closes the connection and disposes of the underlying object.  This will also rollback the current transaction if there is one.  Can specify which SqlConnection with the -ConnectionName parameter.  Cmdlet supports piping connectionNames.
 
 ## EXAMPLES
 

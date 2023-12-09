@@ -78,7 +78,7 @@ Aliases: cn
 
 Required: False
 Position: Named
-Default value: None
+Default value: default
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
@@ -136,6 +136,8 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ### System.String
 
 ### System.Int32
+
+### System.Collections.Hashtable
 
 ## OUTPUTS
 

@@ -18,19 +18,19 @@ Clears all available informational messages.
 Closes the SqlConnection.
 
 ### [Complete-SqlTransaction](Complete-SqlTransaction.md)
-{{ Fill in the Synopsis }}
+Complete a SQL transaction.
 
 ### [Get-SqlConnection](Get-SqlConnection.md)
-{{ Fill in the Synopsis }}
+Gets the underlying provider connection object.
 
 ### [Get-SqlMessage](Get-SqlMessage.md)
-{{ Fill in the Synopsis }}
+Returns any available informational messages.
 
 ### [Get-SqlTransaction](Get-SqlTransaction.md)
-{{ Fill in the Synopsis }}
+Gets the underlying provider transaction object.
 
 ### [Invoke-SqlBulkCopy](Invoke-SqlBulkCopy.md)
-{{ Fill in the Synopsis }}
+Executes a bulk copy between two connections.
 
 ### [Invoke-SqlQuery](Invoke-SqlQuery.md)
 {{ Fill in the Synopsis }}

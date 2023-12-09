@@ -8,7 +8,7 @@ schema: 2.0.0
 # Invoke-SqlUpdate
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Executes a query and returns number of record affected.
 
 ## SYNTAX
 
@@ -31,21 +31,21 @@ Invoke-SqlUpdate [-ConnectionName <String>] [-Query] <String[]> [-CommandTimeout
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Executes a query against the targeted connection and returns the the number of records affected.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Invoke-SqlUpdate -Query "UPDATE employees SET salary = @val WHERE manager = @managerId" -Parameters @{val = 999999; managerId = 549}
 ```
 
-{{ Add example description here }}
+Updates the employee table setting the salary to 999999 for all rows with managerid of 549
 
 ## PARAMETERS
 
 ### -Command
-{{ Fill Command Description }}
+a Data.DbCommand object to execute (or a provider specific version).
 
 ```yaml
 Type: IDbCommand
@@ -60,7 +60,7 @@ Accept wildcard characters: False
 ```
 
 ### -CommandTimeout
-{{ Fill CommandTimeout Description }}
+The timeout, in seconds, for this SQL statement, defaults to the command timeout for the SqlConnection.
 
 ```yaml
 Type: Int32
@@ -84,13 +84,13 @@ Aliases: cn
 
 Required: False
 Position: Named
-Default value: None
+Default value: default
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -Parameters
-{{ Fill Parameters Description }}
+Parameters required by the query. Key matches the parameter name, Value is the value of the parameter.
 
 ```yaml
 Type: Hashtable
@@ -105,7 +105,7 @@ Accept wildcard characters: False
 ```
 
 ### -ParamObject
-{{ Fill ParamObject Description }}
+The object that contains the parameters for the query, member names match the parameter name.
 
 ```yaml
 Type: PSObject
@@ -120,7 +120,7 @@ Accept wildcard characters: False
 ```
 
 ### -Query
-{{ Fill Query Description }}
+SQL statement to run.
 
 ```yaml
 Type: String[]

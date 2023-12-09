@@ -8,7 +8,7 @@ schema: 2.0.0
 # Invoke-SqlScalar
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Executes a Scalar query.
 
 ## SYNTAX
 
@@ -25,13 +25,13 @@ Invoke-SqlScalar [-ConnectionName <String>] [-Query] <String[]> [-CommandTimeout
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Executes a Scalar query against the targeted connection.  If the sql statement generates multiple rows and/or columns, only the first column of the first row is returned.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Invoke-SqlScalar -Query "SELECT Count(1) FROM TABLE"
 ```
 
 {{ Add example description here }}
@@ -39,7 +39,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -CommandTimeout
-{{ Fill CommandTimeout Description }}
+The timeout, in seconds, for this SQL statement, defaults to the command timeout for the SqlConnection.
 
 ```yaml
 Type: Int32
@@ -69,7 +69,7 @@ Accept wildcard characters: False
 ```
 
 ### -Parameters
-{{ Fill Parameters Description }}
+Parameters required by the query. Key matches the parameter name, Value is the value of the parameter.
 
 ```yaml
 Type: Hashtable
@@ -84,7 +84,7 @@ Accept wildcard characters: False
 ```
 
 ### -ParamObject
-{{ Fill ParamObject Description }}
+The object that contains the parameters for the query, member names match the parameter name.
 
 ```yaml
 Type: PSObject
@@ -99,7 +99,7 @@ Accept wildcard characters: False
 ```
 
 ### -Query
-{{ Fill Query Description }}
+SQL statement to run.
 
 ```yaml
 Type: String[]
@@ -139,7 +139,7 @@ Aliases: wi
 
 Required: False
 Position: Named
-Default value: None
+Default value: default
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

@@ -8,7 +8,7 @@ schema: 2.0.0
 # Get-SqlConnection
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Gets the underlying provider connection object.
 
 ## SYNTAX
 
@@ -17,7 +17,7 @@ Get-SqlConnection [-ConnectionName <String>] [-WhatIf] [-Confirm] [<CommonParame
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Gets the underlying provider connection object for the current connection or for the connection name specified.
 
 ## EXAMPLES
 
@@ -40,7 +40,7 @@ Aliases: cn
 
 Required: False
 Position: Named
-Default value: None
+Default value: default
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```

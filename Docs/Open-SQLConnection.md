@@ -121,7 +121,7 @@ Aliases: cn
 
 Required: False
 Position: Named
-Default value: None
+Default value: default
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```

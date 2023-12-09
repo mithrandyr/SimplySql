@@ -24,7 +24,8 @@ task GenerateDocs {
           New-MarkdownHelp -Module SimplySql -OutputFolder Docs -AlphabeticParamsOrder -WithModulePage
           New-MarkdownAboutHelp -OutputFolder Docs -AboutName "SimplySql"
         }
-        else { Update-MarkdownHelpModule -Path "Docs" -AlphabeticParamsOrder -Force -RefreshModulePage }
+        else { Update-MarkdownHelpModule -Path "Docs" -AlphabeticParamsOrder -Force -RefreshModulePage -UpdateInputOutput }
+        New-ExternalHelp -Path "Docs" -OutputPath ".\output\SimplySql\en-US"
       } |
     Receive-Job -Wait -AutoRemoveJob |
     ForEach-Object { "  $($_.Name)" } |
