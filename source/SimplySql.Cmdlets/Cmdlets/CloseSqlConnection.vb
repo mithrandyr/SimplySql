@@ -6,6 +6,7 @@ Public Class CloseSqlConnection
     <Parameter(ValueFromPipelineByPropertyName:=True, ValueFromPipeline:=True, Position:=0)>
     <[Alias]("cn")>
     <ValidateNotNullOrEmpty()>
+    <PSDefaultValue(Value:="default")>
     Public Property ConnectionName As String = "default"
 #End Region
 

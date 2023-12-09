@@ -8,21 +8,25 @@ Public Class OpenSqlConnection
     <Parameter(ValueFromPipelineByPropertyName:=True)>
     <[Alias]("cn")>
     <ValidateNotNullOrEmpty()>
+    <PSDefaultValue(Value:="default")>
     Public Property ConnectionName As String = "default"
 
     <Parameter(ValueFromPipelineByPropertyName:=True)>
+    <PSDefaultValue(Value:=30)>
     Public Property CommandTimeout As Integer = 30
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=0)>
     <Parameter(ParameterSetName:="credential", ValueFromPipelineByPropertyName:=True, Position:=0)>
     <Parameter(ParameterSetName:="token", ValueFromPipelineByPropertyName:=True, Position:=0)>
     <[Alias]("SqlInstance", "SqlServer", "DataSource")>
+    <PSDefaultValue(Value:="localhost")>
     Public Property Server As String = "localhost"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=1)>
     <Parameter(ParameterSetName:="credential", ValueFromPipelineByPropertyName:=True, Position:=1)>
     <Parameter(ParameterSetName:="token", ValueFromPipelineByPropertyName:=True, Position:=1)>
     <[Alias]("SqlDatabase", "InitialCatalog")>
+    <PSDefaultValue(Value:="master")>
     Public Property Database As String = "master"
 
     <Parameter(ParameterSetName:="credential", ValueFromPipelineByPropertyName:=True, Position:=2)>

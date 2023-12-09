@@ -8,7 +8,7 @@ schema: 2.0.0
 # Undo-SqlTransaction
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Undo a SQL transaction.
 
 ## SYNTAX
 
@@ -17,7 +17,7 @@ Undo-SqlTransaction [-ConnectionName <String>] [-WhatIf] [-Confirm] [<CommonPara
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Undo (ROLLBACK) a SQL transaction.
 
 ## EXAMPLES
 
@@ -31,7 +31,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -ConnectionName
-{{ Fill ConnectionName Description }}
+User defined name for connection.
 
 ```yaml
 Type: String
@@ -40,8 +40,8 @@ Aliases: cn
 
 Required: False
 Position: Named
-Default value: None
-Accept pipeline input: True (ByPropertyName)
+Default value: default
+Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 

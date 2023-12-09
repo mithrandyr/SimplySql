@@ -8,26 +8,33 @@ Public Class OpenPostGreConnection
     <Parameter(ValueFromPipelineByPropertyName:=True)>
     <[Alias]("cn")>
     <ValidateNotNullOrEmpty()>
+    <PSDefaultValue(Value:="default")>
     Public Property ConnectionName As String = "default"
 
     <Parameter(ValueFromPipelineByPropertyName:=True)>
+    <PSDefaultValue(Value:=30)>
     Public Property CommandTimeout As Integer = 30
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=0)>
     <[Alias]("Host")>
+    <PSDefaultValue(Value:="localhost")>
     Public Property Server As String = "localhost"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=1)>
     <[Alias]("InitialCatalog")>
+    <PSDefaultValue(Value:="postgres")>
     Public Property Database As String = "postgres"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
+    <PSDefaultValue(Value:=5432)>
     Public Property Port As Integer = 5432
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
+    <PSDefaultValue(Value:=25)>
     Public Property MaxAutoPrepare As Integer = 25
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
+    <PSDefaultValue(Value:="Preferred")>
     Public Property SSLMode As Common.SslMode = SslMode.Preferred
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>

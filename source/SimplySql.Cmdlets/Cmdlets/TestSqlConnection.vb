@@ -4,9 +4,10 @@ Public Class TestSqlConnection
     Inherits PSCmdlet
 
 #Region "Parameters"
-    <Parameter(ValueFromPipelineByPropertyName:=True, ParameterSetName:="single", Position:=0)>
+    <Parameter(ValueFromPipelineByPropertyName:=True, ValueFromPipeline:=True, ParameterSetName:="single", Position:=0)>
     <[Alias]("cn")>
     <ValidateNotNullOrEmpty()>
+    <PSDefaultValue(Value:="default")>
     Public Property ConnectionName As String = "default"
 
     <Parameter(Mandatory:=True, ParameterSetName:="all")>

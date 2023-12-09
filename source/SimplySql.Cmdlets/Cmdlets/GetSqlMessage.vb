@@ -2,9 +2,10 @@
 Public Class GetSqlMessage
     Inherits PSCmdlet
 #Region "Parameters"
-    <Parameter(ValueFromPipelineByPropertyName:=True)>
+    <Parameter(ValueFromPipelineByPropertyName:=True, ValueFromPipeline:=True)>
     <[Alias]("cn")>
     <ValidateNotNullOrEmpty()>
+    <PSDefaultValue(Value:="default")>
     Public Property ConnectionName As String = "default"
 #End Region
 

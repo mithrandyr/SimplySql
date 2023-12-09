@@ -8,6 +8,7 @@ Public Class InvokeSqlUpdate
     <Parameter(ValueFromPipelineByPropertyName:=True)>
     <[Alias]("cn")>
     <ValidateNotNullOrEmpty()>
+    <PSDefaultValue(Value:="default")>
     Public Property ConnectionName As String = "default"
 
     <Parameter(Mandatory:=True, Position:=0)>
@@ -18,6 +19,7 @@ Public Class InvokeSqlUpdate
     Public Property Parameters As Hashtable
 
     <Parameter()>
+    <PSDefaultValue(Value:="-1 (No Timeout)>")>
     Public Property CommandTimeout As Integer = -1
 
     <Parameter(Mandatory:=True, ParameterSetName:="object", Position:=1, ValueFromPipeline:=True)>

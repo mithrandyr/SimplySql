@@ -15,7 +15,7 @@ SimplySql - Talking to relational databases the PowerShell way.   Simple command
 Clears all available informational messages.
 
 ### [Close-SqlConnection](Close-SqlConnection.md)
-{{ Fill in the Synopsis }}
+Closes the SqlConnection.
 
 ### [Complete-SqlTransaction](Complete-SqlTransaction.md)
 {{ Fill in the Synopsis }}
@@ -69,5 +69,5 @@ Clears all available informational messages.
 {{ Fill in the Synopsis }}
 
 ### [Undo-SqlTransaction](Undo-SqlTransaction.md)
-{{ Fill in the Synopsis }}
+Undo a SQL transaction.
 

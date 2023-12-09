@@ -10,19 +10,23 @@ Public Class OpenOracleConnection
     <Parameter(ValueFromPipelineByPropertyName:=True)>
     <[Alias]("cn")>
     <ValidateNotNullOrEmpty()>
+    <PSDefaultValue(Value:="default")>
     Public Property ConnectionName As String = "default"
 
     <Parameter(ValueFromPipelineByPropertyName:=True)>
+    <PSDefaultValue(Value:=30)>
     Public Property CommandTimeout As Integer = 30
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=0)>
     <[Alias]("Host")>
+    <PSDefaultValue(Value:="localhost")>
     Public Property Server As String = "localhost"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=1)>
     Public Property ServiceName As String
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
+    <PSDefaultValue(Value:=1521)>
     Public Property Port As Integer = 1521
 
     <Parameter(Mandatory:=True, ParameterSetName:="tns", ValueFromPipelineByPropertyName:=True)>

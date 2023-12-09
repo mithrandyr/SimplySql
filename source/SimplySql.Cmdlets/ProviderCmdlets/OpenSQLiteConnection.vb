@@ -8,13 +8,16 @@ Public Class OpenSQLiteConnection
     <Parameter(ValueFromPipelineByPropertyName:=True)>
     <[Alias]("cn")>
     <ValidateNotNullOrEmpty()>
+    <PSDefaultValue(Value:="default")>
     Public Property ConnectionName As String = "default"
 
     <Parameter(ValueFromPipelineByPropertyName:=True)>
+    <PSDefaultValue(Value:=30)>
     Public Property CommandTimeout As Integer = 30
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=0)>
     <[Alias]("FilePath")>
+    <PSDefaultValue(Value:=":memory:")>
     Public Property DataSource As String = ":memory:"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=1)>

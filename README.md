@@ -45,6 +45,8 @@ This module requires PowerShell Version 5.0 or greater
 
 ### 2.0.0
 * First release to support Windows PowerShell 5.1, PS Core and PS7.
-* Migrated the base provider class to .Net
+* Migrated the base provider class to .Net & all providers
+* Updated to latest versions of providers (that support .NET Standard 2.0)
+* Leveraged Optimized BulkCopy functionality in each provider.
 
 [View Version History](VersionHistory.md)

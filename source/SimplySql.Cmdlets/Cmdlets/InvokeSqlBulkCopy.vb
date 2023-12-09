@@ -3,11 +3,11 @@ Public Class InvokeSqlBulkCopy
     Inherits PSCmdlet
 #Region "Parameters"
     <Parameter(ValueFromPipelineByPropertyName:=True)>
-    <ValidateNotNullOrEmpty()> <[Alias]("SrcCN")>
+    <ValidateNotNullOrEmpty()> <[Alias]("SrcCN")> <PSDefaultValue(Value:="default")>
     Public Property SourceConnectionName As String = "default"
 
     <Parameter(ValueFromPipelineByPropertyName:=True)>
-    <ValidateNotNullOrEmpty()> <[Alias]("DstCN")>
+    <ValidateNotNullOrEmpty()> <[Alias]("DstCN")> <PSDefaultValue(Value:="default")>
     Public Property DestinationConnectionName As String = "default"
 
     <Parameter(ParameterSetName:="table", ValueFromPipelineByPropertyName:=True)>
@@ -30,10 +30,11 @@ Public Class InvokeSqlBulkCopy
     Public Property ColumnMap As Hashtable
 
     <Parameter()>
-    <ValidateRange(1, 50000)>
+    <ValidateRange(1, 50000)> <PSDefaultValue(Value:=500)>
     Public Property BatchSize As Integer = 500
 
     <Parameter()>
+    <PSDefaultValue(Value:="-1 (No Timeout)>")>
     Public Property BatchTimeout As Integer = -1
 
     <Parameter()>

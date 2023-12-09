@@ -70,7 +70,7 @@ Accept wildcard characters: False
 ```
 
 ### -ConnectionName
-{{ Fill ConnectionName Description }}
+User defined name for connection.
 
 ```yaml
 Type: String

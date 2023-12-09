@@ -8,7 +8,7 @@ schema: 2.0.0
 # Close-SqlConnection
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Closes the SqlConnection.
 
 ## SYNTAX
 
@@ -17,7 +17,8 @@ Close-SqlConnection [[-ConnectionName] <String>] [-WhatIf] [-Confirm] [<CommonPa
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Closes the SqlConnection.  Can specify which SqlConnection with the -ConnectionName
+parameter.  Can pipe connectionNames to cmdlet to close those SqlConnections.
 
 ## EXAMPLES
 
@@ -31,7 +32,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -ConnectionName
-{{ Fill ConnectionName Description }}
+User defined name for connection.
 
 ```yaml
 Type: String
@@ -40,7 +41,7 @@ Aliases: cn
 
 Required: False
 Position: 0
-Default value: None
+Default value: default
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```

@@ -31,7 +31,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -ConnectionName
-{{ Fill ConnectionName Description }}
+User defined name for connection.
 
 ```yaml
 Type: String
@@ -41,7 +41,7 @@ Aliases: cn
 Required: False
 Position: Named
 Default value: None
-Accept pipeline input: True (ByPropertyName)
+Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 

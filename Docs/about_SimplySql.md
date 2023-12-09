@@ -59,12 +59,7 @@ Get/Clear -SqlMessage
 Invoke-SqlBulkCopy
   - This is intended to make moving data from one connection to another
     connection (even cross vendor) simple.  This is highly optimized for
-    destination connections that are SQL Server or SQLite.  Custom
-    optmizations are used for Oracle, PostGre, and MySql.
-  - Unfortunately neither ODP.net, Npgsql, or MySQL.Data have a managed
-    bulkcopy class to leverage that supports a generic DataReader as its
-    source.  So for these implementations we are using provider specific
-    implementations of batching inserts.
+    all providers.
 
 Start/Complete/Undo -SqlTransaction
   - These cmdlets provide a simple way to wrap Invoke-Sql* (except for

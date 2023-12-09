@@ -5,6 +5,7 @@ Public Class SetSqlConnection
     <Parameter(ValueFromPipelineByPropertyName:=True)>
     <[Alias]("cn")>
     <ValidateNotNullOrEmpty()>
+    <PSDefaultValue(Value:="default")>
     Public Property ConnectionName As String = "default"
 
     <Parameter(Position:=0, ValueFromPipelineByPropertyName:=True)>
