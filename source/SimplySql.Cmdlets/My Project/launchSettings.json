@@ -11,6 +11,12 @@
       "executablePath": "powershell",
       "commandLineArgs": "-noexit -nologo -noprofile -file \"ConstructModule.ps1\"",
       "workingDirectory": "..\\"
+    },
+    "WSL": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "pwsh",
+      "workingDirectory": "..\\",
     }
   }
 }

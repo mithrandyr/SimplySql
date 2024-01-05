@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		ConstructModule.ps1 = ConstructModule.ps1
 		thoughts.txt = thoughts.txt
+		wsl.ps1 = wsl.ps1
 	EndProjectSection
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "SimplySql.Common", "SimplySql.Common\SimplySql.Common.vbproj", "{DD361E86-677C-4082-92BF-C582C03A085D}"

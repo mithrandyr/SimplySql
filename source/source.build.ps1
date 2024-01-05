@@ -1,9 +1,9 @@
-param([version]$Version = "2.0.0", [switch]$DebugOnly)
+param([version]$Version = "2.0.0", [switch]$DebugOnly, [switch]$SkipDedup, [validateset("win-x64","linux-x64")][string]$env="win-x64")
 
 if(-not [bool](Get-ChildItem alias:\).where({$_.name -eq "hv"})) {
     New-Alias -Name HV -Value (Resolve-Path ..\HandleVerbose.ps1)
 }
-$Script:envList = @("win-x64")
+$Script:envList = @($env)
 
 task Clean { remove output }
 
@@ -27,7 +27,7 @@ task Build {
 }
 
 Task DeDup {
-    if(-not $DebugOnly) {
+    if(-not $DebugOnly -and -not $SkipDedup) {
         $first = $Script:envList[0]
         $safeFiles = @{}
         Get-ChildItem -Path "output\bin\$first" |

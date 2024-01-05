@@ -40,9 +40,9 @@ Public Class ContextHandling
                 asmPath = Path.Combine(BinPath, $"{asmName.Name}.dll")
             ElseIf PlatformAssemblyList.Contains(asmName.Name.ToLower) Then
                 If RuntimeInformation.IsOSPlatform(OSPlatform.OSX) Then
-                    asmPath = Path.Combine(BinPath, $"osx-x64\{asmName.Name}.dll")
+                    asmPath = Path.Combine(BinPath, "osx-x64", $"{asmName.Name}.dll")
                 ElseIf RuntimeInformation.IsOSPlatform(OSPlatform.Linux) Then
-                    asmPath = Path.Combine(BinPath, $"linux-x64\{asmName.Name}.dll")
+                    asmPath = Path.Combine(BinPath, "linux-x64", $"{asmName.Name}.dll")
                 Else
                     If Environment.Is64BitProcess Then
                         asmPath = Path.Combine(BinPath, $"win-x64\{asmName.Name}.dll")
@@ -51,7 +51,9 @@ Public Class ContextHandling
                     End If
                 End If
             End If
-            If Not String.IsNullOrWhiteSpace(asmPath) Then Return Assembly.LoadFile(asmPath)
+            If Not String.IsNullOrWhiteSpace(asmPath) Then
+                Return Assembly.LoadFile(asmPath)
+            End If
         End If
 
         Return Nothing

@@ -14,5 +14,5 @@ if($tests.count -gt 0) {
     $arglist += "; Invoke-Pester @({0}) -output detailed" -f ($Tests.ForEach({"'.\Tests\$_.tests.ps1'"}) -join ", ")
 }
 
-Start-Process -FilePath $env -ArgumentList $arglist -NoNewWindow -Wait
+Start-Process -FilePath $env -ArgumentList $arglist -NoNewWindow -Wait -WorkingDirectory $PSScriptRoot
 
