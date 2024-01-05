@@ -8,7 +8,7 @@ schema: 2.0.0
 # Open-PostGreConnection
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Open a connection to a PostGre Database.
 
 ## SYNTAX
 
@@ -26,7 +26,12 @@ Open-PostGreConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [[-C
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Open a connection to a PostGre Database.
+        
+PostGreSQL @ https://www.postgresql.org/
+PostGre via Npgsql @ http://www.npgsql.org/
+.NET Provider @ https://www.nuget.org/packages/Npgsql/7.0.6
+Geometry: http://www.npgsql.org/doc/types/nts.html
 
 ## EXAMPLES
 
@@ -40,7 +45,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -Additional
-{{ Fill Additional Description }}
+Hashtable to provide additional connection parameters.
 
 ```yaml
 Type: Hashtable
@@ -55,7 +60,7 @@ Accept wildcard characters: False
 ```
 
 ### -CommandTimeout
-{{ Fill CommandTimeout Description }}
+The default command timeout to be used for all commands executed against this connection.
 
 ```yaml
 Type: Int32
@@ -64,7 +69,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: default
+Default value: 30
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
@@ -79,13 +84,13 @@ Aliases: cn
 
 Required: False
 Position: Named
-Default value: None
+Default value: default
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -ConnectionString
-{{ Fill ConnectionString Description }}
+Specifies a provider specific connectionstring to be used.
 
 ```yaml
 Type: String
@@ -100,7 +105,7 @@ Accept wildcard characters: False
 ```
 
 ### -Credential
-{{ Fill Credential Description }}
+A PSCredential object providing the proper credentials to access to the datasource (if required).
 
 ```yaml
 Type: PSCredential
@@ -115,7 +120,7 @@ Accept wildcard characters: False
 ```
 
 ### -Database
-{{ Fill Database Description }}
+Database name.
 
 ```yaml
 Type: String
@@ -124,13 +129,13 @@ Aliases: InitialCatalog
 
 Required: False
 Position: 1
-Default value: None
+Default value: postgres
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -MaxAutoPrepare
-{{ Fill MaxAutoPrepare Description }}
+The maximum number SQL statements that can be automatically prepared at any given point. Beyond this number the least-recently-used statement will be recycled. Zero disables automatic preparation.  DEFAULTS TO 25.
 
 ```yaml
 Type: Int32
@@ -139,13 +144,13 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: 25
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -Port
-{{ Fill Port Description }}
+Port to connect on, if different from default (5432).
 
 ```yaml
 Type: Int32
@@ -154,13 +159,13 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: 5432
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -Server
-{{ Fill Server Description }}
+The Server for the connection.
 
 ```yaml
 Type: String
@@ -169,13 +174,19 @@ Aliases: Host
 
 Required: False
 Position: 0
-Default value: None
+Default value: localhost
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -SSLMode
-{{ Fill SSLMode Description }}
+Which SLLMode to use (defaults to Preferred)
+Disabled: Do not use SSL.
+Preferred: Use SSL if the server supports it.
+Required: Always use SSL. Deny connection if server does not support SSL. Does not validate CA or hostname.
+VerifyCA: Always use SSL. Validates the CA but tolerates hostname mismatch.
+VerifyFull: Always use SSL. Validates CA and hostname.
+
 
 ```yaml
 Type: SslMode
@@ -191,7 +202,7 @@ Accept wildcard characters: False
 ```
 
 ### -TrustSSL
-{{ Fill TrustSSL Description }}
+This will auto-accept the SSL certificate provided by the server, useful for self-signed certificate scenarios.
 
 ```yaml
 Type: SwitchParameter
@@ -211,17 +222,11 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ### System.String
-
 ### System.Int32
-
 ### SimplySql.Common.SslMode
-
 ### System.Management.Automation.SwitchParameter
-
 ### System.Management.Automation.PSCredential
-
 ### System.Collections.Hashtable
-
 ## OUTPUTS
 
 ### System.Object

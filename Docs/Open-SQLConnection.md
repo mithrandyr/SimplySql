@@ -8,7 +8,7 @@ schema: 2.0.0
 # Open-SQLConnection
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Open a connection to a SQL Server.
 
 ## SYNTAX
 
@@ -38,7 +38,9 @@ Open-SQLConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [[-Crede
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Open a connection to a SQL Server.  Default authentication is Integrated Windows Authetication.
+
+Microsoft.Data.SqlClient (5.1.2).
 
 ## EXAMPLES
 
@@ -52,7 +54,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -Additional
-{{ Fill Additional Description }}
+Hashtable to provide additional connection parameters.
 
 ```yaml
 Type: Hashtable
@@ -67,7 +69,7 @@ Accept wildcard characters: False
 ```
 
 ### -AzureAD
-{{ Fill AzureAD Description }}
+Use this when connecting to an Azure SQL Database and you are using Azure AD credentials. You can specify the credentials by passing in a credential object to the Credential parameter.
 
 ```yaml
 Type: SwitchParameter
@@ -82,7 +84,7 @@ Accept wildcard characters: False
 ```
 
 ### -AzureToken
-{{ Fill AzureToken Description }}
+Pass in Azure Token (make sure you use the proper resource). If your token begins with "bearer " that will be stripped off first.
 
 ```yaml
 Type: String
@@ -97,7 +99,7 @@ Accept wildcard characters: False
 ```
 
 ### -CommandTimeout
-{{ Fill CommandTimeout Description }}
+The default command timeout to be used for all commands executed against this connection.
 
 ```yaml
 Type: Int32
@@ -106,7 +108,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: 30
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
@@ -127,7 +129,7 @@ Accept wildcard characters: False
 ```
 
 ### -ConnectionString
-{{ Fill ConnectionString Description }}
+Specifies a provider specific connectionstring to be used.
 
 ```yaml
 Type: String
@@ -142,7 +144,7 @@ Accept wildcard characters: False
 ```
 
 ### -Credential
-{{ Fill Credential Description }}
+A PSCredential object providing the proper credentials to access to the datasource (if required).
 
 ```yaml
 Type: PSCredential
@@ -157,7 +159,7 @@ Accept wildcard characters: False
 ```
 
 ### -Database
-{{ Fill Database Description }}
+The database to connect to.
 
 ```yaml
 Type: String
@@ -166,13 +168,13 @@ Aliases: SqlDatabase, InitialCatalog
 
 Required: False
 Position: 1
-Default value: None
+Default value: master
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -Server
-{{ Fill Server Description }}
+The server to connect to
 
 ```yaml
 Type: String
@@ -181,7 +183,7 @@ Aliases: SqlInstance, SqlServer, DataSource
 
 Required: False
 Position: 0
-Default value: None
+Default value: localhost
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
@@ -192,15 +194,10 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ### System.String
-
 ### System.Int32
-
 ### System.Management.Automation.PSCredential
-
 ### System.Management.Automation.SwitchParameter
-
 ### System.Collections.Hashtable
-
 ## OUTPUTS
 
 ### System.Object

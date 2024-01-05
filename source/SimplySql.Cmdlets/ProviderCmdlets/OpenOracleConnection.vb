@@ -18,7 +18,7 @@ Public Class OpenOracleConnection
     Public Property CommandTimeout As Integer = 30
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=0)>
-    <[Alias]("Host")>
+    <[Alias]("Host", "DataSource")>
     <PSDefaultValue(Value:="localhost")>
     Public Property Server As String = "localhost"
 

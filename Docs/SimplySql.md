@@ -33,28 +33,28 @@ Gets the underlying provider transaction object.
 Executes a bulk copy between two connections.
 
 ### [Invoke-SqlQuery](Invoke-SqlQuery.md)
-{{ Fill in the Synopsis }}
+Executes a query and returns data.
 
 ### [Invoke-SqlScalar](Invoke-SqlScalar.md)
-{{ Fill in the Synopsis }}
+Executes a Scalar query.
 
 ### [Invoke-SqlUpdate](Invoke-SqlUpdate.md)
-{{ Fill in the Synopsis }}
+Executes a query and returns number of record affected.
 
 ### [Open-MySqlConnection](Open-MySqlConnection.md)
-{{ Fill in the Synopsis }}
+Open a connection to a MySql Database.
 
 ### [Open-OracleConnection](Open-OracleConnection.md)
-{{ Fill in the Synopsis }}
+Open a connection to a Oracle Database.
 
 ### [Open-PostGreConnection](Open-PostGreConnection.md)
-{{ Fill in the Synopsis }}
+Open a connection to a PostGre Database.
 
 ### [Open-SQLConnection](Open-SQLConnection.md)
-{{ Fill in the Synopsis }}
+Open a connection to a SQL Server.
 
 ### [Open-SQLiteConnection](Open-SQLiteConnection.md)
-{{ Fill in the Synopsis }}
+Open a connection to a SQLite database file.
 
 ### [Set-SqlConnection](Set-SqlConnection.md)
 {{ Fill in the Synopsis }}

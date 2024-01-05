@@ -8,7 +8,7 @@ schema: 2.0.0
 # Open-SQLiteConnection
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Open a connection to a SQLite database file.
 
 ## SYNTAX
 
@@ -25,7 +25,9 @@ Open-SQLiteConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [-Con
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Open a connection to a SQLite database file.
+SQLite Development Team @ https://sqlite.org/
+.NET Provider @ http://system.data.sqlite.org/
 
 ## EXAMPLES
 
@@ -39,7 +41,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -Additional
-{{ Fill Additional Description }}
+Hashtable to provide additional connection parameters.
 
 ```yaml
 Type: Hashtable
@@ -54,7 +56,7 @@ Accept wildcard characters: False
 ```
 
 ### -CommandTimeout
-{{ Fill CommandTimeout Description }}
+The default command timeout to be used for all commands executed against this connection.
 
 ```yaml
 Type: Int32
@@ -63,7 +65,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: 30
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
@@ -84,7 +86,7 @@ Accept wildcard characters: False
 ```
 
 ### -ConnectionString
-{{ Fill ConnectionString Description }}
+Specifies a provider specific connectionstring to be used.
 
 ```yaml
 Type: String
@@ -99,7 +101,7 @@ Accept wildcard characters: False
 ```
 
 ### -DataSource
-{{ Fill DataSource Description }}
+The datasource for the connection.
 
 ```yaml
 Type: String
@@ -108,13 +110,13 @@ Aliases: FilePath
 
 Required: False
 Position: 0
-Default value: None
+Default value: :memory:
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -Password
-{{ Fill Password Description }}
+Password for the database file.
 
 ```yaml
 Type: String
@@ -134,11 +136,8 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ### System.String
-
 ### System.Int32
-
 ### System.Collections.Hashtable
-
 ## OUTPUTS
 
 ### System.Object

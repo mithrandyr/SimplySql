@@ -32,7 +32,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -CommandTimeout
-{{ Fill CommandTimeout Description }}
+The default command timeout to be used for all commands executed against this connection.
 
 ```yaml
 Type: Int32
@@ -113,9 +113,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ### System.String
-
 ### System.Int32
-
 ## OUTPUTS
 
 ### System.Object

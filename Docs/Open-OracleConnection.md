@@ -8,7 +8,7 @@ schema: 2.0.0
 # Open-OracleConnection
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Open a connection to a Oracle Database.
 
 ## SYNTAX
 
@@ -32,7 +32,10 @@ Open-OracleConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [-Pri
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Open a connection to a Oracle Database.
+        
+Oracle Managed Data Access @ http://www.oracle.com/technetwork/topics/dotnet/index-085163.html
+Provider for .NET @ https://www.nuget.org/packages/Oracle.ManagedDataAccess/19.21.0
 
 ## EXAMPLES
 
@@ -46,7 +49,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -Additional
-{{ Fill Additional Description }}
+Hashtable to provide additional connection parameters.
 
 ```yaml
 Type: Hashtable
@@ -61,7 +64,7 @@ Accept wildcard characters: False
 ```
 
 ### -CommandTimeout
-{{ Fill CommandTimeout Description }}
+The default command timeout to be used for all commands executed against this connection.
 
 ```yaml
 Type: Int32
@@ -70,7 +73,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: 30
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
@@ -91,7 +94,7 @@ Accept wildcard characters: False
 ```
 
 ### -ConnectionString
-{{ Fill ConnectionString Description }}
+Specifies a provider specific connectionstring to be used.
 
 ```yaml
 Type: String
@@ -106,7 +109,7 @@ Accept wildcard characters: False
 ```
 
 ### -Credential
-{{ Fill Credential Description }}
+A PSCredential object providing the proper credentials to access to the datasource (if required).
 
 ```yaml
 Type: PSCredential
@@ -121,7 +124,7 @@ Accept wildcard characters: False
 ```
 
 ### -Port
-{{ Fill Port Description }}
+Port to connect on, if different from default (1521).
 
 ```yaml
 Type: Int32
@@ -130,13 +133,13 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: 1521
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -Privilege
-{{ Fill Privilege Description }}
+Determines the elevated privileges the connection has: SYSDBA, SYSOPER, SYSASM.  By default, none.
 
 ```yaml
 Type: OraclePrivilege
@@ -152,22 +155,22 @@ Accept wildcard characters: False
 ```
 
 ### -Server
-{{ Fill Server Description }}
+The datasource for the connection.
 
 ```yaml
 Type: String
 Parameter Sets: default
-Aliases: Host
+Aliases: Host, DataSource
 
 Required: False
 Position: 0
-Default value: None
+Default value: localhost
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -ServiceName
-{{ Fill ServiceName Description }}
+Oracle ServiceName (SID).
 
 ```yaml
 Type: String
@@ -182,7 +185,7 @@ Accept wildcard characters: False
 ```
 
 ### -TnsName
-{{ Fill TnsName Description }}
+The TnsName to connect to.
 
 ```yaml
 Type: String
@@ -202,15 +205,10 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ### System.String
-
 ### System.Int32
-
 ### SimplySql.Common.ConnectionOracle+OraclePrivilege
-
 ### System.Management.Automation.PSCredential
-
 ### System.Collections.Hashtable
-
 ## OUTPUTS
 
 ### System.Object

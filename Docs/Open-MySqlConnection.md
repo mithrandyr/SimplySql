@@ -8,7 +8,7 @@ schema: 2.0.0
 # Open-MySqlConnection
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Open a connection to a MySql Database.
 
 ## SYNTAX
 
@@ -26,7 +26,10 @@ Open-MySqlConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [[-Cre
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Open a connection to a MySql Database.
+        
+MySqlConnector: High Performance .NET MySQL Driver @ https://mysqlconnector.net/
+.NET Provider @ https://www.nuget.org/packages/MySqlConnector/2.3.3
 
 ## EXAMPLES
 
@@ -40,7 +43,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -Additional
-{{ Fill Additional Description }}
+Hashtable to provide additional connection parameters.
 
 ```yaml
 Type: Hashtable
@@ -55,7 +58,7 @@ Accept wildcard characters: False
 ```
 
 ### -CommandTimeout
-{{ Fill CommandTimeout Description }}
+The default command timeout to be used for all commands executed against this connection.
 
 ```yaml
 Type: Int32
@@ -64,7 +67,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: 30
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
@@ -85,7 +88,7 @@ Accept wildcard characters: False
 ```
 
 ### -ConnectionString
-{{ Fill ConnectionString Description }}
+Specifies a provider specific connectionstring to be used.
 
 ```yaml
 Type: String
@@ -100,7 +103,7 @@ Accept wildcard characters: False
 ```
 
 ### -Credential
-{{ Fill Credential Description }}
+A PSCredential object providing the proper credentials to access to the datasource (if required).
 
 ```yaml
 Type: PSCredential
@@ -115,7 +118,7 @@ Accept wildcard characters: False
 ```
 
 ### -Database
-{{ Fill Database Description }}
+Database name.
 
 ```yaml
 Type: String
@@ -124,13 +127,13 @@ Aliases: InitialCatalog
 
 Required: False
 Position: 1
-Default value: None
+Default value: mysql
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -Port
-{{ Fill Port Description }}
+Port to connect on, if different from default (3306).
 
 ```yaml
 Type: Int32
@@ -139,13 +142,13 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: 3306
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -Server
-{{ Fill Server Description }}
+The Server for the connection.
 
 ```yaml
 Type: String
@@ -154,13 +157,18 @@ Aliases: Host
 
 Required: False
 Position: 0
-Default value: None
+Default value: localhost
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -SSLMode
-{{ Fill SSLMode Description }}
+Which SLLMode to use (defaults to Preferred)
+Disabled: (equivalent to 'None') Do not use SSL.
+Preferred: Use SSL if the server supports it.
+Required: Always use SSL. Deny connection if server does not support SSL. Does not validate CA or hostname.
+VerifyCA: Always use SSL. Validates the CA but tolerates hostname mismatch.
+VerifyFull: Always use SSL. Validates CA and hostname.
 
 ```yaml
 Type: SslMode
@@ -170,7 +178,7 @@ Accepted values: Disabled, Preferred, Required, VerifyCA, VerifyFull
 
 Required: False
 Position: Named
-Default value: None
+Default value: Preferred
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
@@ -181,15 +189,10 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ### System.String
-
 ### System.Int32
-
 ### SimplySql.Common.SslMode
-
 ### System.Management.Automation.PSCredential
-
 ### System.Collections.Hashtable
-
 ## OUTPUTS
 
 ### System.Object
