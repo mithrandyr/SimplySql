@@ -1,12 +1,14 @@
-<#
-    requires that the predefined account HR is unlocked and has password hr
-    using oracle 11.2g Express instance
-#>
 Describe "Oracle" {
-    BeforeEach { Open-OracleConnection -ServiceName xe -Credential ([pscredential]::new("hr", (ConvertTo-SecureString -Force -AsPlainText "hr"))) }
+    BeforeAll {
+        $srvName = "192.168.1.245"
+        $u = "hr"
+        $p = "hr"
+        $c = [pscredential]::new($u, (ConvertTo-SecureString -Force -AsPlainText $p))        
+    }
+    BeforeEach { Open-OracleConnection -DataSource $srvName -ServiceName xe -Credential $c }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
     AfterAll {
-        Open-OracleConnection -ServiceName xe -Credential ([pscredential]::new("hr", (ConvertTo-SecureString -Force -AsPlainText "hr")))
+        Open-OracleConnection -DataSource $srvName -ServiceName xe -Credential $c
         foreach($tbl in @("transactionTest", "tmpTable", "tmpTable2")) {
             $query = "BEGIN
                     EXECUTE IMMEDIATE 'DROP TABLE $tbl';
@@ -23,14 +25,15 @@ Describe "Oracle" {
 
     It "Test ConnectionString Switch" {
         {
-            Open-OracleConnection -ConnectionName Test -ConnectionString 'USER ID=hr;PASSWORD=hr;DATA SOURCE="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))";STATEMENT CACHE SIZE=5;'
+            $connstr = 'USER ID={0};PASSWORD={1};DATA SOURCE="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={2})(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))";STATEMENT CACHE SIZE=5;' -f $u, $p, $srvName
+            Open-OracleConnection -ConnectionName Test -ConnectionString $connstr
             Close-SqlConnection -ConnectionName Test
         } | Should -Not -Throw
     }
 
     It "UserName/Password Are Removed" {
         {
-            Open-OracleConnection -ServiceName xe -UserName hr -Password hr -ConnectionName test
+            Open-OracleConnection -DataSource $srvName -ServiceName xe -UserName $u -Password $p -ConnectionName test
             Close-SqlConnection -ConnectionName test
         } | Should -Throw
     }
@@ -94,7 +97,7 @@ Describe "Oracle" {
             FROM dual
             CONNECT BY ROWNUM <= 65536"
         
-        Open-OracleConnection -ConnectionName bcp -ServiceName xe -Credential ([pscredential]::new("hr", (ConvertTo-SecureString -Force -AsPlainText "hr")))
+        Open-OracleConnection -ConnectionName bcp -DataSource $srvName -ServiceName xe -Credential $c
         Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
 
         Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
@@ -111,7 +114,7 @@ Describe "Oracle" {
             FROM dual
             CONNECT BY ROWNUM <= 65536"
         
-        Open-OracleConnection -ConnectionName bcp -ServiceName xe -Credential ([pscredential]::new("hr", (ConvertTo-SecureString -Force -AsPlainText "hr")))
+        Open-OracleConnection -ConnectionName bcp -ServiceName xe -Credential $c
         Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
         Start-SqlTransaction -ConnectionName bcp
         Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
@@ -143,3 +146,7 @@ Describe "Oracle" {
         Invoke-SqlUpdate "DROP TABLE transactionTest"
     }
 }
+<#
+    requires that the predefined account HR is unlocked and has password hr
+    using oracle 11.2g Express instance
+#>

@@ -1,21 +1,22 @@
 Describe "MSSQL" {
     BeforeAll {
-        Open-SqlConnection -DataSource "(localdb)\MSSQLLocalDB"
+        $srvName = "192.168.1.245\SQLEXPRESS"
+        Open-SqlConnection -DataSource $srvName
         Invoke-SqlUpdate "IF EXISTS (SELECT * FROM sys.databases WHERE name = 'test') DROP DATABASE test; CREATE DATABASE test" | Should -Be -1
         Close-SqlConnection
     }
     AfterAll {
-        Open-SqlConnection -DataSource "(localdb)\MSSQLLocalDB" -Database master
+        Open-SqlConnection -DataSource $srvName -Database master
         @(isq "sp_who2" | ? dbname -eq test |% spid).foreach({ isu "KILL $_"})
         Invoke-SqlUpdate "DROP Database Test" | Should -Be -1
         Close-SqlConnection
     }
-    BeforeEach { Open-SqlConnection -DataSource "(localdb)\MSSQLLocalDB" }
+    BeforeEach { Open-SqlConnection -DataSource $srvName }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
 
     It "Test ConnectionString Switch" {
         {
-            Open-SqlConnection -ConnectionString "Data Source=(localdb)\MSSQLLocalDB" -ConnectionName Test
+            Open-SqlConnection -ConnectionString "Data Source=$srvName" -ConnectionName Test
             Close-SqlConnection -ConnectionName Test
         } | Should -Not -Throw
     }
@@ -66,7 +67,7 @@ Describe "MSSQL" {
     It "Invoke-SqlBulkCopy" {
         Set-SqlConnection -Database "Test"
         Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
-        Open-SqlConnection -DataSource "(localdb)\MSSQLLocalDB" -ConnectionName bcp 
+        Open-SqlConnection -DataSource $srvName -ConnectionName bcp 
         Set-SqlConnection -Database test -ConnectionName bcp
         
         Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |

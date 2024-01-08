@@ -1,14 +1,12 @@
-<#
-    http://use-the-index-luke.com/blog/2011-07-30/mysql-row-generator#mysql_generator_code
-#>
 Describe "MySql" {
     BeforeAll {
+        $srvName = "192.168.1.245"
         $u = "root"
         $p = "root"
         $db = "mysql"
         $c = [pscredential]::new($u, (ConvertTo-SecureString -Force -AsPlainText $p))
 
-        Open-MySqlConnection -Database $db -Credential $c
+        Open-MySqlConnection -Server $srvName -Database $db -Credential $c
         Invoke-SqlUpdate -Query "CREATE OR REPLACE VIEW $db.generator_16
             AS SELECT 0 n UNION ALL SELECT 1  UNION ALL SELECT 2  UNION ALL 
             SELECT 3   UNION ALL SELECT 4  UNION ALL SELECT 5  UNION ALL
@@ -27,7 +25,7 @@ Describe "MySql" {
         Close-SqlConnection
     }
     AfterAll {
-        Open-MySqlConnection -Database $db -Credential $c
+        Open-MySqlConnection -Server $srvName -Database $db -Credential $c
         Invoke-SqlUpdate "DROP TABLE IF EXISTS transactionTest;
                         DROP TABLE IF EXISTS $db.tmpTable;
                         DROP TABLE IF EXISTS $db.tmpTable2;
@@ -36,19 +34,19 @@ Describe "MySql" {
                         DROP VIEW IF EXISTS $db.generator_16;"
         Close-SqlConnection
     }
-    BeforeEach { Open-MySqlConnection -Database $db -Credential $c }
+    BeforeEach { Open-MySqlConnection -Server $srvName -Database $db -Credential $c }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
 
     It "Test ConnectionString Switch " {
         {
-            Open-MySqlConnection -ConnectionString "server=localhost;database=$db;port=3306;user id=$u;password=$p;useaffectedrows=True;allowuservariables=True;sslmode=none" -ConnectionName Test
+            Open-MySqlConnection -ConnectionString "server=$srvName;database=$db;port=3306;user id=$u;password=$p;useaffectedrows=True;allowuservariables=True;sslmode=none" -ConnectionName Test
             Close-SqlConnection -ConnectionName Test
         } | Should -Not -Throw
     }
 
     It "UserName/Password Are Removed" {
         {
-            Open-MySqlConnection -UserName $u -Password $p -Database $db -ConnectionName test
+            Open-MySqlConnection -Server $srvName -UserName $u -Password $p -Database $db -ConnectionName test
             Close-SqlConnection -ConnectionName test
         } | Should -Throw
     }
@@ -105,7 +103,7 @@ Describe "MySql" {
                 , uuid() AS colText
             FROM $db.generator_64k"
         
-        Open-MySqlConnection -ConnectionName bcp -Database mysql -Credential $c
+        Open-MySqlConnection -ConnectionName bcp -Server $srvName -Database mysql -Credential $c
         Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable2 (colDec REAL, colInt INTEGER, colText TEXT)"
 
         Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable2" -Notify |
@@ -135,3 +133,7 @@ Describe "MySql" {
         Invoke-SqlUpdate "DROP TABLE transactionTest"
     }
 }
+
+<#
+    http://use-the-index-luke.com/blog/2011-07-30/mysql-row-generator#mysql_generator_code
+#>

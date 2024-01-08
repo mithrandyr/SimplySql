@@ -9,7 +9,7 @@ $arglist += "-NoProfile", "-NoLogo"
 if($Interactive){ $arglist += "-NoExit" }
 
 
-$arglist += "-Command function prompt {'TESTING> '}; Import-Module .\Output\SimplySql"
+$arglist += "-Command function prompt {'TESTING> '}; Import-Module .\Output\SimplySql; 'SimplySql Version: {0}' -f (Get-Module SimplySql | Select-Object -ExpandProperty Version)"
 if($tests.count -gt 0) {
     $arglist += "; Invoke-Pester @({0}) -output detailed" -f ($Tests.ForEach({"'.\Tests\$_.tests.ps1'"}) -join ", ")
 }

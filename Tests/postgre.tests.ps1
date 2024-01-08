@@ -1,27 +1,34 @@
 Describe "PostGre" {
-    BeforeEach { Open-PostGreConnection -Database postgres -Credential ([pscredential]::new("postgres", (ConvertTo-SecureString -Force -AsPlainText "postgres"))) }
+    BeforeAll {
+        $srvName = "192.168.1.245"
+        $u = "postgres"
+        $p = "postgres"
+        $db = "postgres"
+        $c = [pscredential]::new($u, (ConvertTo-SecureString -Force -AsPlainText $p))
+    }
+    BeforeEach { Open-PostGreConnection -Server $srvName -Database $db -Credential $c }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
     BeforeAll{
         #warm up connection
-        Open-PostGreConnection -Database postgres -Credential ([pscredential]::new("postgres", (ConvertTo-SecureString -Force -AsPlainText "postgres")))
+        Open-PostGreConnection -Server $srvName -Database $db -Credential $c
         Close-SqlConnection
     }
     AfterAll {
-        Open-PostGreConnection -Database postgres -Credential ([pscredential]::new("postgres", (ConvertTo-SecureString -Force -AsPlainText "postgres")))
+        Open-PostGreConnection -Server $srvName -Database $db -Credential $c
         Invoke-SqlUpdate "DROP TABLE IF EXISTS transactionTest, tmpTable, tmpTable2;"
         Close-SqlConnection
     }
 
     It "Test ConnectionString Switch" {
         {
-            Open-PostGreConnection -ConnectionString "Max Auto Prepare=25;Host=localhost;Database=postgres;Port=5432;Username=postgres;password=postgres" -ConnectionName Test
+            Open-PostGreConnection -ConnectionString "Max Auto Prepare=25;Host=$srvName;Database=$db;Port=5432;Username=$u;password=$p" -ConnectionName Test
             Close-SqlConnection -ConnectionName Test
         } | Should -Not -Throw
     }
     
     It "UserName/Password Are Removed" {
         {
-            Open-PostGreConnection -Database postgres -UserName postgres -Password postgres -ConnectionName test
+            Open-PostGreConnection -Server $srvName -Database $db -UserName $u -Password $p -ConnectionName test
             Close-SqlConnection -ConnectionName test
         } | Should -Throw
     }
@@ -69,7 +76,7 @@ Describe "PostGre" {
 
     It "Invoke-SqlBulkCopy" {
         Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
-        Open-PostGreConnection -Database postgres -ConnectionName bcp -Credential ([pscredential]::new("postgres", (ConvertTo-SecureString -Force -AsPlainText "postgres")))
+        Open-PostGreConnection -Server $srvName -Database $db -ConnectionName bcp -Credential $c
         Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |
             Should -Be 65536
         Close-SqlConnection -ConnectionName bcp
