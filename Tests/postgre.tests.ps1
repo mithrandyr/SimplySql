@@ -1,6 +1,6 @@
 Describe "PostGre" {
     BeforeAll {
-        $srvName = "192.168.1.245"
+        $srvName = "xbags"
         $u = "postgres"
         $p = "postgres"
         $db = "postgres"
@@ -21,7 +21,7 @@ Describe "PostGre" {
 
     It "Test ConnectionString Switch" {
         {
-            Open-PostGreConnection -ConnectionString "Max Auto Prepare=25;Host=$srvName;Database=$db;Port=5432;Username=$u;password=$p" -ConnectionName Test
+            Open-PostGreConnection -ConnectionString "Max Auto Prepare=25;Host=$srvName;Database=$db;Port=5432;Username=$u;password=$p" -ConnectionName Test -ea Stop
             Close-SqlConnection -ConnectionName Test
         } | Should -Not -Throw
     }

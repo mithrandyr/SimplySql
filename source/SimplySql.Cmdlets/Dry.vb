@@ -48,11 +48,11 @@ Public Class ConnectionNotFound
     Inherits Exception
     Public ReadOnly Property ConnectionName As String
     Sub New(connectionName As String)
-        MyBase.New($"Connection '{connectionName} does not exist.")
+        MyBase.New($"Connection '{connectionName}' does not exist.")
         Me.ConnectionName = connectionName
     End Sub
     Public Sub New(connectionName As String, innerException As Exception)
-        MyBase.New($"Connection '{connectionName} does not exist.", innerException)
+        MyBase.New($"Connection '{connectionName}' does not exist.", innerException)
         Me.ConnectionName = connectionName
     End Sub
 End Class
@@ -61,11 +61,11 @@ Public Class ConnectionNotOpen
     Inherits Exception
     Public ReadOnly Property ConnectionName As String
     Sub New(connectionName As String)
-        MyBase.New($"Connection '{connectionName} is not open.")
+        MyBase.New($"Connection '{connectionName}' is not open.")
         Me.ConnectionName = connectionName
     End Sub
     Public Sub New(connectionName As String, innerException As Exception)
-        MyBase.New($"Connection '{connectionName} is not open.", innerException)
+        MyBase.New($"Connection '{connectionName}' is not open.", innerException)
         Me.ConnectionName = connectionName
     End Sub
 End Class

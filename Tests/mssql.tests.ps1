@@ -1,22 +1,35 @@
 Describe "MSSQL" {
     BeforeAll {
-        $srvName = "192.168.1.245\SQLEXPRESS"
-        Open-SqlConnection -DataSource $srvName
+        $srvName = "xbags\SQLEXPRESS"
+        $c = [pscredential]::new("simplysql", (ConvertTo-SecureString -Force -AsPlainText "simplysql"))
+        $connHT = @{
+            DataSource = $srvName
+            Credential = $c
+        }
+        
+        Open-SqlConnection @connHT
         Invoke-SqlUpdate "IF EXISTS (SELECT * FROM sys.databases WHERE name = 'test') DROP DATABASE test; CREATE DATABASE test" | Should -Be -1
         Close-SqlConnection
     }
     AfterAll {
-        Open-SqlConnection -DataSource $srvName -Database master
+        Open-SqlConnection @connHT -Database master
         @(isq "sp_who2" | ? dbname -eq test |% spid).foreach({ isu "KILL $_"})
         Invoke-SqlUpdate "DROP Database Test" | Should -Be -1
         Close-SqlConnection
     }
-    BeforeEach { Open-SqlConnection -DataSource $srvName }
+    BeforeEach { Open-SqlConnection @connHT }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
 
     It "Test ConnectionString Switch" {
         {
-            Open-SqlConnection -ConnectionString "Data Source=$srvName" -ConnectionName Test
+            $connStr = "Data Source=$srvName;TrustServerCertificate=true"
+            if($connHT.ContainsKey("Credential")) {
+                Open-SqlConnection -ConnectionString $connStr -ConnectionName Test -Credential $connHT.Credential -ErrorAction Stop
+            }
+            else {
+                Open-SqlConnection -ConnectionString "$connStr;Integrated Security=SSPI" -ConnectionName Test -ErrorAction Stop
+            }
+
             Close-SqlConnection -ConnectionName Test
         } | Should -Not -Throw
     }
@@ -67,7 +80,7 @@ Describe "MSSQL" {
     It "Invoke-SqlBulkCopy" {
         Set-SqlConnection -Database "Test"
         Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
-        Open-SqlConnection -DataSource $srvName -ConnectionName bcp 
+        Open-SqlConnection @connHT -ConnectionName bcp 
         Set-SqlConnection -Database test -ConnectionName bcp
         
         Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |

@@ -1,6 +1,6 @@
 Describe "MySql" {
     BeforeAll {
-        $srvName = "192.168.1.245"
+        $srvName = "xbags"
         $u = "root"
         $p = "root"
         $db = "mysql"
@@ -39,7 +39,7 @@ Describe "MySql" {
 
     It "Test ConnectionString Switch " {
         {
-            Open-MySqlConnection -ConnectionString "server=$srvName;database=$db;port=3306;user id=$u;password=$p;useaffectedrows=True;allowuservariables=True;sslmode=none" -ConnectionName Test
+            Open-MySqlConnection -ConnectionString "server=$srvName;database=$db;port=3306;user id=$u;password=$p;useaffectedrows=True;allowuservariables=True;sslmode=none" -ConnectionName Test -ea Stop
             Close-SqlConnection -ConnectionName Test
         } | Should -Not -Throw
     }

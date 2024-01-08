@@ -1,6 +1,6 @@
 Describe "Oracle" {
     BeforeAll {
-        $srvName = "192.168.1.245"
+        $srvName = "xbags"
         $u = "hr"
         $p = "hr"
         $c = [pscredential]::new($u, (ConvertTo-SecureString -Force -AsPlainText $p))        
@@ -26,7 +26,7 @@ Describe "Oracle" {
     It "Test ConnectionString Switch" {
         {
             $connstr = 'USER ID={0};PASSWORD={1};DATA SOURCE="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={2})(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))";STATEMENT CACHE SIZE=5;' -f $u, $p, $srvName
-            Open-OracleConnection -ConnectionName Test -ConnectionString $connstr
+            Open-OracleConnection -ConnectionName Test -ConnectionString $connstr -ea Stop
             Close-SqlConnection -ConnectionName Test
         } | Should -Not -Throw
     }

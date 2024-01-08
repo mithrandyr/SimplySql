@@ -65,6 +65,7 @@ Public Class OpenSqlConnection
 
             If Me.ParameterSetName = "conn" Then
                 connDetail.ConnectionString = ConnectionString
+                If Credential IsNot Nothing Then connDetail.SetAuthCredential(Credential)
             Else
                 With connDetail
                     .Server = Server

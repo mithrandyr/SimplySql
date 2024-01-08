@@ -102,7 +102,9 @@ Public Class MSSQLProvider
             Case ConnectionMSSQL.AuthMSSQLType.Token
                 conn.AccessToken = connDetail.Token
             Case ConnectionMSSQL.AuthMSSQLType.AzureCredential, ConnectionMSSQL.AuthMSSQLType.Credential
-                conn.Credential = New SqlCredential(connDetail.UserName, connDetail.SecurePassword)
+                Dim p = connDetail.SecurePassword
+                p.MakeReadOnly()
+                conn.Credential = New SqlCredential(connDetail.UserName, p)
         End Select
 
         Return New MSSQLProvider(connDetail.ConnectionName, connDetail.CommandTimeout, conn)

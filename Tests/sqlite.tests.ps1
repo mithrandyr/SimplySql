@@ -4,7 +4,7 @@ Describe "SQLite" {
     
     It "Test ConnectionString Switch" {
         {
-            Open-SQLiteConnection -ConnectionString "Data Source=:memory:" -ConnectionName Test
+            Open-SQLiteConnection -ConnectionString "Data Source=:memory:" -ConnectionName Test -ea Stop
             Close-SqlConnection -ConnectionName Test
         } | Should -Not -Throw
     }
