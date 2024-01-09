@@ -114,7 +114,7 @@ Describe "Oracle" {
             FROM dual
             CONNECT BY ROWNUM <= 65536"
         
-        Open-OracleConnection -ConnectionName bcp -ServiceName xe -Credential $c
+        Open-OracleConnection -ConnectionName bcp -DataSource $srvName -ServiceName xe -Credential $c
         Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
         Start-SqlTransaction -ConnectionName bcp
         Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |

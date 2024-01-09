@@ -1,15 +1,13 @@
 Describe "PostGre" {
-    BeforeAll {
+    BeforeEach { Open-PostGreConnection -Server $srvName -Database $db -Credential $c }
+    AfterEach { Show-SqlConnection -all | Close-SqlConnection }
+    BeforeAll{
+        #warm up connection
         $srvName = "xbags"
         $u = "postgres"
         $p = "postgres"
         $db = "postgres"
         $c = [pscredential]::new($u, (ConvertTo-SecureString -Force -AsPlainText $p))
-    }
-    BeforeEach { Open-PostGreConnection -Server $srvName -Database $db -Credential $c }
-    AfterEach { Show-SqlConnection -all | Close-SqlConnection }
-    BeforeAll{
-        #warm up connection
         Open-PostGreConnection -Server $srvName -Database $db -Credential $c
         Close-SqlConnection
     }

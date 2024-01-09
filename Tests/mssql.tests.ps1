@@ -34,6 +34,19 @@ Describe "MSSQL" {
         } | Should -Not -Throw
     }
 
+    It "Test Integrated Security" {
+        if($PSVersionTable.PSEdition -eq "Desktop" -or $PSVersionTable.Platform -like "Win*") {
+            {
+                Open-SqlConnection -Server $srvName -ConnectionName "Test" -ErrorAction Stop
+                Close-SqlConnection -ConnectionName "Test"                
+            } | Should -Not -Throw
+        }
+        else {
+            Set-ItResult -Skipped -Because "Environment does not support Windows Integrated Auth"
+        }
+        
+    }
+
     It "Invoke-SqlScalar" {
         Invoke-SqlScalar -Query "SELECT GETDATE()" | Should -BeOfType System.DateTime
     }

@@ -1,6 +1,6 @@
 param(
     [ValidateSet("pwsh","powershell")][string]$env = "pwsh"
-    , [ValidateSet("mssql","mysql","postgre","oracle","sqlite")][string[]]$Tests = "sqlite"
+    , [ValidateSet("mssql","mysql","postgre","oracle","sqlite")][string[]]$Tests
     , [switch]$Interactive
 )
 
