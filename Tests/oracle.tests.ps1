@@ -145,6 +145,29 @@ Describe "Oracle" {
         Invoke-SqlScalar "SELECT Count(1) FROM transactionTest" | Should -Be 0
         Invoke-SqlUpdate "DROP TABLE transactionTest"
     }
+    
+    It "PipelineInput: Invoke-SqlScalar" {
+        {
+            [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT :Name FROM dual" -ErrorAction Stop
+            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlScalar "SELECT :Name FROM dual" -ErrorAction Stop
+        } | Should -Not -Throw
+    }
+
+    It "PipelineInput: Invoke-SqlQuery" {
+        {
+            [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT :Name FROM dual" -ErrorAction Stop
+            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlQuery "SELECT :Name FROM dual" -ErrorAction Stop
+        } | Should -Not -Throw
+    }
+
+    It "PipelineInput: Invoke-SqlScalar" {
+        {
+            Invoke-SqlUpdate "CREATE TABLE t(x varchar(255))" -ErrorAction Stop
+            [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "INSERT INTO t SELECT :Name FROM dual" -ErrorAction Stop
+            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlScalar "INSERT INTO t SELECT :Name FROM dual"-ErrorAction Stop
+            Invoke-SqlUpdate "DROP TABLE t" -ErrorAction Stop
+        } | Should -Not -Throw
+    }
 }
 <#
     requires that the predefined account HR is unlocked and has password hr

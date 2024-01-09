@@ -1,4 +1,4 @@
-﻿<Cmdlet(VerbsLifecycle.Invoke, "SqlQuery", SupportsShouldProcess:=True, DefaultParameterSetName:="hashtable")>
+﻿<Cmdlet(VerbsLifecycle.Invoke, "SqlQuery", SupportsShouldProcess:=True, DefaultParameterSetName:="object")>
 <[Alias]("isq")>
 Public Class InvokeSqlQuery
     Inherits PSCmdlet
@@ -13,14 +13,14 @@ Public Class InvokeSqlQuery
     <ValidateNotNullOrEmpty>
     Public Property Query As String()
 
-    <Parameter(ParameterSetName:="hashtable", Position:=1)>
+    <Parameter(Mandatory:=True, ParameterSetName:="hashtable", Position:=1)>
     Public Property Parameters As Hashtable
 
     <Parameter()>
     <PSDefaultValue(Value:="-1 (No Timeout)>")>
     Public Property CommandTimeout As Integer = -1
 
-    <Parameter(Mandatory:=True, ParameterSetName:="object", Position:=1, ValueFromPipeline:=True)>
+    <Parameter(ParameterSetName:="object", Position:=1, ValueFromPipeline:=True)>
     Public Property ParamObject As PSObject
 
     <Parameter(ParameterSetName:="hashtable")>
@@ -39,7 +39,9 @@ Public Class InvokeSqlQuery
             Dim singleQuery As String = String.Join(Environment.NewLine, Query)
 
             If Me.ShouldProcess(ConnectionName, $"Execute '{singleQuery}'") Then
-                If ParameterSetName.Equals("object", StringComparison.OrdinalIgnoreCase) Then Parameters = ParamObject.ConvertToHashtable
+                If ParameterSetName.Equals("object", StringComparison.OrdinalIgnoreCase) AndAlso ParamObject IsNot Nothing Then
+                    Parameters = ParamObject.ConvertToHashtable
+                End If
                 Try
                     If Stream.IsPresent Then
                         Using dr = Engine.Logic.GetConnection(ConnectionName).GetDataReader(singleQuery, Parameters, CommandTimeout)

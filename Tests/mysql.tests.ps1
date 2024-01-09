@@ -132,6 +132,27 @@ Describe "MySql" {
         Invoke-SqlScalar "SELECT Count(1) FROM transactionTest" | Should -Be 0
         Invoke-SqlUpdate "DROP TABLE transactionTest"
     }
+    
+    It "PipelineInput: Invoke-SqlScalar" {
+        {
+            [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
+        } | Should -Not -Throw
+    }
+
+    It "PipelineInput: Invoke-SqlQuery" {
+        {
+            [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
+        } | Should -Not -Throw
+    }
+
+    It "PipelineInput: Invoke-SqlScalar" {
+        {
+            [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "CREATE TABLE t(v varchar(255)); INSERT INTO t SELECT @Name; DROP TABLE t" -ErrorAction Stop
+            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlScalar "CREATE TABLE t(v varchar(255)); INSERT INTO t SELECT @Name; DROP TABLE t"-ErrorAction Stop
+        } | Should -Not -Throw
+    }
 }
 
 <#

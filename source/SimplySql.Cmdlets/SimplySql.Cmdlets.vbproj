@@ -8,6 +8,14 @@
     <AnalysisLevel>latest-minimum</AnalysisLevel>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="EnumerableToDataReader" Version="1.1.0" />
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" />

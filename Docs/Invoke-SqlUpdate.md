@@ -12,16 +12,16 @@ Executes a query and returns number of record affected.
 
 ## SYNTAX
 
-### hashtable (Default)
-```
-Invoke-SqlUpdate [-ConnectionName <String>] [-Query] <String[]> [[-Parameters] <Hashtable>]
- [-CommandTimeout <Int32>] [-WhatIf] [-Confirm] [<CommonParameters>]
-```
-
-### object
+### object (Default)
 ```
 Invoke-SqlUpdate [-ConnectionName <String>] [-Query] <String[]> [-CommandTimeout <Int32>]
- [-ParamObject] <PSObject> [-WhatIf] [-Confirm] [<CommonParameters>]
+ [[-ParamObject] <PSObject>] [-WhatIf] [-Confirm] [<CommonParameters>]
+```
+
+### hashtable
+```
+Invoke-SqlUpdate [-ConnectionName <String>] [-Query] <String[]> [-Parameters] <Hashtable>
+ [-CommandTimeout <Int32>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### cmd
@@ -97,7 +97,7 @@ Type: Hashtable
 Parameter Sets: hashtable
 Aliases:
 
-Required: False
+Required: True
 Position: 1
 Default value: None
 Accept pipeline input: False
@@ -112,7 +112,7 @@ Type: PSObject
 Parameter Sets: object
 Aliases:
 
-Required: True
+Required: False
 Position: 1
 Default value: None
 Accept pipeline input: True (ByValue)

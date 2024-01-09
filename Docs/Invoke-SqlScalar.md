@@ -12,16 +12,16 @@ Executes a Scalar query.
 
 ## SYNTAX
 
-### hashtable (Default)
-```
-Invoke-SqlScalar [-ConnectionName <String>] [-Query] <String[]> [[-Parameters] <Hashtable>]
- [-CommandTimeout <Int32>] [-WhatIf] [-Confirm] [<CommonParameters>]
-```
-
-### object
+### object (Default)
 ```
 Invoke-SqlScalar [-ConnectionName <String>] [-Query] <String[]> [-CommandTimeout <Int32>]
- [-ParamObject] <PSObject> [-WhatIf] [-Confirm] [<CommonParameters>]
+ [[-ParamObject] <PSObject>] [-WhatIf] [-Confirm] [<CommonParameters>]
+```
+
+### hashtable
+```
+Invoke-SqlScalar [-ConnectionName <String>] [-Query] <String[]> [-Parameters] <Hashtable>
+ [-CommandTimeout <Int32>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -76,7 +76,7 @@ Type: Hashtable
 Parameter Sets: hashtable
 Aliases:
 
-Required: False
+Required: True
 Position: 1
 Default value: None
 Accept pipeline input: False
@@ -91,7 +91,7 @@ Type: PSObject
 Parameter Sets: object
 Aliases:
 
-Required: True
+Required: False
 Position: 1
 Default value: None
 Accept pipeline input: True (ByValue)

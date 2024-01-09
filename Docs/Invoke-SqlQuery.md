@@ -12,17 +12,17 @@ Executes a query and returns data.
 
 ## SYNTAX
 
-### hashtable (Default)
+### object (Default)
 ```
-Invoke-SqlQuery [-ConnectionName <String>] [-Query] <String[]> [[-Parameters] <Hashtable>]
- [-CommandTimeout <Int32>] [-Stream] [-AsDataTable] [-UseTypesFromProvider] [-WhatIf] [-Confirm]
+Invoke-SqlQuery [-ConnectionName <String>] [-Query] <String[]> [-CommandTimeout <Int32>]
+ [[-ParamObject] <PSObject>] [-Stream] [-AsDataTable] [-UseTypesFromProvider] [-WhatIf] [-Confirm]
  [<CommonParameters>]
 ```
 
-### object
+### hashtable
 ```
-Invoke-SqlQuery [-ConnectionName <String>] [-Query] <String[]> [-CommandTimeout <Int32>]
- [-ParamObject] <PSObject> [-Stream] [-AsDataTable] [-UseTypesFromProvider] [-WhatIf] [-Confirm]
+Invoke-SqlQuery [-ConnectionName <String>] [-Query] <String[]> [-Parameters] <Hashtable>
+ [-CommandTimeout <Int32>] [-Stream] [-AsDataTable] [-UseTypesFromProvider] [-WhatIf] [-Confirm]
  [<CommonParameters>]
 ```
 
@@ -104,7 +104,7 @@ Type: Hashtable
 Parameter Sets: hashtable
 Aliases:
 
-Required: False
+Required: True
 Position: 1
 Default value: None
 Accept pipeline input: False
@@ -119,7 +119,7 @@ Type: PSObject
 Parameter Sets: object
 Aliases:
 
-Required: True
+Required: False
 Position: 1
 Default value: None
 Accept pipeline input: True (ByValue)

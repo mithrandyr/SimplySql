@@ -105,13 +105,13 @@ Describe "MSSQL" {
 
     It "Transaction: Invoke-SqlScalar" {
         Start-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1" } | Should -Not -Throw
+        { Invoke-SqlScalar "SELECT 1" -ea Stop} | Should -Not -Throw
         Undo-SqlTransaction
     }
 
     It "Transaction: Invoke-SqlQuery" {
         Start-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1" } | Should -Not -Throw
+        { Invoke-SqlScalar "SELECT 1" -ea Stop } | Should -Not -Throw
         Undo-SqlTransaction
     }
 
@@ -120,5 +120,26 @@ Describe "MSSQL" {
         { Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)" -ea Stop } | Should -Not -Throw
         Undo-SqlTransaction
         { Invoke-SqlScalar "SELECT 1 FROM transactionTest" -ea Stop } | Should -Throw
+    }
+
+    It "PipelineInput: Invoke-SqlScalar" {
+        {
+            [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
+        } | Should -Not -Throw
+    }
+
+    It "PipelineInput: Invoke-SqlQuery" {
+        {
+            [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
+        } | Should -Not -Throw
+    }
+
+    It "PipelineInput: Invoke-SqlScalar" {
+        {
+            [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "CREATE TABLE t(v varchar(255)); INSERT INTO t SELECT @Name; DROP TABLE t" -ErrorAction Stop
+            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlScalar "CREATE TABLE t(v varchar(255)); INSERT INTO t SELECT @Name; DROP TABLE t"-ErrorAction Stop
+        } | Should -Not -Throw
     }
 }
