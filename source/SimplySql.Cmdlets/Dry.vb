@@ -31,8 +31,18 @@ Module Dry
         Dim propQuery = this.Properties.Where(Function(prop) prop.MemberType = PSMemberTypes.Property Or prop.MemberType = PSMemberTypes.AliasProperty Or prop.MemberType = PSMemberTypes.NoteProperty).AsQueryable
         If ignoreNull Then propQuery = propQuery.Where(Function(prop) prop.Value IsNot Nothing)
 
+        Dim nValue As Object
         For Each prop In propQuery
-            ht.Add(prop.Name, prop.Value)
+            nValue = prop.Value
+            If TypeOf nValue Is PSObject Then nValue = DirectCast(nValue, PSObject).BaseObject
+            If Type.GetTypeCode(nValue.GetType()) = TypeCode.Object Then
+                If TypeOf nValue Is Xml.XmlNode Then
+                    nValue = DirectCast(nValue, Xml.XmlNode).OuterXml
+                Else
+                    nValue = nValue.ToString()
+                End If
+            End If
+            ht.Add(prop.Name, nValue)
         Next
         Return ht
     End Function
