@@ -46,7 +46,7 @@ Public Class MSSQLProvider
                     Catch ex As Exception
                         ex.Data.Add("Query", query)
                         ex.Data.Add("Parameters", params)
-                        Throw ex
+                        Throw
                     End Try
                 End Using
             End Using

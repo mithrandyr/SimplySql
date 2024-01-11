@@ -76,7 +76,7 @@ Public MustInherit Class ProviderBase
             Catch ex As Exception
                 ex.Data.Add("Query", query)
                 ex.Data.Add("Parameters", params)
-                Throw ex
+                Throw
             End Try
         End Using
     End Function
@@ -102,7 +102,7 @@ Public MustInherit Class ProviderBase
             Catch ex As Exception
                 ex.Data.Add("Query", query)
                 ex.Data.Add("Parameters", params)
-                Throw ex
+                Throw
             End Try
         End Using
     End Function
@@ -116,7 +116,7 @@ Public MustInherit Class ProviderBase
             Catch ex As Exception
                 ex.Data.Add("Query", query)
                 ex.Data.Add("Parameters", params)
-                Throw ex
+                Throw
             End Try
         End Using
     End Function
@@ -130,7 +130,7 @@ Public MustInherit Class ProviderBase
         Catch ex As Exception
             ex.Data.Add("Query", cmd.CommandText)
             ex.Data.Add("Parameters", cmd.Parameters)
-            Throw ex
+            Throw
         End Try
     End Function
     Public Overridable Function Update(query As String, timeout As Integer, params As Hashtable) As Int64 Implements ISimplySqlProvider.Update
@@ -186,7 +186,7 @@ Public MustInherit Class ProviderBase
                             Dim ex As New TimeoutException(String.Format("Batch took longer than {0} seconds to complete.", batchTimeout))
                             ex.Data.Add("Query", insertSql)
                             ex.Data.Add("Parameters", bulkCmd.Parameters)
-                            Throw ex
+                            Throw
                         End If
 
                         If batchIteration Mod batchSize = 0 Then
@@ -202,7 +202,7 @@ Public MustInherit Class ProviderBase
                 Catch ex As Exception
                     ex.Data.Add("Query", insertSql)
                     ex.Data.Add("Parameters", bulkCmd.Parameters)
-                    Throw ex
+                    Throw
                 Finally
                     If bulkCmd.Transaction IsNot Nothing Then bulkCmd.Transaction.Dispose()
                 End Try
