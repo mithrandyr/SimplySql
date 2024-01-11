@@ -88,6 +88,11 @@ Public Class PostGreProvider
         End Using
     End Function
 
+    Public Overrides Function HandleParamValue(x As Object) As Object
+        If x.GetType().IsEnum Then x = DirectCast(x, Integer)
+        Return MyBase.HandleParamValue(x)
+    End Function
+
     Private Sub HandleNoticeMessage(sender As Object, e As NpgsqlNoticeEventArgs)
         Me.Messages.Enqueue(New SqlMessage(e.Notice.MessageText))
     End Sub

@@ -58,6 +58,11 @@ Public Class OracleProvider
         End If
     End Function
 
+    Public Overrides Function HandleParamValue(x As Object) As Object
+        If x.GetType().IsEnum Then x = DirectCast(x, Integer)
+        Return MyBase.HandleParamValue(x)
+    End Function
+
     Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
         If batchTimeout < 0 Then batchTimeout = CommandTimeout
         If Me.HasTransaction Then
@@ -72,10 +77,6 @@ Public Class OracleProvider
             Using bcp As New OracleBulkCopy(Me.Connection) With {.BatchSize = batchSize, .BulkCopyTimeout = batchTimeout, .DestinationTableName = destinationTable}
                 GenerateSchemaMap(dataReader, columnMap).ForEach(Sub(x) bcp.ColumnMappings.Add(x.SourceName, x.DestinationName))
 
-                'If notify IsNot Nothing Then
-                '    bcp.NotifyAfter = batchSize
-                '    AddHandler bcp.OracleRowsCopied, Sub(sender As Object, e As OracleRowsCopiedEventArgs) notify.Invoke(e.RowsCopied)
-                'End If
                 bcp.NotifyAfter = 1
                 Dim rowsCopied As Long = 0
                 AddHandler bcp.OracleRowsCopied, Sub(sender As Object, e As OracleRowsCopiedEventArgs)
@@ -131,7 +132,7 @@ Public Class OracleProvider
         End Using
     End Function
 
-    Private Function MapOracleType(netType As String) As OracleDbType
+    Private Shared Function MapOracleType(netType As String) As OracleDbType
         'FROM: https://docs.oracle.com/en/database/oracle///oracle-database/23/odpnt/featOraCommand.html#GUID-BBEF52D9-E4E3-4A9C-93F5-3E408A83FC04
         Select Case netType.ToLower
             Case "system.boolean"
@@ -174,7 +175,7 @@ Public Class OracleProvider
         If _rowsCopiedField Is Nothing Then _rowsCopiedField = GetType(OracleBulkCopy).GetField("_rowsCopied", BindingFlags.NonPublic Or BindingFlags.GetField Or BindingFlags.Instance)
         Dim fieldList = GetType(OracleBulkCopy).GetFields(BindingFlags.NonPublic Or BindingFlags.GetField Or BindingFlags.Instance Or BindingFlags.GetProperty)
 
-        Console.Write($"FieldCount = {fieldList.Count}")
+        Console.Write($"FieldCount = {fieldList.Length}")
         'Return DirectCast(_rowsCopiedField.GetValue(this), Integer)
         Return 0
     End Function

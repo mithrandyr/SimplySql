@@ -13,7 +13,7 @@ Describe "PostGre" {
     }
     AfterAll {
         Open-PostGreConnection -Server $srvName -Database $db -Credential $c
-        Invoke-SqlUpdate "DROP TABLE IF EXISTS transactionTest, tmpTable, tmpTable2;"
+        Invoke-SqlUpdate "DROP TABLE IF EXISTS transactionTest, tmpTable, tmpTable2, t;"
         Close-SqlConnection
     }
 
@@ -80,6 +80,18 @@ Describe "PostGre" {
         Close-SqlConnection -ConnectionName bcp
     }
 
+    It "Transaction: Invoke-SqlBulkCopy" {
+        Open-PostGreConnection -Server $srvName -Database $db -ConnectionName bcp -Credential $c
+        
+        Start-SqlTransaction -ConnectionName bcp
+        Invoke-SqlUpdate -Query "SELECT * INTO tmpTable3 FROM tmpTable WHERE 1=2" -ConnectionName bcp
+        { Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable3 -Notify |
+            Should -Be 65536} | Should -Not -Throw
+        Undo-SqlTransaction -ConnectionName bcp
+
+        { Invoke-SqlScalar -ConnectionName bcp -Query "SELECT COUNT(1) FROM tmpTable3" -ea Stop} | Should -Throw
+    }
+
     It "Transaction: Invoke-SqlScalar" {
         Start-SqlTransaction
         { Invoke-SqlScalar "SELECT 1" -ea Stop} | Should -Not -Throw
@@ -102,21 +114,23 @@ Describe "PostGre" {
     It "PipelineInput: Invoke-SqlScalar" {
         {
             [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
-            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Invoke-SqlScalar "SELECT @Name " -ErrorAction Stop
         } | Should -Not -Throw
     }
 
     It "PipelineInput: Invoke-SqlQuery" {
         {
             [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
-            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
         } | Should -Not -Throw
     }
 
     It "PipelineInput: Invoke-SqlScalar" {
         {
-            [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "CREATE TABLE t(v varchar(255)); INSERT INTO t SELECT @Name; DROP TABLE t" -ErrorAction Stop
-            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlScalar "CREATE TABLE t(v varchar(255)); INSERT INTO t SELECT @Name; DROP TABLE t"-ErrorAction Stop
+            Invoke-SqlUpdate "CREATE TABLE t(x varchar(255))" -ErrorAction Stop
+            [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "INSERT INTO t SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Invoke-SqlScalar "INSERT INTO t SELECT @Name"-ErrorAction Stop
+            Invoke-SqlUpdate "DROP TABLE t" -ErrorAction Stop
         } | Should -Not -Throw
     }
 }

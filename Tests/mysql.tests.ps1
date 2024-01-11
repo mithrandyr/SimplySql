@@ -29,6 +29,7 @@ Describe "MySql" {
         Invoke-SqlUpdate "DROP TABLE IF EXISTS transactionTest;
                         DROP TABLE IF EXISTS $db.tmpTable;
                         DROP TABLE IF EXISTS $db.tmpTable2;
+                        DROP TABLE IF EXISTS $db.tmpTable3;
                         DROP VIEW IF EXISTS $db.generator_64k;
                         DROP VIEW IF EXISTS $db.generator_256;
                         DROP VIEW IF EXISTS $db.generator_16;"
@@ -108,8 +109,24 @@ Describe "MySql" {
 
         Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable2" -Notify |
             Should -Be 65536
+    }
+
+    It "Transaction: Invoke-SqlBulkCopy" {
+        $query = "SELECT rand() AS colDec
+                , CAST(rand() * 1000000000 AS SIGNED) AS colInt
+                , uuid() AS colText
+            FROM $db.generator_64k"
         
-        Close-SqlConnection -ConnectionName bcp
+        Open-MySqlConnection -ConnectionName bcp -Server $srvName -Database mysql -Credential $c
+        
+        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable3 (colDec REAL, colInt INTEGER, colText TEXT)"
+        Start-SqlTransaction bcp
+        
+        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable3" -Notify | Should -Be 65536
+        Invoke-SqlScalar -Query "SELECT COUNT(1) FROM $db.tmpTable3" -cn bcp | Should -Be 65536
+
+        Undo-SqlTransaction bcp
+        Invoke-SqlScalar -Query "SELECT COUNT(1) FROM $db.tmpTable3" -cn bcp | Should -Be 0
     }
 
     It "Transaction: Invoke-SqlScalar" {
@@ -136,21 +153,23 @@ Describe "MySql" {
     It "PipelineInput: Invoke-SqlScalar" {
         {
             [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
-            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
         } | Should -Not -Throw
     }
 
     It "PipelineInput: Invoke-SqlQuery" {
         {
             [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
-            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
         } | Should -Not -Throw
     }
 
     It "PipelineInput: Invoke-SqlScalar" {
         {
-            [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "CREATE TABLE t(v varchar(255)); INSERT INTO t SELECT @Name; DROP TABLE t" -ErrorAction Stop
-            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlScalar "CREATE TABLE t(v varchar(255)); INSERT INTO t SELECT @Name; DROP TABLE t"-ErrorAction Stop
+            Invoke-SqlUpdate "CREATE TABLE t(x varchar(255))" -ErrorAction Stop
+            [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "INSERT INTO t SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Invoke-SqlScalar "INSERT INTO t SELECT @Name"-ErrorAction Stop
+            Invoke-SqlUpdate "DROP TABLE t" -ErrorAction Stop
         } | Should -Not -Throw
     }
 }

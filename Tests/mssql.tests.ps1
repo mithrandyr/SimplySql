@@ -1,3 +1,4 @@
+$ErrorActionPreference
 Describe "MSSQL" {
     BeforeAll {
         $srvName = "xbags\SQLEXPRESS"
@@ -17,7 +18,7 @@ Describe "MSSQL" {
         Invoke-SqlUpdate "DROP Database Test" | Should -Be -1
         Close-SqlConnection
     }
-    BeforeEach { Open-SqlConnection @connHT }
+    BeforeEach { Open-SqlConnection @connHT -Database "test" }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
 
     It "Test ConnectionString Switch" {
@@ -59,7 +60,6 @@ Describe "MSSQL" {
     }
 
     It "Invoke-SqlUpdate" {
-        Set-SqlConnection -Database "Test"
         Invoke-SqlUpdate -Query ";WITH a(n) AS (SELECT 1 UNION ALL SELECT 1)
             , b(n) AS (SELECT 1 FROM a CROSS JOIN a AS x)
             , c(n) AS (SELECT 1 FROM b CROSS JOIN b AS x)
@@ -75,7 +75,6 @@ Describe "MSSQL" {
     }
 
     It "Invoke-SqlQuery" {
-        Set-SqlConnection -Database "Test"
         Invoke-SqlQuery -Query "SELECT TOP 1000 * FROM tmpTable" |
             Measure-Object |
             Select-Object -ExpandProperty Count |
@@ -83,7 +82,6 @@ Describe "MSSQL" {
     }
 
     It "Invoke-SqlQuery -stream" {
-        Set-SqlConnection -Database "Test"
         Invoke-SqlQuery -Query "SELECT TOP 1000 * FROM tmpTable" -Stream |
             Measure-Object |
             Select-Object -ExpandProperty Count |
@@ -91,16 +89,24 @@ Describe "MSSQL" {
     }
 
     It "Invoke-SqlBulkCopy" {
-        Set-SqlConnection -Database "Test"
         Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
         Open-SqlConnection @connHT -ConnectionName bcp 
         Set-SqlConnection -Database test -ConnectionName bcp
         
         Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |
             Should -Be 65536
+    }
+
+        It "Transaction: Invoke-SqlBulkCopy" {
+        Open-SqlConnection @connHT -ConnectionName bcp -Database test
+
+        Start-SqlTransaction -ConnectionName bcp    
+        Invoke-SqlUpdate -Query "SELECT * INTO tmpTable3 FROM tmpTable WHERE 1=2" -ConnectionName bcp
+        { Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable3 -Notify -ea Stop |
+                Should -Be 65536 } | Should -Not -Throw
+        Undo-SqlTransaction -ConnectionName bcp
         
-        Set-SqlConnection -Database master -ConnectionName bcp
-        Close-SqlConnection -ConnectionName bcp
+        { Invoke-SqlScalar -Query "SELECT COUNT(1) FROM tmpTable3" -ea Stop} | Should -Throw
     }
 
     It "Transaction: Invoke-SqlScalar" {
@@ -125,21 +131,24 @@ Describe "MSSQL" {
     It "PipelineInput: Invoke-SqlScalar" {
         {
             [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
-            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
         } | Should -Not -Throw
     }
 
     It "PipelineInput: Invoke-SqlQuery" {
         {
             [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
-            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
         } | Should -Not -Throw
     }
 
     It "PipelineInput: Invoke-SqlScalar" {
         {
-            [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "CREATE TABLE t(v varchar(255)); INSERT INTO t SELECT @Name; DROP TABLE t" -ErrorAction Stop
-            Get-ChildItem | Select-Object -First 1 name | Invoke-SqlScalar "CREATE TABLE t(v varchar(255)); INSERT INTO t SELECT @Name; DROP TABLE t"-ErrorAction Stop
+            Invoke-SqlUpdate "CREATE TABLE t(x varchar(255))" -ErrorAction Stop
+            [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "INSERT INTO t SELECT @Name" -ErrorAction Stop
+            Get-ChildItem | Invoke-SqlScalar "INSERT INTO t SELECT @Name"-ErrorAction Stop
+            Invoke-SqlUpdate "DROP TABLE t" -ErrorAction Stop
         } | Should -Not -Throw
     }
+
 }

@@ -37,6 +37,10 @@ Public MustInherit Class ProviderBase
         Return od
     End Function
     Public MustOverride Sub ChangeDatabase(databaseName As String) Implements ISimplySqlProvider.ChangeDatabase
+
+    Public Overridable Function HandleParamValue(x As Object) As Object
+        Return If(x, DBNull.Value)
+    End Function
 #End Region
 
 #Region "Concrete"
@@ -56,7 +60,7 @@ Public MustInherit Class ProviderBase
             For Each de As DictionaryEntry In params
                 Dim param As IDbDataParameter = cmd.CreateParameter()
                 param.ParameterName = de.Key
-                param.Value = If(de.Value, DBNull.Value)
+                param.Value = HandleParamValue(de.Value)
                 cmd.Parameters.Add(param)
             Next
         End If
@@ -186,7 +190,7 @@ Public MustInherit Class ProviderBase
                             Dim ex As New TimeoutException(String.Format("Batch took longer than {0} seconds to complete.", batchTimeout))
                             ex.Data.Add("Query", insertSql)
                             ex.Data.Add("Parameters", bulkCmd.Parameters)
-                            Throw
+                            Throw ex
                         End If
 
                         If batchIteration Mod batchSize = 0 Then
@@ -211,7 +215,7 @@ Public MustInherit Class ProviderBase
         Return batchIteration
     End Function
 
-    Friend Function GenerateSchemaMap(dr As IDataReader, columnMap As Hashtable) As List(Of SchemaMapItem)
+    Friend Shared Function GenerateSchemaMap(dr As IDataReader, columnMap As Hashtable) As List(Of SchemaMapItem)
         Dim schemaMap As New List(Of SchemaMapItem)
         Dim ord As Integer = 0
         For Each row In dr.GetSchemaTable().Select().OrderBy(Function(x) x("ColumnOrdinal"))

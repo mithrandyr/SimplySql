@@ -2,7 +2,7 @@
 Public Class UndoSqlTransaction
     Inherits PSCmdlet
 #Region "Parameters"
-    <Parameter(ValueFromPipelineByPropertyName:=True, ValueFromPipeline:=True)>
+    <Parameter(ValueFromPipelineByPropertyName:=True, ValueFromPipeline:=True, Position:=0)>
     <[Alias]("cn")>
     <ValidateNotNullOrEmpty()>
     <PSDefaultValue(Value:="default")>
