@@ -194,6 +194,9 @@ Public Class OracleProvider
             Else
                 sb.DataSource = $"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={connDetail.Host})(PORT={connDetail.Port}))(CONNECT_DATA=(SERVICE_NAME={connDetail.ServiceName})))"
             End If
+
+            'Process additional parameters through the hashtable
+            sb.AddHashtable(connDetail.Additional)
         End If
 
         Dim oraPrivilege = ConvertToOracleDBAPrivilege(connDetail.Privilege)

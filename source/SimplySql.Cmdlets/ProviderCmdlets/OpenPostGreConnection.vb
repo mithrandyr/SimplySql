@@ -57,7 +57,7 @@ Public Class OpenPostGreConnection
                 Engine.Logic.CloseAndRemoveConnection(ConnectionName)
             End If
 
-            Dim connDetail As New ConnectionPostGre(ConnectionName, CommandTimeout)
+            Dim connDetail As New ConnectionPostGre(ConnectionName, CommandTimeout) With {.Additional = Additional}
             If Credential IsNot Nothing Then connDetail.SetAuthCredential(Credential)
 
             If Me.ParameterSetName = "conn" Then
@@ -70,6 +70,7 @@ Public Class OpenPostGreConnection
                     .MaxAutoPrepare = MaxAutoPrepare
                     .SslMode = SSLMode
                     .TrustServerCertificate = TrustSSL.IsPresent
+                    .Additional = Additional
                 End With
             End If
 

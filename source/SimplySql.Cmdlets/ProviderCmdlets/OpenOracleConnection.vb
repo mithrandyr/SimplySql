@@ -60,13 +60,15 @@ Public Class OpenOracleConnection
                 Case "conn"
                     connDetail.ConnectionString = ConnectionString
                 Case "tns"
-                    connDetail.TNSName = TnsName
+                    connDetail.TnsName = TnsName
+                    connDetail.Additional = Additional
                 Case Else
                     With connDetail
                         .Host = Server
                         .ServiceName = ServiceName
                         .Port = Port
                         .Privilege = Privilege
+                        .Additional = Additional
                     End With
             End Select
 

@@ -45,6 +45,7 @@ Public Class OpenSQLiteConnection
                 End If
                 connDetail.Database = DataSource
                 If Not String.IsNullOrWhiteSpace(Password) Then connDetail.Credential = New Net.NetworkCredential(Nothing, Password)
+                connDetail.Additional = Additional
             End If
 
             Engine.Logic.OpenAndAddConnection(connDetail)

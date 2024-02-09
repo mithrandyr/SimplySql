@@ -70,6 +70,7 @@ Public Class OpenSqlConnection
                 With connDetail
                     .Server = Server
                     .Database = Database
+                    .Additional = Additional
                 End With
             End If
 

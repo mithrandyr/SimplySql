@@ -61,6 +61,7 @@ Public Class OpenMySqlConnection
                     .Database = Database
                     .Port = Port
                     .SslMode = SSLMode
+                    .Additional = Additional
                 End With
             End If
 
