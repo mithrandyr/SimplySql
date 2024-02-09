@@ -1,5 +1,17 @@
 # Version History
 
+### 1.9.1
+* Updating SQLite library.  Interop Version: 1.0.117.0 & SQLite Server Version: 3.40.0 thanks @JediNite
+### 1.9.0
+* Updated classes to use `::new()` constructor.  thanks @joalcorn
+* Updated MySql provider to use new library (8.0.28).  thanks @twerthi
+
+### 1.8.0
+* Minor Update, enhancing progress notifications for Invoke-SqlBulkCopy, you can now specify -NotifyAction and pass in a scriptblock
+### 1.7.0
+
+* Minor update to expose the transaction object to the user via the new `Get-SqlTransaction` cmdlet.
+
 ### 1.6.2
 
 * added support for .Net Framework 4.6.1 (included library 'DataReaderToPSObject' is compiled against .Net Standard 2.0 which requires shims on .Net 4.6.1).  (@jantari)
