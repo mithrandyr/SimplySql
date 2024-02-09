@@ -1,0 +1,22 @@
+{
+  "profiles": {
+    "PWSH": {
+      "commandName": "Executable",
+      "executablePath": "pwsh",
+      "commandLineArgs": "-noexit -nologo -noprofile -file \"ConstructModule.ps1\"",
+      "workingDirectory": "..\\"
+    },
+    "Powershell": {
+      "commandName": "Executable",
+      "executablePath": "powershell",
+      "commandLineArgs": "-noexit -nologo -noprofile -file \"ConstructModule.ps1\"",
+      "workingDirectory": "..\\"
+    },
+    "WSL": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "pwsh",
+      "workingDirectory": "..\\",
+    }
+  }
+}

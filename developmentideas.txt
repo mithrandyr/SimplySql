@@ -1,15 +1,22 @@
-Each Provider will provide its open "Open-*Connection" cmdlet...
-    Open-OracleConnection, Open-SqlConnection, Open-SQLiteConnection, Open-PostGreConnection, Open-MySqlConnection
-
-    This will simply providing help for the provider as well as writing the providers.
-    It will add some redunant code between the Open-*Connection cmdlets, but little enough to be a problem.
-
-Providers now simply need to have a config.ps1 in their folder, that file will control setting up the provider and exporting its cmdlet.
-    If the provider requires adding types, then the provider class will need to be in a separate file (provider.ps1) and config.ps1 will need to dotsource
-    it after it has added the required types.
+Eventually make the wiki Project in github reference the /docs subfolder
+https://stackoverflow.com/a/76144369
+    EXAMPLE cmds:
+    git clone https://github.com/youName/ProjectName.wiki docs
+    git submodule add https://github.com/youName/ProjectName.wiki docs
+    git submodule update --init
 
 ORACLE
     InfoMessage
     https://stackoverflow.com/questions/193107/print-text-in-oracle-sql-developer-sql-worksheet-window 
 
 Always roll version (minor) forward by 1 when updating provider nuget packages.
+
+---------
+TODO:
++ PSObjectDataReader in .NET
+    - update sqlBulkcopy to take objects directly / andor to take datareader directly?
+    - or create full fleged provider for objects? (maybe using datatable as backend?)
++ Allow invoke-SqlQuery/SqlUpdate to take objects as input (translate to parameters) -- single or multiple objects? (probably single only)
+
+
+---- Better Information : https://devblogs.microsoft.com/powershell/resolving-powershell-module-assembly-dependency-conflicts/#quick-fixes-and-their-limitations ----

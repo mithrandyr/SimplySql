@@ -1,0 +1,16 @@
+automapper v10 (supports .net standard 2) -- use this for datareader to psobject?
+
+EnumerableToDataReader -- for getting input objects to datareader to be used by bulkCopy
+
+
+Tasks
+-Add argumentcompleter to all ConnectionName parameters
+
+
+
+Handling dataReader to PSObject: https://expressiontree-tutorial.net/knowledge-base/19841120/generic-dbdatareader-to-list-t--mapping
+
+
+- https://tyrrrz.me/blog/expression-trees
+- https://www.programmerall.com/article/6642195713/
+- https://expressiontree-tutorial.net/knowledge-base/19841120/generic-dbdatareader-to-list-t--mapping

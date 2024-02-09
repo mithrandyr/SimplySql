@@ -5,7 +5,7 @@
 [![Powershell Gallery](https://img.shields.io/powershellgallery/v/SimplySql.svg)](https://www.powershellgallery.com/packages/SimplySql/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/SimplySql.svg)](https://www.powershellgallery.com/packages/SimplySql/)
 
-**Update (1/27/2023):** Work still in progress (v2) which will support PS7.
+**Update (2/8/2024):** V2 is Released!!!.
 
 Querying SQL (SQL Server, Oracle, PostgreSql, SQLite, & mySql) the PowerShell way: simple commands... powerful opportunities.
 
@@ -24,6 +24,9 @@ The basic pattern is to connect to a database, invoke one or more sql statements
 
 See the [Wiki](https://github.com/mithrandyr/SimplySql/wiki) for more details
 
+## Breaking Changes for 2.0
+- UserName/Password parameters are no longer present on `Open-*Connection` cmdlets.  Instead, provide a PSCredential object.
+
 ## Status
 
 It has been released to PowerShellGallery.  Installation is as simple as
@@ -32,13 +35,20 @@ It has been released to PowerShellGallery.  Installation is as simple as
 
 This module requires PowerShell Version 5.0 or greater
 
+## Database Providers
+
+- Microsoft Sql Server : [Microsoft.Data.SqlClient 5.1.5](https://www.nuget.org/packages/Microsoft.Data.SqlClient/5.1.5)
+- MySQL : [MySqlConnector 2.3.5](https://www.nuget.org/packages/MySqlConnector/2.3.5)
+- Oracle : [Oracle.ManagedDataAccess.Core 2.19.220](https://www.nuget.org/packages/Oracle.ManagedDataAccess.Core/2.19.220) (this is the latest version supporting .NET Standard 2.0)
+- SQLite : [System.Data.SQLite.Core 1.0.118](https://www.nuget.org/packages/System.Data.SQLite.Core/1.0.118)
+- PostgreSQL : [Npgsql (8.0.1)](https://www.nuget.org/packages/Npgsql/8.0.1)
+
 ## Latest Version
-### 1.9.1
-* Updating SQLite library.  Interop Version: 1.0.117.0 & SQLite Server Version: 3.40.0 thanks @JediNite
-### 1.9.0
-* Updated classes to use `::new()` constructor.  thanks @joalcorn
-* Updated MySql provider to use new library (8.0.28).  thanks @twerthi
-### 1.8.0
-* Minor Update, enhancing progress notifications for Invoke-SqlBulkCopy, you can now specify -NotifyAction and pass in a scriptblock
+
+### 2.0.67
+* First release to support Windows PowerShell 5.1, PS Core and PS7.
+* Migrated the base provider class to .Net & all providers
+* Updated to latest versions of providers (that support .NET Standard 2.0)
+* Leveraged Optimized BulkCopy functionality in each provider.
 
 [View Version History](VersionHistory.md)
