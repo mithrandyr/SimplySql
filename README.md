@@ -35,15 +35,15 @@ This module requires PowerShell Version 5.0 or greater
 
 ## Database Providers
 
-- Microsoft Sql Server : [Microsoft.Data.SqlClient 5.1.2](https://www.nuget.org/packages/Microsoft.Data.SqlClient/5.1.2)
-- MySQL : [MySqlConnector 2.3.1](https://www.nuget.org/packages/MySqlConnector/2.3.1)
-- Oracle : [Oracle.ManagedDataAccess.Core 2.19.210](https://www.nuget.org/packages/Oracle.ManagedDataAccess.Core/2.19.210) (this is the latest version supporting .NET Standard 2.0)
+- Microsoft Sql Server : [Microsoft.Data.SqlClient 5.1.5](https://www.nuget.org/packages/Microsoft.Data.SqlClient/5.1.5)
+- MySQL : [MySqlConnector 2.3.5](https://www.nuget.org/packages/MySqlConnector/2.3.5)
+- Oracle : [Oracle.ManagedDataAccess.Core 2.19.220](https://www.nuget.org/packages/Oracle.ManagedDataAccess.Core/2.19.220) (this is the latest version supporting .NET Standard 2.0)
 - SQLite : [System.Data.SQLite.Core 1.0.118](https://www.nuget.org/packages/System.Data.SQLite.Core/1.0.118)
-- PostgreSQL : [Npgsql (7.0.6)](https://www.nuget.org/packages/Npgsql/7.0.6)
+- PostgreSQL : [Npgsql (8.0.1)](https://www.nuget.org/packages/Npgsql/8.0.1)
 
 ## Latest Version
 
-### 2.0.0
+### 2.0.64
 * First release to support Windows PowerShell 5.1, PS Core and PS7.
 * Migrated the base provider class to .Net & all providers
 * Updated to latest versions of providers (that support .NET Standard 2.0)

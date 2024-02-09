@@ -35,7 +35,7 @@ Open-OracleConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [-Pri
 Open a connection to a Oracle Database.
         
 Oracle Managed Data Access @ http://www.oracle.com/technetwork/topics/dotnet/index-085163.html
-Provider for .NET @ https://www.nuget.org/packages/Oracle.ManagedDataAccess/19.21.0
+Provider for .NET @ https://www.nuget.org/packages/Oracle.ManagedDataAccess
 
 ## EXAMPLES
 

@@ -29,7 +29,7 @@ Open-MySqlConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [[-Cre
 Open a connection to a MySql Database.
         
 MySqlConnector: High Performance .NET MySQL Driver @ https://mysqlconnector.net/
-.NET Provider @ https://www.nuget.org/packages/MySqlConnector/2.3.3
+.NET Provider @ https://www.nuget.org/packages/MySqlConnector/
 
 ## EXAMPLES
 

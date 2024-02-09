@@ -109,10 +109,8 @@ Public Class PostGreProvider
                     .Port = connDetail.Port,
                     .Database = connDetail.Database,
                     .MaxAutoPrepare = connDetail.MaxAutoPrepare,
-                    .TrustServerCertificate = connDetail.TrustServerCertificate,
                     .SslMode = MapSslMode(connDetail.SslMode)
                 }
-            If connDetail.UseIntegratedSecurity Then sb.IntegratedSecurity = True
 
             'Process additional parameters through the hashtable
             sb.AddHashtable(connDetail.Additional)

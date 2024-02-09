@@ -37,9 +37,6 @@ Public Class OpenPostGreConnection
     <PSDefaultValue(Value:="Preferred")>
     Public Property SSLMode As Common.SslMode = SslMode.Preferred
 
-    <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
-    Public Property TrustSSL As SwitchParameter
-
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=2)>
     <Parameter(ParameterSetName:="conn", ValueFromPipelineByPropertyName:=True)>
     Public Property Credential As PSCredential
@@ -69,7 +66,6 @@ Public Class OpenPostGreConnection
                     .Port = Port
                     .MaxAutoPrepare = MaxAutoPrepare
                     .SslMode = SSLMode
-                    .TrustServerCertificate = TrustSSL.IsPresent
                     .Additional = Additional
                 End With
             End If

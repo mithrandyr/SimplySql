@@ -15,7 +15,7 @@ Open a connection to a PostGre Database.
 ### default (Default)
 ```
 Open-PostGreConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [[-Server] <String>]
- [[-Database] <String>] [-Port <Int32>] [-MaxAutoPrepare <Int32>] [-SSLMode <SslMode>] [-TrustSSL]
+ [[-Database] <String>] [-Port <Int32>] [-MaxAutoPrepare <Int32>] [-SSLMode <SslMode>]
  [[-Credential] <PSCredential>] [-Additional <Hashtable>] [<CommonParameters>]
 ```
 
@@ -30,7 +30,7 @@ Open a connection to a PostGre Database.
         
 PostGreSQL @ https://www.postgresql.org/
 PostGre via Npgsql @ http://www.npgsql.org/
-.NET Provider @ https://www.nuget.org/packages/Npgsql/7.0.6
+.NET Provider @ https://www.nuget.org/packages/Npgsql
 Geometry: http://www.npgsql.org/doc/types/nts.html
 
 ## EXAMPLES
@@ -193,21 +193,6 @@ Type: SslMode
 Parameter Sets: default
 Aliases:
 Accepted values: Disabled, Preferred, Required, VerifyCA, VerifyFull
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: True (ByPropertyName)
-Accept wildcard characters: False
-```
-
-### -TrustSSL
-This will auto-accept the SSL certificate provided by the server, useful for self-signed certificate scenarios.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: default
-Aliases:
 
 Required: False
 Position: Named

@@ -40,7 +40,7 @@ Open-SQLConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [[-Crede
 ## DESCRIPTION
 Open a connection to a SQL Server.  Default authentication is Integrated Windows Authetication.
 
-Microsoft.Data.SqlClient (5.1.2).
+Microsoft.Data.SqlClient.
 
 ## EXAMPLES
 

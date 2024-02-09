@@ -5,7 +5,6 @@ Public Class ConnectionPostGre
     Public Property Host As String
     Public Property Port As Integer
     Public Property Database As String
-    Public Property TrustServerCertificate As Boolean = False
     Public Property SslMode As SslMode
     Public Property MaxAutoPrepare As Integer
 
