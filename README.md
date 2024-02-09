@@ -43,7 +43,7 @@ This module requires PowerShell Version 5.0 or greater
 
 ## Latest Version
 
-### 2.0.64
+### 2.0.67
 * First release to support Windows PowerShell 5.1, PS Core and PS7.
 * Migrated the base provider class to .Net & all providers
 * Updated to latest versions of providers (that support .NET Standard 2.0)
