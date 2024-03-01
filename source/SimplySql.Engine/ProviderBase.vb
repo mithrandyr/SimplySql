@@ -78,8 +78,7 @@ Public MustInherit Class ProviderBase
             Try
                 Return cmd.ExecuteScalar()
             Catch ex As Exception
-                ex.Data.Add("Query", query)
-                ex.Data.Add("Parameters", params)
+                ex.AddQueryDetails(query, params)
                 Throw
             End Try
         End Using
@@ -104,8 +103,7 @@ Public MustInherit Class ProviderBase
                 End Using
                 Return ds
             Catch ex As Exception
-                ex.Data.Add("Query", query)
-                ex.Data.Add("Parameters", params)
+                ex.AddQueryDetails(query, params)
                 Throw
             End Try
         End Using
@@ -118,8 +116,7 @@ Public MustInherit Class ProviderBase
             Try
                 Return cmd.ExecuteReader()
             Catch ex As Exception
-                ex.Data.Add("Query", query)
-                ex.Data.Add("Parameters", params)
+                ex.AddQueryDetails(query, params)
                 Throw
             End Try
         End Using
@@ -132,8 +129,7 @@ Public MustInherit Class ProviderBase
         Try
             Return cmd.ExecuteNonQuery()
         Catch ex As Exception
-            ex.Data.Add("Query", cmd.CommandText)
-            ex.Data.Add("Parameters", cmd.Parameters)
+            ex.AddQueryDetails(cmd.CommandText, cmd.Parameters)
             Throw
         End Try
     End Function
@@ -188,8 +184,7 @@ Public MustInherit Class ProviderBase
 
                         If sw.Elapsed.TotalSeconds > batchTimeout Then
                             Dim ex As New TimeoutException(String.Format("Batch took longer than {0} seconds to complete.", batchTimeout))
-                            ex.Data.Add("Query", insertSql)
-                            ex.Data.Add("Parameters", bulkCmd.Parameters)
+                            ex.AddQueryDetails(insertSql, bulkCmd.Parameters)
                             Throw ex
                         End If
 
@@ -204,8 +199,7 @@ Public MustInherit Class ProviderBase
 
                     bulkCmd.Transaction.Commit()
                 Catch ex As Exception
-                    ex.Data.Add("Query", insertSql)
-                    ex.Data.Add("Parameters", bulkCmd.Parameters)
+                    ex.AddQueryDetails(insertSql, bulkCmd.Parameters)
                     Throw
                 Finally
                     If bulkCmd.Transaction IsNot Nothing Then bulkCmd.Transaction.Dispose()
