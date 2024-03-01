@@ -39,8 +39,7 @@ Public Class MySqlProvider
                         da.Fill(ds)
                         Return ds
                     Catch ex As Exception
-                        ex.Data.Add("Query", query)
-                        ex.Data.Add("Parameters", params)
+                        ex.AddQueryDetails(query, params)
                         Throw
                     End Try
                 End Using

@@ -80,57 +80,61 @@ Describe "PostGre" {
         Close-SqlConnection -ConnectionName bcp
     }
 
-    It "Transaction: Invoke-SqlBulkCopy" {
-        Open-PostGreConnection -Server $srvName -Database $db -ConnectionName bcp -Credential $c
-        
-        Start-SqlTransaction -ConnectionName bcp
-        Invoke-SqlUpdate -Query "SELECT * INTO tmpTable3 FROM tmpTable WHERE 1=2" -ConnectionName bcp
-        { Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable3 -Notify |
-            Should -Be 65536} | Should -Not -Throw
-        Undo-SqlTransaction -ConnectionName bcp
+    Context "Transaction..." {
+        It "Invoke-SqlBulkCopy" {
+            Open-PostGreConnection -Server $srvName -Database $db -ConnectionName bcp -Credential $c
+            
+            Start-SqlTransaction -ConnectionName bcp
+            Invoke-SqlUpdate -Query "SELECT * INTO tmpTable3 FROM tmpTable WHERE 1=2" -ConnectionName bcp
+            { Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable3 -Notify |
+                Should -Be 65536} | Should -Not -Throw
+            Undo-SqlTransaction -ConnectionName bcp
 
-        { Invoke-SqlScalar -ConnectionName bcp -Query "SELECT COUNT(1) FROM tmpTable3" -ea Stop} | Should -Throw
-    }
+            { Invoke-SqlScalar -ConnectionName bcp -Query "SELECT COUNT(1) FROM tmpTable3" -ea Stop} | Should -Throw
+        }
 
-    It "Transaction: Invoke-SqlScalar" {
-        Start-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1" -ea Stop} | Should -Not -Throw
-        Undo-SqlTransaction
-    }
+        It "Invoke-SqlScalar" {
+            Start-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1" -ea Stop} | Should -Not -Throw
+            Undo-SqlTransaction
+        }
 
-    It "Transaction: Invoke-SqlQuery" {
-        Start-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1" -ea Stop} | Should -Not -Throw
-        Undo-SqlTransaction
-    }
+        It "Invoke-SqlQuery" {
+            Start-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1" -ea Stop} | Should -Not -Throw
+            Undo-SqlTransaction
+        }
 
-    It "Transaction: Invoke-SqlUpdate" {
-        Start-SqlTransaction
-        { Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)" -ea Stop} | Should -Not -Throw
-        Undo-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1 FROM transactionTest" -ea Stop } | Should -Throw
+        It "Invoke-SqlUpdate" {
+            Start-SqlTransaction
+            { Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)" -ea Stop} | Should -Not -Throw
+            Undo-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1 FROM transactionTest" -ea Stop } | Should -Throw
+        }
     }
     
-    It "PipelineInput: Invoke-SqlScalar" {
-        {
-            [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
-            Get-ChildItem | Invoke-SqlScalar "SELECT @Name " -ErrorAction Stop
-        } | Should -Not -Throw
-    }
+    Context "PipelineInput..." {
+        It "Invoke-SqlScalar" {
+            {
+                [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
+                Get-ChildItem | Invoke-SqlScalar "SELECT @Name " -ErrorAction Stop
+            } | Should -Not -Throw
+        }
 
-    It "PipelineInput: Invoke-SqlQuery" {
-        {
-            [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
-            Get-ChildItem | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
-        } | Should -Not -Throw
-    }
+        It "Invoke-SqlQuery" {
+            {
+                [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
+                Get-ChildItem | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
+            } | Should -Not -Throw
+        }
 
-    It "PipelineInput: Invoke-SqlScalar" {
-        {
-            Invoke-SqlUpdate "CREATE TABLE t(x varchar(255))" -ErrorAction Stop
-            [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "INSERT INTO t SELECT @Name" -ErrorAction Stop
-            Get-ChildItem | Invoke-SqlScalar "INSERT INTO t SELECT @Name"-ErrorAction Stop
-            Invoke-SqlUpdate "DROP TABLE t" -ErrorAction Stop
-        } | Should -Not -Throw
+        It "Invoke-SqlScalar" {
+            {
+                Invoke-SqlUpdate "CREATE TABLE t(x varchar(255))" -ErrorAction Stop
+                [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "INSERT INTO t SELECT @Name" -ErrorAction Stop
+                Get-ChildItem | Invoke-SqlScalar "INSERT INTO t SELECT @Name"-ErrorAction Stop
+                Invoke-SqlUpdate "DROP TABLE t" -ErrorAction Stop
+            } | Should -Not -Throw
+        }
     }
 }

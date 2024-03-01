@@ -106,67 +106,71 @@ Describe "Oracle" {
         Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"
     }
 
-    It "Transaction: Invoke-SqlBulkCopy" -Tag bulkcopytransaction {
-        $query = "SELECT dbms_random.random /1000000000000. AS colDec
-                , dbms_random.random AS colInt
-                , dbms_random.string('x',20) AS colText
-            FROM dual
-            CONNECT BY ROWNUM <= 65536"
-        
-        Open-OracleConnection -ConnectionName bcp -DataSource $srvName -ServiceName xe -Credential $c
-        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
-        
-        Start-SqlTransaction -ConnectionName bcp        
-        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
-            Should -Be 65536
-        Invoke-SqlScalar -ConnectionName bcp -Query "SELECT COUNT(1) FROM tmpTable2" | Should -Be 65536
-        Undo-SqlTransaction -ConnectionName bcp
-        Invoke-SqlScalar -ConnectionName bcp -Query "SELECT COUNT(1) FROM tmpTable2" | Should -Be 0
-        Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"
+    Context "Transaction..." {
+        It "Invoke-SqlBulkCopy" -Tag bulkcopytransaction {
+            $query = "SELECT dbms_random.random /1000000000000. AS colDec
+                    , dbms_random.random AS colInt
+                    , dbms_random.string('x',20) AS colText
+                FROM dual
+                CONNECT BY ROWNUM <= 65536"
+            
+            Open-OracleConnection -ConnectionName bcp -DataSource $srvName -ServiceName xe -Credential $c
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
+            
+            Start-SqlTransaction -ConnectionName bcp        
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
+                Should -Be 65536
+            Invoke-SqlScalar -ConnectionName bcp -Query "SELECT COUNT(1) FROM tmpTable2" | Should -Be 65536
+            Undo-SqlTransaction -ConnectionName bcp
+            Invoke-SqlScalar -ConnectionName bcp -Query "SELECT COUNT(1) FROM tmpTable2" | Should -Be 0
+            Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"
+        }
+
+        It "Invoke-SqlScalar" {
+            Start-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1 FROM dual" -ea Stop} | Should -Not -Throw
+            Undo-SqlTransaction
+        }
+
+        It "Invoke-SqlQuery" {
+            Start-SqlTransaction
+            { Invoke-SqlScalar "SELECT 1 FROM dual" -ea Stop} | Should -Not -Throw
+            Undo-SqlTransaction
+        }
+
+        It "Invoke-SqlUpdate" {
+            Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)"
+            Start-SqlTransaction
+            { Invoke-SqlUpdate "INSERT INTO transactionTest VALUES (1)" -ea Stop } | Should -Not -Throw
+            Undo-SqlTransaction
+            Invoke-SqlScalar "SELECT Count(1) FROM transactionTest" | Should -Be 0
+            Invoke-SqlUpdate "DROP TABLE transactionTest"
+        }
     }
 
-    It "Transaction: Invoke-SqlScalar" {
-        Start-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1 FROM dual" -ea Stop} | Should -Not -Throw
-        Undo-SqlTransaction
-    }
+    Context "PipelineInput..." {
+        It "Invoke-SqlScalar" {
+            {
+                [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT :Name FROM dual" -ErrorAction Stop
+                Get-ChildItem | Invoke-SqlScalar "SELECT :Name FROM dual" -ErrorAction Stop
+            } | Should -Not -Throw
+        }
 
-    It "Transaction: Invoke-SqlQuery" {
-        Start-SqlTransaction
-        { Invoke-SqlScalar "SELECT 1 FROM dual" -ea Stop} | Should -Not -Throw
-        Undo-SqlTransaction
-    }
+        It "Invoke-SqlQuery" {
+            {
+                [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT :Name FROM dual" -ErrorAction Stop
+                Get-ChildItem | Invoke-SqlQuery "SELECT :Name FROM dual" -ErrorAction Stop
+            } | Should -Not -Throw
+        }
 
-    It "Transaction: Invoke-SqlUpdate" {
-        Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)"
-        Start-SqlTransaction
-        { Invoke-SqlUpdate "INSERT INTO transactionTest VALUES (1)" -ea Stop } | Should -Not -Throw
-        Undo-SqlTransaction
-        Invoke-SqlScalar "SELECT Count(1) FROM transactionTest" | Should -Be 0
-        Invoke-SqlUpdate "DROP TABLE transactionTest"
-    }
-    
-    It "PipelineInput: Invoke-SqlScalar" {
-        {
-            [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT :Name FROM dual" -ErrorAction Stop
-            Get-ChildItem | Invoke-SqlScalar "SELECT :Name FROM dual" -ErrorAction Stop
-        } | Should -Not -Throw
-    }
-
-    It "PipelineInput: Invoke-SqlQuery" {
-        {
-            [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT :Name FROM dual" -ErrorAction Stop
-            Get-ChildItem | Invoke-SqlQuery "SELECT :Name FROM dual" -ErrorAction Stop
-        } | Should -Not -Throw
-    }
-
-    It "PipelineInput: Invoke-SqlScalar" {
-        {
-            Invoke-SqlUpdate "CREATE TABLE t(x varchar(255))" -ErrorAction Stop
-            [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "INSERT INTO t SELECT :Name FROM dual" -ErrorAction Stop
-            Get-ChildItem | Invoke-SqlScalar "INSERT INTO t SELECT :Name FROM dual"-ErrorAction Stop
-            Invoke-SqlUpdate "DROP TABLE t" -ErrorAction Stop
-        } | Should -Not -Throw
+        It "Invoke-SqlScalar" {
+            {
+                Invoke-SqlUpdate "CREATE TABLE t(x varchar(255))" -ErrorAction Stop
+                [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "INSERT INTO t SELECT :Name FROM dual" -ErrorAction Stop
+                Get-ChildItem | Invoke-SqlScalar "INSERT INTO t SELECT :Name FROM dual"-ErrorAction Stop
+                Invoke-SqlUpdate "DROP TABLE t" -ErrorAction Stop
+            } | Should -Not -Throw
+        }
     }
 }
 <#

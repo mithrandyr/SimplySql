@@ -1,9 +1,22 @@
-param([version]$Version, [switch]$CommitRevision)
+param([version]$Version, [switch]$CommitRevision, [ValidateSet("Major", "Minor", "Build")][string]$Increment)
 New-Alias -Name HV -Value (Resolve-Path HandleVerbose.ps1)
 
 if(-not $version) {
   $Script:Version = [Version](Import-PowerShellDataFile -Path "ModuleManifest\SimplySql.psd1")["ModuleVersion"]
-  $Script:Version = [version]::new($version.Major, $version.Minor, $version.Build, $version.Revision + 1)
+  switch ($Increment) {
+    "Major" {
+      $Script:Version = [version]::new($version.Major + 1, 0, 0, $version.Revision + 1)
+    }
+    "Minor" {
+      $Script:Version = [version]::new($version.Major, $version.Minor + 1, 0, $version.Revision + 1)
+    }
+    "Build" {
+      $Script:Version = [version]::new($version.Major, $version.Minor, $version.Build + 1, $version.Revision + 1)
+    }
+    default {
+      $Script:Version = [version]::new($version.Major, $version.Minor, $version.Build, $version.Revision + 1)
+    }
+  }  
 }
 
 task Clean { remove "output" }

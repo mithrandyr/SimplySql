@@ -9,4 +9,14 @@ Module Dry
             Next
         End If
     End Sub
+
+    <Extension>
+    Sub AddQueryDetails(this As Exception, query As String, ht As Hashtable)
+        this.Data.Add("Query", query)
+        Try
+            this.Data.Add("Parameters", ht)
+        Catch ex As Exception
+            this.Data.Add("ParameterExceptionMessage", ex.Message)
+        End Try
+    End Sub
 End Module
