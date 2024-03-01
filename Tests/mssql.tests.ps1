@@ -154,6 +154,4 @@ Describe "MSSQL" {
             } | Should -Not -Throw
         }
     }
-
-
 }
