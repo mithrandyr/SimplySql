@@ -172,6 +172,12 @@ Describe "Oracle" {
             } | Should -Not -Throw
         }
     }
+
+    Context "Validations..." {
+        It "Handles JSON as PSObject" {
+            Invoke-SqlScalar "SELECT :json FROM dual" -Parameters @{json = (1..5 | ConvertTo-Json -Compress)} | Should -Be "[1,2,3,4,5]"
+        }
+    }
 }
 <#
     requires that the predefined account HR is unlocked and has password hr

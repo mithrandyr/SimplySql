@@ -1,4 +1,5 @@
-﻿Imports System.Data.Common
+﻿Imports System.Data
+Imports System.Data.Common
 Imports System.Runtime.CompilerServices
 Module Dry
     <Extension>
@@ -15,6 +16,16 @@ Module Dry
         this.Data.Add("Query", query)
         Try
             this.Data.Add("Parameters", ht)
+        Catch ex As Exception
+            this.Data.Add("ParameterExceptionMessage", ex.Message)
+        End Try
+    End Sub
+
+    <Extension>
+    Sub AddQueryDetails(this As Exception, query As String, sqlParams As IDataParameterCollection)
+        this.Data.Add("Query", query)
+        Try
+            this.Data.Add("Parameters", sqlParams)
         Catch ex As Exception
             this.Data.Add("ParameterExceptionMessage", ex.Message)
         End Try

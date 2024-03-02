@@ -154,4 +154,10 @@ Describe "MSSQL" {
             } | Should -Not -Throw
         }
     }
+
+    Context "Validations..." {
+        It "Handles JSON as PSObject" {
+            Invoke-SqlScalar "SELECT @json" -Parameters @{json = (1..5 | ConvertTo-Json -Compress)} | Should -Be "[1,2,3,4,5]"
+        }
+    }
 }

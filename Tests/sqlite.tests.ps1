@@ -1,6 +1,9 @@
 Describe "SQLite" {
     BeforeEach { Open-SQLiteConnection }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
+    AfterAll {
+        Remove-Item "$home\temp.db"        
+    }
     
     It "Test ConnectionString Switch" {
         {
@@ -163,5 +166,9 @@ Describe "SQLite" {
         }
     }
 
-    It "Remove File" { { Remove-Item "$home\temp.db" } | Should -Not -Throw }
+    Context "Validations..." {
+        It "Handles JSON as PSObject" {
+            Invoke-SqlScalar "SELECT @json" -Parameters @{json = (1..5 | ConvertTo-Json -Compress)} | Should -Be "[1,2,3,4,5]"
+        }
+    }
 }

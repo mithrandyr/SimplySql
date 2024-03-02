@@ -25,6 +25,7 @@
     <PackageReference Include="Npgsql" Version="8.0.1" />
     <PackageReference Include="Npgsql.NetTopologySuite" Version="8.0.1" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.220" />
+    <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.118" />
   </ItemGroup>
