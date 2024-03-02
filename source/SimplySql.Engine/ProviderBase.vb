@@ -39,6 +39,7 @@ Public MustInherit Class ProviderBase
     Public MustOverride Sub ChangeDatabase(databaseName As String) Implements ISimplySqlProvider.ChangeDatabase
 
     Public Overridable Function HandleParamValue(x As Object) As Object
+        If TypeOf x Is System.Management.Automation.PSObject Then x = DirectCast(x, System.Management.Automation.PSObject).BaseObject
         Return If(x, DBNull.Value)
     End Function
 #End Region
