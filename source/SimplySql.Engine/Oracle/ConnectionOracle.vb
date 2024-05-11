@@ -13,7 +13,7 @@ Public Class ConnectionOracle
     Public Property Host As String
     Public Property ServiceName As String
     Public Property Port As Integer
-    Public Property Privilege As OraclePrivilege = OraclePrivilege.None
+    Public Property Privilege As String = "None"
 
     Sub New(connName As String, cmdTimeout As Integer)
         MyBase.New(connName, ProviderTypes.Oracle, cmdTimeout)
@@ -23,11 +23,4 @@ Public Class ConnectionOracle
         Me.UseIntegratedSecurity = False
         Me.Credential = cred
     End Sub
-
-    Public Enum OraclePrivilege
-        None
-        SYSDBA
-        SYSOPER
-        SYSASM
-    End Enum
 End Class

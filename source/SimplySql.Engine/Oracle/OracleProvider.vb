@@ -1,9 +1,6 @@
 ﻿Imports System.Collections.Specialized
 Imports System.ComponentModel
 Imports System.Data
-Imports Microsoft.Data.SqlClient
-Imports NetTopologySuite.Algorithm
-Imports System.Reflection
 Imports Oracle.ManagedDataAccess.Client
 
 Public Class OracleProvider
@@ -169,15 +166,6 @@ Public Class OracleProvider
         Me.Messages.Enqueue(New SqlMessage(e.Message))
     End Sub
 #Region "Shared"
-    Private Shared _rowsCopiedField As FieldInfo
-    Private Shared Function RowsCopiedCount(this As OracleBulkCopy) As Integer
-        If _rowsCopiedField Is Nothing Then _rowsCopiedField = GetType(OracleBulkCopy).GetField("_rowsCopied", BindingFlags.NonPublic Or BindingFlags.GetField Or BindingFlags.Instance)
-        Dim fieldList = GetType(OracleBulkCopy).GetFields(BindingFlags.NonPublic Or BindingFlags.GetField Or BindingFlags.Instance Or BindingFlags.GetProperty)
-
-        Console.Write($"FieldCount = {fieldList.Length}")
-        'Return DirectCast(_rowsCopiedField.GetValue(this), Integer)
-        Return 0
-    End Function
     Shared Sub New()
         OracleConfiguration.BindByName = True 'otherwise oracle commands will bind parameters by position
     End Sub
@@ -214,19 +202,8 @@ Public Class OracleProvider
 
         Return New OracleProvider(connDetail.ConnectionName, connDetail.CommandTimeout, conn, oraPrivilege)
     End Function
-    Private Shared Function ConvertToOracleDBAPrivilege(priv As ConnectionOracle.OraclePrivilege) As OracleDBAPrivilege
-        Select Case priv
-            Case ConnectionOracle.OraclePrivilege.None
-                Return OracleDBAPrivilege.None
-            Case ConnectionOracle.OraclePrivilege.SYSDBA
-                Return OracleDBAPrivilege.SYSDBA
-            Case ConnectionOracle.OraclePrivilege.SYSOPER
-                Return OracleDBAPrivilege.SYSOPER
-            Case ConnectionOracle.OraclePrivilege.SYSASM
-                Return OracleDBAPrivilege.SYSASM
-            Case Else
-                Throw New InvalidEnumArgumentException(NameOf(priv), priv, GetType(OracleDBAPrivilege))
-        End Select
+    Private Shared Function ConvertToOracleDBAPrivilege(priv As String) As OracleDBAPrivilege
+        Return [Enum].Parse(GetType(OracleDBAPrivilege), priv)
     End Function
 #End Region
 End Class
