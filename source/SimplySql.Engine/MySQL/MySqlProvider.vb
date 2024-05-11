@@ -1,6 +1,5 @@
 ﻿Imports System.Collections.Specialized
 Imports System.Data
-Imports Microsoft.Data.SqlClient
 Imports MySqlConnector
 
 Public Class MySqlProvider
@@ -102,20 +101,20 @@ Public Class MySqlProvider
 
         Return New MySqlProvider(connDetail.ConnectionName, connDetail.CommandTimeout, New MySqlConnection(sb.ToString))
     End Function
-    Private Shared Function MapSslMode(input As Common.SslMode) As MySqlSslMode
-        Select Case input
-            Case Common.SslMode.Disabled
+    Private Shared Function MapSslMode(ssl As String) As MySqlSslMode
+        Select Case ssl.ToLower()
+            Case "Disabled"
                 Return MySqlSslMode.Disabled
-            Case Common.SslMode.Preferred
+            Case "Preferred"
                 Return MySqlSslMode.Preferred
-            Case Common.SslMode.Required
+            Case "Required"
                 Return MySqlSslMode.Required
-            Case Common.SslMode.VerifyCA
+            Case "VerifyCA"
                 Return MySqlSslMode.VerifyCA
-            Case Common.SslMode.VerifyFull
+            Case "VerifyFull"
                 Return MySqlSslMode.VerifyFull
             Case Else
-                Throw New InvalidOperationException($"'{input}' is not a valid SSLMode option for the MySql provider (MySqlConnector).")
+                Throw New InvalidOperationException($" '{ssl}' is not a valid SSLMode option for the MySql provider (MySqlConnector).")
         End Select
     End Function
 #End Region
