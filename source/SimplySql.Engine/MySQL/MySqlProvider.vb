@@ -102,20 +102,7 @@ Public Class MySqlProvider
         Return New MySqlProvider(connDetail.ConnectionName, connDetail.CommandTimeout, New MySqlConnection(sb.ToString))
     End Function
     Private Shared Function MapSslMode(ssl As String) As MySqlSslMode
-        Select Case ssl.ToLower()
-            Case "Disabled"
-                Return MySqlSslMode.Disabled
-            Case "Preferred"
-                Return MySqlSslMode.Preferred
-            Case "Required"
-                Return MySqlSslMode.Required
-            Case "VerifyCA"
-                Return MySqlSslMode.VerifyCA
-            Case "VerifyFull"
-                Return MySqlSslMode.VerifyFull
-            Case Else
-                Throw New InvalidOperationException($" '{ssl}' is not a valid SSLMode option for the MySql provider (MySqlConnector).")
-        End Select
+        Return [Enum].Parse(GetType(MySqlSslMode), ssl)
     End Function
 #End Region
 End Class
