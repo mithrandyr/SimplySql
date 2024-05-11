@@ -21,6 +21,7 @@ Public MustInherit Class ProviderBase
         _providerType = providerType
         Connection = conn
         CommandTimeout = timeout
+        'conn.Open()
     End Sub
 
 #Region "Overrides"

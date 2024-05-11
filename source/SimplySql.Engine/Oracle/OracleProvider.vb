@@ -1,19 +1,18 @@
 ﻿Imports System.Collections.Specialized
-Imports System.ComponentModel
 Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
 
 Public Class OracleProvider
     Inherits ProviderBase
 
-    Private Privilege As OracleDBAPrivilege
+    Private Privilege As String
     Public Overloads ReadOnly Property Connection As OracleConnection
         Get
             Return DirectCast(MyBase.Connection, OracleConnection)
         End Get
     End Property
 
-    Private Sub New(connName As String, timeout As Integer, conn As OracleConnection, priv As OracleDBAPrivilege)
+    Private Sub New(connName As String, timeout As Integer, conn As OracleConnection, priv As String)
         MyBase.New(connName, ProviderTypes.Oracle, conn, timeout)
         Privilege = priv
         AddHandler Me.Connection.InfoMessage, AddressOf HandleInfoMessage
@@ -128,7 +127,11 @@ Public Class OracleProvider
         End Using
     End Function
 
-    Private Shared Function MapOracleType(netType As String) As OracleDbType
+    Private Sub HandleInfoMessage(sender As Object, e As OracleInfoMessageEventArgs)
+        Me.Messages.Enqueue(New SqlMessage(e.Message))
+    End Sub
+#Region "Shared"
+    Private Function MapOracleType(netType As String) As OracleDbType
         'FROM: https://docs.oracle.com/en/database/oracle///oracle-database/23/odpnt/featOraCommand.html#GUID-BBEF52D9-E4E3-4A9C-93F5-3E408A83FC04
         Select Case netType.ToLower
             Case "system.boolean"
@@ -161,11 +164,6 @@ Public Class OracleProvider
                 Return OracleDbType.Varchar2
         End Select
     End Function
-
-    Private Sub HandleInfoMessage(sender As Object, e As OracleInfoMessageEventArgs)
-        Me.Messages.Enqueue(New SqlMessage(e.Message))
-    End Sub
-#Region "Shared"
     Shared Sub New()
         OracleConfiguration.BindByName = True 'otherwise oracle commands will bind parameters by position
     End Sub
@@ -186,21 +184,19 @@ Public Class OracleProvider
             sb.AddHashtable(connDetail.Additional)
         End If
 
-        Dim oraPrivilege = ConvertToOracleDBAPrivilege(connDetail.Privilege)
-
         If connDetail.Credential IsNot Nothing Then
             Dim sp = connDetail.SecurePassword
             sp.MakeReadOnly()
-            conn = New OracleConnection(sb.ConnectionString, New OracleCredential(connDetail.UserName, sp, oraPrivilege))
+            conn = New OracleConnection(sb.ConnectionString, New OracleCredential(connDetail.UserName, sp, ConvertToOracleDBAPrivilege(connDetail.Privilege)))
         Else
             If (sb.UserID = "/" Or String.IsNullOrWhiteSpace(sb.UserID)) Then
                 sb.UserID = "/"
-                sb.DBAPrivilege = oraPrivilege
+                If Not connDetail.Privilege.Equals("None", StringComparison.OrdinalIgnoreCase) Then sb.DBAPrivilege = connDetail.Privilege
             End If
             conn = New OracleConnection(sb.ConnectionString)
         End If
 
-        Return New OracleProvider(connDetail.ConnectionName, connDetail.CommandTimeout, conn, oraPrivilege)
+        Return New OracleProvider(connDetail.ConnectionName, connDetail.CommandTimeout, conn, connDetail.Privilege)
     End Function
     Private Shared Function ConvertToOracleDBAPrivilege(priv As String) As OracleDBAPrivilege
         Return [Enum].Parse(GetType(OracleDBAPrivilege), priv)
