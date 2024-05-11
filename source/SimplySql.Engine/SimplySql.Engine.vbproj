@@ -19,23 +19,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EnumerableToDataReader" Version="1.1.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.5" />
-    <PackageReference Include="MySqlConnector" Version="2.3.5" />
-    <PackageReference Include="Npgsql" Version="8.0.1" />
-    <PackageReference Include="Npgsql.NetTopologySuite" Version="8.0.1" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.220" />
+    <PackageReference Include="MySqlConnector" Version="2.3.7" />
+    <PackageReference Include="Npgsql" Version="8.0.3" />
+    <PackageReference Include="Npgsql.NetTopologySuite" Version="8.0.3" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.230" />
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.118" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SimplySql.Common\SimplySql.Common.vbproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Import Include="SimplySql.Common" />
   </ItemGroup>
 
 </Project>

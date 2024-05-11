@@ -15,7 +15,7 @@ Open a connection to a MySql Database.
 ### default (Default)
 ```
 Open-MySqlConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [[-Server] <String>]
- [[-Database] <String>] [-Port <Int32>] [-SSLMode <SslMode>] [[-Credential] <PSCredential>]
+ [[-Database] <String>] [-Port <Int32>] [-SSLMode <String>] [[-Credential] <PSCredential>]
  [-Additional <Hashtable>] [<CommonParameters>]
 ```
 
@@ -171,7 +171,7 @@ VerifyCA: Always use SSL. Validates the CA but tolerates hostname mismatch.
 VerifyFull: Always use SSL. Validates CA and hostname.
 
 ```yaml
-Type: SslMode
+Type: String
 Parameter Sets: default
 Aliases:
 Accepted values: Disabled, Preferred, Required, VerifyCA, VerifyFull

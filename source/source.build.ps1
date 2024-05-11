@@ -14,15 +14,12 @@ task Build {
     exec { dotnet publish "SimplySql.Cmdlets" -c $Configuration -o "output\bin" -p:Version=$Version -p:AssemblyVersion=$version} | HV "Building SimplySql.Cmdlets ($version)" "."
     
     Move-Item "output\bin\SimplySql.Cmdlets.*" -Destination "output"
-    Move-Item "output\bin\SimplySql.Common.*" -Destination "output"
-    Move-Item "output\bin\EnumerableToDataReader.dll" -Destination "output"
     Remove-Item "output\bin\" -Exclude "SimplySql.*" -Recurse
 
     if(-not $DebugOnly) { $Script:envList += @("win-x86", "linux-x64", "osx-x64")}
     foreach($env in $Script:envList) {
         exec { dotnet publish "SimplySql.Cmdlets" -c $Configuration -r $env -o "output\bin\$env"} | HV "Building PlatformSpecific Dependencies $env" "."
         Remove-Item "output\bin\$env" -Include "SimplySql.*" -Recurse
-        remove "output\bin\$env\EnumerableToDataReader.dll"
     }
 }
 

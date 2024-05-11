@@ -24,7 +24,7 @@ Public Class TestSqlConnection
             If Detailed Then
                 WriteObject(Engine.Logic.ConnectionExists(ConnectionName))
             Else
-                WriteObject(Engine.Logic.ConnectionExists(ConnectionName, False) = Common.ValidateConnectionResult.Found)
+                WriteObject(Engine.Logic.ConnectionExists(ConnectionName, False) = Engine.ValidateConnectionResult.Found)
             End If
         End If
     End Sub

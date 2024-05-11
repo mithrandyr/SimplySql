@@ -1,6 +1,4 @@
-﻿Imports SimplySql.Common
-
-<Cmdlet(VerbsCommon.Open, "SQLiteConnection", DefaultParameterSetName:="default")>
+﻿<Cmdlet(VerbsCommon.Open, "SQLiteConnection", DefaultParameterSetName:="default")>
 Public Class OpenSQLiteConnection
     Inherits PSCmdlet
 
@@ -36,7 +34,7 @@ Public Class OpenSQLiteConnection
                 Engine.Logic.CloseAndRemoveConnection(ConnectionName)
             End If
 
-            Dim connDetail As New ConnectionSQLite(ConnectionName, CommandTimeout)
+            Dim connDetail As New Engine.ConnectionSQLite(ConnectionName, CommandTimeout)
             If Me.ParameterSetName = "conn" Then
                 connDetail.ConnectionString = ConnectionString
             Else

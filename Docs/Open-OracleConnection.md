@@ -15,19 +15,19 @@ Open a connection to a Oracle Database.
 ### default (Default)
 ```
 Open-OracleConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [[-Server] <String>]
- [[-ServiceName] <String>] [-Port <Int32>] [-Privilege <OraclePrivilege>] [[-Credential] <PSCredential>]
+ [[-ServiceName] <String>] [-Port <Int32>] [-Privilege <String>] [[-Credential] <PSCredential>]
  [-Additional <Hashtable>] [<CommonParameters>]
 ```
 
 ### tns
 ```
 Open-OracleConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] -TnsName <String>
- [-Privilege <OraclePrivilege>] [[-Credential] <PSCredential>] [-Additional <Hashtable>] [<CommonParameters>]
+ [-Privilege <String>] [[-Credential] <PSCredential>] [-Additional <Hashtable>] [<CommonParameters>]
 ```
 
 ### conn
 ```
-Open-OracleConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [-Privilege <OraclePrivilege>]
+Open-OracleConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [-Privilege <String>]
  -ConnectionString <String> [<CommonParameters>]
 ```
 
@@ -142,7 +142,7 @@ Accept wildcard characters: False
 Determines the elevated privileges the connection has: SYSDBA, SYSOPER, SYSASM.  By default, none.
 
 ```yaml
-Type: OraclePrivilege
+Type: String
 Parameter Sets: (All)
 Aliases:
 Accepted values: None, SYSDBA, SYSOPER, SYSASM

@@ -2,12 +2,12 @@
 Imports System.Data
 Imports System.Data.Common
 Imports System.Threading
-Imports SimplySql.Common
+
 Public MustInherit Class ProviderBase
     Implements ISimplySqlProvider
     Public ReadOnly Property ConnectionName As String Implements ISimplySqlProvider.ConnectionName
 
-    Private _providerType As Common.ProviderTypes
+    Private _providerType As Engine.ProviderTypes
     Public ReadOnly Property ProviderType As String Implements ISimplySqlProvider.ProviderName
         Get
             Return _providerType.ToString()
@@ -16,11 +16,12 @@ Public MustInherit Class ProviderBase
 
     Public ReadOnly Property Connection As IDbConnection Implements ISimplySqlProvider.Connection
     Public Property CommandTimeout As Integer = 30 Implements ISimplySqlProvider.CommandTimeout
-    Public Sub New(connName As String, providerType As Common.ProviderTypes, conn As IDbConnection, timeout As Integer)
+    Public Sub New(connName As String, providerType As Engine.ProviderTypes, conn As IDbConnection, timeout As Integer)
         ConnectionName = connName
         _providerType = providerType
         Connection = conn
         CommandTimeout = timeout
+        'conn.Open()
     End Sub
 
 #Region "Overrides"
@@ -296,4 +297,10 @@ Public MustInherit Class ProviderBase
     End Structure
 End Class
 
-
+Public Enum ProviderTypes
+    PostGre
+    Oracle
+    MySql
+    MSSQL
+    SQLite
+End Enum

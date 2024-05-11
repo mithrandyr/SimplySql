@@ -1,6 +1,5 @@
 ﻿Imports System.DirectoryServices.ActiveDirectory
 Imports System.Runtime.InteropServices.ComTypes
-Imports SimplySql.Common
 
 <Cmdlet(VerbsCommon.Open, "OracleConnection", DefaultParameterSetName:="default")>
 Public Class OpenOracleConnection
@@ -33,7 +32,8 @@ Public Class OpenOracleConnection
     Public Property TnsName As String
 
     <Parameter(ValueFromPipelineByPropertyName:=True)>
-    Public Property Privilege As SimplySql.Common.ConnectionOracle.OraclePrivilege = ConnectionOracle.OraclePrivilege.None
+    <ValidateSet("None", "SYSASM", "SYSDBA", "SYSOPER")>
+    Public Property Privilege As String = "None"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=2)>
     <Parameter(ParameterSetName:="tns", ValueFromPipelineByPropertyName:=True)>
@@ -53,7 +53,7 @@ Public Class OpenOracleConnection
                 Engine.Logic.CloseAndRemoveConnection(ConnectionName)
             End If
 
-            Dim connDetail As New ConnectionOracle(ConnectionName, CommandTimeout)
+            Dim connDetail As New Engine.ConnectionOracle(ConnectionName, CommandTimeout)
             If Credential IsNot Nothing Then connDetail.SetAuthCredential(Credential)
 
             Select Case ParameterSetName

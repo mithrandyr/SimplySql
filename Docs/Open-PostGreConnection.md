@@ -15,7 +15,7 @@ Open a connection to a PostGre Database.
 ### default (Default)
 ```
 Open-PostGreConnection [-ConnectionName <String>] [-CommandTimeout <Int32>] [[-Server] <String>]
- [[-Database] <String>] [-Port <Int32>] [-MaxAutoPrepare <Int32>] [-SSLMode <SslMode>]
+ [[-Database] <String>] [-Port <Int32>] [-MaxAutoPrepare <Int32>] [-SSLMode <String>]
  [[-Credential] <PSCredential>] [-Additional <Hashtable>] [<CommonParameters>]
 ```
 
@@ -189,7 +189,7 @@ VerifyFull: Always use SSL. Validates CA and hostname.
 
 
 ```yaml
-Type: SslMode
+Type: String
 Parameter Sets: default
 Aliases:
 Accepted values: Disabled, Preferred, Required, VerifyCA, VerifyFull

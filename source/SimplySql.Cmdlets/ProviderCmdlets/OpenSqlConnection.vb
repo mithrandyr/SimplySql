@@ -1,4 +1,4 @@
-﻿Imports SimplySql.Common
+﻿
 
 <Cmdlet(VerbsCommon.Open, "SQLConnection", DefaultParameterSetName:="default")>
 Public Class OpenSqlConnection
@@ -55,7 +55,7 @@ Public Class OpenSqlConnection
                 Engine.Logic.CloseAndRemoveConnection(ConnectionName)
             End If
 
-            Dim connDetail As New ConnectionMSSQL(ConnectionName, CommandTimeout)
+            Dim connDetail As New Engine.ConnectionMSSQL(ConnectionName, CommandTimeout)
             Select Case Me.ParameterSetName
                 Case "credential"
                     connDetail.SetAuthCredential(Credential, AzureAD.IsPresent)

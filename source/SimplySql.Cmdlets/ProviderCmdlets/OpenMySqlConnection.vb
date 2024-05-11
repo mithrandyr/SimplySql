@@ -1,6 +1,4 @@
-﻿Imports SimplySql.Common
-
-<Cmdlet(VerbsCommon.Open, "MySqlConnection", DefaultParameterSetName:="default")>
+﻿<Cmdlet(VerbsCommon.Open, "MySqlConnection", DefaultParameterSetName:="default")>
 Public Class OpenMySqlConnection
     Inherits PSCmdlet
 
@@ -31,7 +29,8 @@ Public Class OpenMySqlConnection
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
     <PSDefaultValue(Value:="Preferred")>
-    Public Property SSLMode As Common.SslMode = SslMode.Preferred
+    <ValidateSet("Disabled", "Preferred", "Required", "VerifyCA", "VerifyFull")>
+    Public Property SSLMode As String = "Preferred"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=2)>
     <Parameter(ParameterSetName:="conn", ValueFromPipelineByPropertyName:=True)>
@@ -50,7 +49,7 @@ Public Class OpenMySqlConnection
                 Engine.Logic.CloseAndRemoveConnection(ConnectionName)
             End If
 
-            Dim connDetail As New ConnectionMySql(ConnectionName, CommandTimeout)
+            Dim connDetail As New Engine.ConnectionMySql(ConnectionName, CommandTimeout)
             If Credential IsNot Nothing Then connDetail.SetAuthCredential(Credential)
 
             If Me.ParameterSetName = "conn" Then

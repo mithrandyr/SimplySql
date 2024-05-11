@@ -5,7 +5,7 @@ Public Class ConnectionMySql
     Public Property Server As String
     Public Property Database As String
     Public Property Port As Integer
-    Public Property SslMode As SslMode
+    Public Property SslMode As String = ""
 
     Sub New(connName As String, cmdTimeout As Integer)
         MyBase.New(connName, ProviderTypes.MySql, cmdTimeout)

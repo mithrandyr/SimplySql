@@ -1,6 +1,4 @@
-﻿Imports SimplySql.Common
-
-<Cmdlet(VerbsCommon.Open, "PostGreConnection", DefaultParameterSetName:="default")>
+﻿<Cmdlet(VerbsCommon.Open, "PostGreConnection", DefaultParameterSetName:="default")>
 Public Class OpenPostGreConnection
     Inherits PSCmdlet
 
@@ -35,7 +33,8 @@ Public Class OpenPostGreConnection
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
     <PSDefaultValue(Value:="Preferred")>
-    Public Property SSLMode As Common.SslMode = SslMode.Preferred
+    <ValidateSet("Disable", "Prefer", "Require", "VerifyCA", "VerifyFull")>
+    Public Property SSLMode As String = "Prefer"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=2)>
     <Parameter(ParameterSetName:="conn", ValueFromPipelineByPropertyName:=True)>
@@ -54,7 +53,7 @@ Public Class OpenPostGreConnection
                 Engine.Logic.CloseAndRemoveConnection(ConnectionName)
             End If
 
-            Dim connDetail As New ConnectionPostGre(ConnectionName, CommandTimeout) With {.Additional = Additional}
+            Dim connDetail As New Engine.ConnectionPostGre(ConnectionName, CommandTimeout) With {.Additional = Additional}
             If Credential IsNot Nothing Then connDetail.SetAuthCredential(Credential)
 
             If Me.ParameterSetName = "conn" Then
