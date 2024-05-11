@@ -33,7 +33,7 @@ Public Class OpenPostGreConnection
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
     <PSDefaultValue(Value:="Preferred")>
-    <ValidateSet("Disable", "Prefer", "Require", "VerifyCA", "VerifyFull")
+    <ValidateSet("Disable", "Prefer", "Require", "VerifyCA", "VerifyFull")>
     Public Property SSLMode As String = "Prefer"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=2)>

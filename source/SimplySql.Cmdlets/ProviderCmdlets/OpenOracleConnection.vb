@@ -53,7 +53,7 @@ Public Class OpenOracleConnection
                 Engine.Logic.CloseAndRemoveConnection(ConnectionName)
             End If
 
-            Dim connDetail As New ConnectionOracle(ConnectionName, CommandTimeout)
+            Dim connDetail As New Engine.ConnectionOracle(ConnectionName, CommandTimeout)
             If Credential IsNot Nothing Then connDetail.SetAuthCredential(Credential)
 
             Select Case ParameterSetName

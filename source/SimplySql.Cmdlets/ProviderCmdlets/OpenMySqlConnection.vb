@@ -1,6 +1,4 @@
-﻿Imports SimplySql.Common
-
-<Cmdlet(VerbsCommon.Open, "MySqlConnection", DefaultParameterSetName:="default")>
+﻿<Cmdlet(VerbsCommon.Open, "MySqlConnection", DefaultParameterSetName:="default")>
 Public Class OpenMySqlConnection
     Inherits PSCmdlet
 
