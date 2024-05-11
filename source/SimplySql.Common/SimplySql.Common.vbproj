@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace>SimplySql.Common</RootNamespace>
@@ -8,5 +8,9 @@
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <AnalysisLevel>latest-minimum</AnalysisLevel>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="ConnectionDetails\" />
+  </ItemGroup>
 
 </Project>

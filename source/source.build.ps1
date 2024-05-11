@@ -14,7 +14,6 @@ task Build {
     exec { dotnet publish "SimplySql.Cmdlets" -c $Configuration -o "output\bin" -p:Version=$Version -p:AssemblyVersion=$version} | HV "Building SimplySql.Cmdlets ($version)" "."
     
     Move-Item "output\bin\SimplySql.Cmdlets.*" -Destination "output"
-    Move-Item "output\bin\SimplySql.Common.*" -Destination "output"
     Move-Item "output\bin\EnumerableToDataReader.dll" -Destination "output"
     Remove-Item "output\bin\" -Exclude "SimplySql.*" -Recurse
 

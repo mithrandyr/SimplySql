@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SimplySql.Common\SimplySql.Common.vbproj" />
     <ProjectReference Include="..\SimplySql.Engine\SimplySql.Engine.vbproj" />
   </ItemGroup>
 

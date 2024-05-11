@@ -7,13 +7,13 @@ Module Dry
     Function ValidateConnection(this As PSCmdlet, connectionName As String, Optional validateIsOpen As Boolean = True) As Boolean
         Dim result = Engine.ConnectionExists(connectionName, validateIsOpen)
         Select Case result
-            Case Common.ValidateConnectionResult.NotFound
+            Case Engine.ValidateConnectionResult.NotFound
                 this.WriteError(New ErrorRecord(New ConnectionNotFound(connectionName), this.MyInvocation.MyCommand.Name, ErrorCategory.ObjectNotFound, connectionName))
                 Return False
-            Case Common.ValidateConnectionResult.NotOpen
+            Case Engine.ValidateConnectionResult.NotOpen
                 this.WriteError(New ErrorRecord(New ConnectionNotOpen(connectionName), this.MyInvocation.MyCommand.Name, ErrorCategory.ResourceUnavailable, connectionName))
                 Return False
-            Case Common.ValidateConnectionResult.Found, Common.ValidateConnectionResult.Open
+            Case Engine.ValidateConnectionResult.Found, Engine.ValidateConnectionResult.Open
                 Return True
             Case Else
                 Throw New NotImplementedException($"ValidateConnectionResult '{result}' is not implemented!")

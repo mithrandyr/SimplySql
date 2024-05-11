@@ -31,10 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SimplySql.Common\SimplySql.Common.vbproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Import Include="SimplySql.Common" />
   </ItemGroup>
 
