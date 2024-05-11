@@ -3,7 +3,6 @@ Imports System.Data
 Imports System.Data.Common
 Imports System.Runtime.CompilerServices
 Imports System.Security.Cryptography
-Imports Microsoft.Data.SqlClient
 Imports NetTopologySuite.Geometries
 Imports Npgsql
 
@@ -125,21 +124,8 @@ Public Class PostGreProvider
 
         Return New PostGreProvider(connDetail.ConnectionName, connDetail.CommandTimeout, dsBuilder.Build.CreateConnection())
     End Function
-    Private Shared Function MapSslMode(input As Common.SslMode) As SslMode
-        Select Case input
-            Case Common.SslMode.Disabled
-                Return SslMode.Disable
-            Case Common.SslMode.Preferred
-                Return SslMode.Prefer
-            Case Common.SslMode.Required
-                Return SslMode.Require
-            Case Common.SslMode.VerifyCA
-                Return SslMode.VerifyCA
-            Case Common.SslMode.VerifyFull
-                Return SslMode.VerifyFull
-            Case Else
-                Throw New InvalidOperationException($"'{input}' is not a valid SSLMode option for the PostGre provider (npgsql).")
-        End Select
+    Private Shared Function MapSslMode(ssl As String) As SslMode
+        Return [Enum].Parse(GetType(SslMode), ssl)
     End Function
 #End Region
 End Class

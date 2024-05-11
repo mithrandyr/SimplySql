@@ -5,7 +5,7 @@ Public Class ConnectionPostGre
     Public Property Host As String
     Public Property Port As Integer
     Public Property Database As String
-    Public Property SslMode As SslMode
+    Public Property SslMode As String = ""
     Public Property MaxAutoPrepare As Integer
 
     Sub New(connName As String, cmdTimeout As Integer)
