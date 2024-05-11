@@ -29,7 +29,9 @@ Public Class ContextHandling
         Dim asmName = New AssemblyName(args.Name)
         Dim asmPath As String = String.Empty
 
+#If DEBUG Then
         Console.WriteLine($"{Environment.NewLine}ASSEMBLY LOAD: '{asmName}' BECAUSE '{args.RequestingAssembly}'{Environment.NewLine}")
+#End If
 
         If asmName.Name.Equals("SimplySql.Engine", StringComparison.OrdinalIgnoreCase) Then
             IsEngineLoaded = True
