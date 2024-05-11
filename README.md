@@ -38,14 +38,18 @@ This module requires PowerShell Version 5.0 or greater
 ## Database Providers
 
 - Microsoft Sql Server : [Microsoft.Data.SqlClient 5.1.5](https://www.nuget.org/packages/Microsoft.Data.SqlClient/5.1.5)
-- MySQL : [MySqlConnector 2.3.5](https://www.nuget.org/packages/MySqlConnector/2.3.5)
-- Oracle : [Oracle.ManagedDataAccess.Core 2.19.220](https://www.nuget.org/packages/Oracle.ManagedDataAccess.Core/2.19.220) (this is the latest version supporting .NET Standard 2.0)
+- MySQL : [MySqlConnector 2.3.7](https://www.nuget.org/packages/MySqlConnector/2.3.7)
+- Oracle : [Oracle.ManagedDataAccess.Core 2.19.230](https://www.nuget.org/packages/Oracle.ManagedDataAccess.Core/2.19.230) (this is the latest version supporting .NET Standard 2.0)
 - SQLite : [System.Data.SQLite.Core 1.0.118](https://www.nuget.org/packages/System.Data.SQLite.Core/1.0.118)
-- PostgreSQL : [Npgsql (8.0.1)](https://www.nuget.org/packages/Npgsql/8.0.1)
+- PostgreSQL : [Npgsql (8.0.3)](https://www.nuget.org/packages/Npgsql/8.0.3)
 
 ## Latest Version
 
-### 2.0.67
+## 2.0.3
+* Providers updated.
+* Minor changes to -Privilege and -SSLMode (Oracle and MySql/PostGre respectively), changed from ENUM to STRING
+
+### 2.0.0
 * First release to support Windows PowerShell 5.1, PS Core and PS7.
 * Migrated the base provider class to .Net & all providers
 * Updated to latest versions of providers (that support .NET Standard 2.0)
