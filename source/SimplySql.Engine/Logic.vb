@@ -1,6 +1,4 @@
-﻿Imports SimplySql.Common
-
-Public Module Logic
+﻿Public Module Logic
     ReadOnly Property Connections As New Dictionary(Of String, ISimplySqlProvider)
 
     Function ConnectionExists(connectionName As String, Optional checkIsOpen As Boolean = True) As ValidateConnectionResult

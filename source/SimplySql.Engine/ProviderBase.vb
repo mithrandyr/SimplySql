@@ -2,7 +2,7 @@
 Imports System.Data
 Imports System.Data.Common
 Imports System.Threading
-Imports SimplySql.Common
+
 Public MustInherit Class ProviderBase
     Implements ISimplySqlProvider
     Public ReadOnly Property ConnectionName As String Implements ISimplySqlProvider.ConnectionName
@@ -296,4 +296,10 @@ Public MustInherit Class ProviderBase
     End Structure
 End Class
 
-
+Public Enum ProviderTypes
+    PostGre
+    Oracle
+    MySql
+    MSSQL
+    SQLite
+End Enum
