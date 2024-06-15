@@ -99,7 +99,27 @@ Public MustInherit Class ProviderBase
                 Using dr As IDataReader = cmd.ExecuteReader
                     Do
                         Dim dt As New DataTable
-                        dt.Load(dr)
+                        Dim nameList As New Dictionary(Of String, Integer)
+                        For i As Integer = 0 To dr.FieldCount - 1
+                            Dim n As String = dr.GetName(i)
+                            Dim ni As Integer = 0
+                            If nameList.TryGetValue(n, ni) Then
+                                nameList(n) += 1
+                                n += ni.ToString
+                            Else
+                                nameList.Add(n, 1)
+                            End If
+                            dt.Columns.Add(n, dr.GetFieldType(i))
+                        Next
+
+                        ' Read data and add rows
+                        While dr.Read()
+                            Dim row As DataRow = dt.NewRow()
+                            For i As Integer = 0 To dr.FieldCount - 1
+                                row(i) = dr(i)
+                            Next
+                            dt.Rows.Add(row)
+                        End While
                         If dt.Rows.Count > 0 Then ds.Tables.Add(dt)
                     Loop While Not dr.IsClosed AndAlso dr.NextResult()
                 End Using
