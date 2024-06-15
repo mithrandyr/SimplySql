@@ -30,6 +30,7 @@ Describe "MySql" {
                         DROP TABLE IF EXISTS $db.tmpTable;
                         DROP TABLE IF EXISTS $db.tmpTable2;
                         DROP TABLE IF EXISTS $db.tmpTable3;
+                        DROP TABLE IF EXISTS $db.tmpPK;
                         DROP VIEW IF EXISTS $db.generator_64k;
                         DROP VIEW IF EXISTS $db.generator_256;
                         DROP VIEW IF EXISTS $db.generator_16;"
@@ -84,6 +85,32 @@ Describe "MySql" {
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 1000
+    }
+
+    It "Invoke-SqlQuery (with Primary Key)" {
+        Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2));" | Out-Null
+        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1" | Out-Null
+        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 2" | Out-Null
+        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'B', 3" | Out-Null
+
+        Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
+            Measure-Object |
+            Select-Object -ExpandProperty Count |
+            Should -Be 3
+    }
+    
+    It "Invoke-SqlQuery (multiple columns of same name)" {
+        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a"
+        $val.a | Should -Be 1
+        $val.a1 | Should -Be 2
+        $val.a2 | Should -Be 3
+    }
+
+    It "Invoke-SqlQuery (multiple columns of same name) -stream" {
+        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a" -Stream
+        $val.a | Should -Be 1
+        $val.a1 | Should -Be 2
+        $val.a2 | Should -Be 3
     }
 
     It "Invoke-SqlQuery -stream" {

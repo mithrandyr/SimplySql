@@ -9,7 +9,7 @@ Describe "Oracle" {
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
     AfterAll {
         Open-OracleConnection -DataSource $srvName -ServiceName xe -Credential $c
-        foreach($tbl in @("transactionTest", "tmpTable", "tmpTable2","t")) {
+        foreach($tbl in @("transactionTest", "tmpTable", "tmpTable2","t", "tmpPK")) {
             $query = "BEGIN
                     EXECUTE IMMEDIATE 'DROP TABLE $tbl';
                 EXCEPTION
@@ -77,6 +77,32 @@ Describe "Oracle" {
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 1000
+    }
+
+    It "Invoke-SqlQuery (with Primary Key)" {
+        Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2))" | Out-Null
+        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1 FROM dual" | Out-Null
+        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 2 FROM dual" | Out-Null
+        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'B', 3 FROM dual" | Out-Null
+
+        Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
+            Measure-Object |
+            Select-Object -ExpandProperty Count |
+            Should -Be 3
+    }
+
+    It "Invoke-SqlQuery (multiple columns of same name)" {
+        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a FROM dual"
+        $val.a | Should -Be 1
+        $val.a1 | Should -Be 2
+        $val.a2 | Should -Be 3
+    }
+
+    It "Invoke-SqlQuery (multiple columns of same name) -stream" {
+        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a FROM dual" -Stream
+        $val.a | Should -Be 1
+        $val.a1 | Should -Be 2
+        $val.a2 | Should -Be 3
     }
 
     It "Invoke-SqlQuery -stream" {

@@ -8,8 +8,12 @@ Public Class DataReaderToPSObject
             Dim columns = map.CreateMappings(theDataReader)
             While theDataReader.Read
                 Dim pso As New PSObject
-
+                Dim nameList As New Dictionary(Of String, Integer)
                 For Each col In columns
+
+
+
+
                     If theDataReader.IsDBNull(col.Ordinal) Then
                         pso.Properties.Add(New PSNoteProperty(col.Name, Nothing), True)
                     Else
@@ -62,7 +66,18 @@ Public Class DataReaderToPSObject
         Public Name As String
         Public Type As String
         Shared Function CreateMappings(dr As IDataReader) As Generic.List(Of map)
-            Return Linq.Enumerable.Range(0, dr.FieldCount).Select(Function(ord) New map With {.Ordinal = ord, .Name = dr.GetName(ord), .Type = dr.GetFieldType(ord).ToString}).ToList
+            Dim nameList As New Dictionary(Of String, Integer)
+            Return Linq.Enumerable.Range(0, dr.FieldCount).Select(Function(ord)
+                                                                      Dim n As String = dr.GetName(ord)
+                                                                      Dim ni As Integer
+                                                                      If nameList.TryGetValue(n, ni) Then
+                                                                          nameList(n) += 1
+                                                                          n += ni.ToString
+                                                                      Else
+                                                                          nameList.Add(n, 1)
+                                                                      End If
+                                                                      Return New map With {.Ordinal = ord, .Name = n, .Type = dr.GetFieldType(ord).ToString}
+                                                                  End Function).ToList
         End Function
 
         Shared Function CreateFunction(dr As IDataReader) As Func(Of IDataRecord, PSObject)
