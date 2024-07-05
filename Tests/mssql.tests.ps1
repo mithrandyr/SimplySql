@@ -82,10 +82,10 @@ Describe "MSSQL" {
     }
     
     It "Invoke-SqlQuery (with Primary Key)" {
-        Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2));" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 2" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'B', 3" | Out-Null
+        Invoke-SqlUpdate -Query "CREATE TABLE #tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2));" | Out-Null
+        Invoke-SqlUpdate -Query "INSERT INTO #tmpPK SELECT 'A', 1" | Out-Null
+        Invoke-SqlUpdate -Query "INSERT INTO #tmpPK SELECT 'A', 2" | Out-Null
+        Invoke-SqlUpdate -Query "INSERT INTO #tmpPK SELECT 'B', 3" | Out-Null
 
         Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
             Measure-Object |
