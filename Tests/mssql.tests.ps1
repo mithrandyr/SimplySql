@@ -87,7 +87,7 @@ Describe "MSSQL" {
         Invoke-SqlUpdate -Query "INSERT INTO #tmpPK SELECT 'A', 2" | Out-Null
         Invoke-SqlUpdate -Query "INSERT INTO #tmpPK SELECT 'B', 3" | Out-Null
 
-        Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
+        Invoke-SqlQuery -Query "SELECT col1 FROM #tmpPK" |
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 3
@@ -119,9 +119,29 @@ Describe "MSSQL" {
         Open-SqlConnection @connHT -ConnectionName bcp 
         Set-SqlConnection -Database test -ConnectionName bcp
         
+        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 |
+        Should -Be 65536
+    }
+
+    It "Invoke-SqlBulkCopy (with -Notify)" {
+        Invoke-SqlUpdate -Query "SELECT * INTO tmpTable20 FROM tmpTable WHERE 1=2"
+        Open-SqlConnection @connHT -ConnectionName bcp 
+        Set-SqlConnection -Database test -ConnectionName bcp
+        
         Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |
         Should -Be 65536
     }
+    
+    It "Invoke-SqlBulkCopy (with -NotifyAction)" {
+        Invoke-SqlUpdate -Query "SELECT * INTO tmpTable10 FROM tmpTable WHERE 1=2"
+        Open-SqlConnection @connHT -ConnectionName bcp 
+        Set-SqlConnection -Database test -ConnectionName bcp
+        
+        $result = @{val = 0}
+        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -NotifyAction {param($rows) $result.val = $rows }
+        $result.val | Should -Be 65536
+    }
+
 
     Context "Transaction..." {
         It "Invoke-SqlBulkCopy" {

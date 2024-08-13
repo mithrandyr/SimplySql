@@ -15,22 +15,24 @@ Executes a bulk copy between two connections.
 ### hashtable (Default)
 ```
 Invoke-SqlBulkCopy [-SourceConnectionName <String>] [-DestinationConnectionName <String>]
- [-ColumnMap <Hashtable>] [-BatchSize <Int32>] [-BatchTimeout <Int32>] [-Notify] [-WhatIf] [-Confirm]
- [<CommonParameters>]
+ [-ColumnMap <Hashtable>] [-BatchSize <Int32>] [-BatchTimeout <Int32>] [-Notify]
+ [-NotifyAction <System.Action`1[System.Int64]>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### table
 ```
 Invoke-SqlBulkCopy [-SourceConnectionName <String>] [-DestinationConnectionName <String>]
  [-DestinationTable <String>] -SourceTable <String> [-ColumnMap <Hashtable>] [-BatchSize <Int32>]
- [-BatchTimeout <Int32>] [-Notify] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-BatchTimeout <Int32>] [-Notify] [-NotifyAction <System.Action`1[System.Int64]>] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
 ```
 
 ### query
 ```
 Invoke-SqlBulkCopy [-SourceConnectionName <String>] [-DestinationConnectionName <String>]
  -DestinationTable <String> -SourceQuery <String[]> [-SourceParameters <Hashtable>] [-ColumnMap <Hashtable>]
- [-BatchSize <Int32>] [-BatchTimeout <Int32>] [-Notify] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-BatchSize <Int32>] [-BatchTimeout <Int32>] [-Notify] [-NotifyAction <System.Action`1[System.Int64]>]
+ [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -148,6 +150,22 @@ If present, as each batch completes a progress notification will be generated wi
 
 ```yaml
 Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -NotifyAction
+Provide a scriptblock to be executed after every BatchSize number of rows are inserted.
+Scriptblock will be called with the number of rows inserted so far.
+
+```yaml
+Type: System.Action`1[System.Int64]
 Parameter Sets: (All)
 Aliases:
 

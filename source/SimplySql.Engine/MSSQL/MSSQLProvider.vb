@@ -65,6 +65,8 @@ Public Class MSSQLProvider
                 End If
 
                 bcp.WriteToServer(dataReader)
+
+                If notify IsNot Nothing Then notify.Invoke(bcp.RowsCopied)
                 Return bcp.RowsCopied
             End Using
         End Using
