@@ -29,7 +29,7 @@ Public Class OpenMySqlConnection
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True)>
     <PSDefaultValue(Value:="Preferred")>
-    <ValidateSet("Disabled", "Preferred", "Required", "VerifyCA", "VerifyFull")>
+    <ValidateSet("None", "Preferred", "Required", "VerifyCA", "VerifyFull")>
     Public Property SSLMode As String = "Preferred"
 
     <Parameter(ParameterSetName:="default", ValueFromPipelineByPropertyName:=True, Position:=2)>

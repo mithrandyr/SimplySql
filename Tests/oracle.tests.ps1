@@ -1,6 +1,6 @@
 Describe "Oracle" {
     BeforeAll {
-        $srvName = "xbags"
+        $srvName = $env:COMPUTERNAME
         $u = "hr"
         $p = "hr"
         $c = [pscredential]::new($u, (ConvertTo-SecureString -Force -AsPlainText $p))        
@@ -117,6 +117,22 @@ Describe "Oracle" {
     }
 
     It "Invoke-SqlBulkCopy" -Tag bulkcopy {
+        $query = "SELECT dbms_random.random /1000000000000. AS colDec
+                , dbms_random.random AS colInt
+                , dbms_random.string('x',20) AS colText
+            FROM dual
+            CONNECT BY ROWNUM <= 65536"
+        
+        Open-OracleConnection -ConnectionName bcp -DataSource $srvName -ServiceName xe -Credential $c
+        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
+
+        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 |
+            Should -Be 65536
+        
+        Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"
+    }
+
+    It "Invoke-SqlBulkCopy (with -Notify)" -Tag bulkcopy {
         $query = "SELECT dbms_random.random /1000000000000. AS colDec
                 , dbms_random.random AS colInt
                 , dbms_random.string('x',20) AS colText

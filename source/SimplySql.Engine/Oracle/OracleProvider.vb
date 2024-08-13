@@ -76,7 +76,7 @@ Public Class OracleProvider
                 Dim rowsCopied As Long = 0
                 AddHandler bcp.OracleRowsCopied, Sub(sender As Object, e As OracleRowsCopiedEventArgs)
                                                      rowsCopied += 1
-                                                     If rowsCopied Mod batchSize = 0 Then
+                                                     If rowsCopied Mod batchSize = 0 AndAlso notify IsNot Nothing Then
                                                          notify.Invoke(rowsCopied)
                                                      End If
                                                  End Sub

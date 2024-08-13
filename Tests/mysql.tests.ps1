@@ -1,6 +1,6 @@
 Describe "MySql" {
     BeforeAll {
-        $srvName = "xbags"
+        $srvName = $env:COMPUTERNAME
         $u = "root"
         $p = "root"
         $db = "mysql"
@@ -29,6 +29,8 @@ Describe "MySql" {
         Invoke-SqlUpdate "DROP TABLE IF EXISTS transactionTest;
                         DROP TABLE IF EXISTS $db.tmpTable;
                         DROP TABLE IF EXISTS $db.tmpTable2;
+                        DROP TABLE IF EXISTS $db.tmpTable20;
+                        DROP TABLE IF EXISTS $db.tmpTable21;
                         DROP TABLE IF EXISTS $db.tmpTable3;
                         DROP TABLE IF EXISTS $db.tmpPK;
                         DROP VIEW IF EXISTS $db.generator_64k;
@@ -134,8 +136,35 @@ Describe "MySql" {
         Open-MySqlConnection -ConnectionName bcp -Server $srvName -Database mysql -Credential $c
         Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable2 (colDec REAL, colInt INTEGER, colText TEXT)"
 
-        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable2" -Notify |
+        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable2" |
             Should -Be 65536
+    }
+
+    It "Invoke-SqlBulkCopy (with -Notify)" {
+        $query = "SELECT rand() AS colDec
+                , CAST(rand() * 1000000000 AS SIGNED) AS colInt
+                , uuid() AS colText
+            FROM $db.generator_64k"
+        
+        Open-MySqlConnection -ConnectionName bcp -Server $srvName -Database mysql -Credential $c
+        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable20 (colDec REAL, colInt INTEGER, colText TEXT)"
+
+        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable20" -Notify |
+            Should -Be 65536
+    }
+
+    It "Invoke-SqlBulkCopy (with -NotifyAction)" {
+        $query = "SELECT rand() AS colDec
+                , CAST(rand() * 1000000000 AS SIGNED) AS colInt
+                , uuid() AS colText
+            FROM $db.generator_64k"
+        
+        Open-MySqlConnection -ConnectionName bcp -Server $srvName -Database mysql -Credential $c
+        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable21 (colDec REAL, colInt INTEGER, colText TEXT)"
+
+        $result = @{val = 0}
+        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable21" -NotifyAction {param($rows) $result.val = $rows }
+        $result.val | Should -Be 65536
     }
 
     Context "Transaction..." {
