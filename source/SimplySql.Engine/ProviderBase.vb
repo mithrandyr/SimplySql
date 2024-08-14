@@ -228,6 +228,7 @@ Public MustInherit Class ProviderBase
                 End Try
             End Using
         End Using
+        If notify IsNot Nothing Then notify.Invoke(batchIteration)
         Return batchIteration
     End Function
 

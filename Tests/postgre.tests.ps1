@@ -1,9 +1,9 @@
 Describe "PostGre" {
     BeforeEach { Open-PostGreConnection -Server $srvName -Database $db -Credential $c }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
-    BeforeAll{
+    BeforeAll {
         #warm up connection
-        $srvName = "xbags"
+        $srvName = $env:COMPUTERNAME
         $u = "postgres"
         $p = "postgres"
         $db = "postgres"
@@ -13,7 +13,7 @@ Describe "PostGre" {
     }
     AfterAll {
         Open-PostGreConnection -Server $srvName -Database $db -Credential $c
-        Invoke-SqlUpdate "DROP TABLE IF EXISTS transactionTest, tmpTable, tmpTable2, t, tmpPK;"
+        Invoke-SqlUpdate "DROP TABLE IF EXISTS transactionTest, tmpTable, tmpTable2, tmpTable21, tmpTable22, t, tmpPK;"
         Close-SqlConnection
     }
 
@@ -35,13 +35,6 @@ Describe "PostGre" {
         Invoke-SqlScalar -Query "SELECT Now()" | Should -BeOfType System.DateTime
     }
 
-    It "Invoke-SqlQuery (No ResultSet Warning)" {
-        Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
-        Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
-        Invoke-SqlUpdate -Query "DROP TABLE temp"
-        $w | Should -BeLike "Query returned no resultset.*"
-    }
-
     It "Invoke-SqlUpdate" {
         Invoke-SqlUpdate -Query "CREATE TABLE tmpTable (colDec decimal, colInt Int, colText varchar(50))"
         Invoke-SqlUpdate -Query ";WITH a(n) AS (SELECT 1 UNION ALL SELECT 1)
@@ -57,53 +50,81 @@ Describe "PostGre" {
                     , CAST(Random() AS VARCHAR(50)) AS colText                
                 FROM tally" | Should -Be 65536
     }
-
-    It "Invoke-SqlQuery" {
-        Invoke-SqlQuery -Query "SELECT * FROM tmpTable LIMIT 1000" |
+    Context "Invoke-SqlQuery" {
+        It "No ResultSet Warning" {
+            Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
+            Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
+            Invoke-SqlUpdate -Query "DROP TABLE temp"
+            $w | Should -BeLike "Query returned no resultset.*"
+        }
+        It "Normal" {
+            Invoke-SqlQuery -Query "SELECT * FROM tmpTable LIMIT 1000" |
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 1000
-    }
+        }
 
-    It "Invoke-SqlQuery (with Primary Key)" {
-        Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2));" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 2" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'B', 3" | Out-Null
+        It "With Primary Key" {
+            Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2));" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 2" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'B', 3" | Out-Null
 
-        Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
+            Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 3
-    }
+        }
 
-    It "Invoke-SqlQuery (multiple columns of same name)" {
-        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a"
-        $val.a | Should -Be 1
-        $val.a1 | Should -Be 2
-        $val.a2 | Should -Be 3
-    }
+        It "Multiple columns of same name" {
+            $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a"
+            $val.a | Should -Be 1
+            $val.a1 | Should -Be 2
+            $val.a2 | Should -Be 3
+        }
 
-    It "Invoke-SqlQuery (multiple columns of same name) -stream" {
-        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a" -Stream
-        $val.a | Should -Be 1
-        $val.a1 | Should -Be 2
-        $val.a2 | Should -Be 3
-    }
+        It "Multiple columns of same name With -stream" {
+            $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a" -Stream
+            $val.a | Should -Be 1
+            $val.a1 | Should -Be 2
+            $val.a2 | Should -Be 3
+        }
 
-    It "Invoke-SqlQuery -stream" {
-        Invoke-SqlQuery -Query "SELECT * FROM tmpTable LIMIT 1000" -Stream |
+        It "With -stream" {
+            Invoke-SqlQuery -Query "SELECT * FROM tmpTable LIMIT 1000" -Stream |
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 1000
+        }
     }
-
-    It "Invoke-SqlBulkCopy" {
-        Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
-        Open-PostGreConnection -Server $srvName -Database $db -ConnectionName bcp -Credential $c
-        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |
+    
+    Context "Invoke-SqlBulkCopy" {
+        It "Normal" {
+            Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
+            Open-PostGreConnection -Server $srvName -Database $db -ConnectionName bcp -Credential $c
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 |
             Should -Be 65536
-        Close-SqlConnection -ConnectionName bcp
+            Close-SqlConnection -ConnectionName bcp
+        }
+        
+        It "With -Notify" {
+            Invoke-SqlUpdate -Query "SELECT * INTO tmpTable21 FROM tmpTable WHERE 1=2"
+            Open-PostGreConnection -Server $srvName -Database $db -ConnectionName bcp -Credential $c
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable21 -Notify |
+            Should -Be 65536
+            Close-SqlConnection -ConnectionName bcp
+        }
+
+        It "With -NotifyAction" {
+            Invoke-SqlUpdate -Query "SELECT * INTO tmpTable22 FROM tmpTable WHERE 1=2"
+            Open-PostGreConnection -Server $srvName -Database $db -ConnectionName bcp -Credential $c
+            
+            $result = @{val = 0 }
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable22 -NotifyAction { param($rows) $result.val = $rows }
+            $result.val | Should -Be 65536
+
+            Close-SqlConnection -ConnectionName bcp
+        }
     }
 
     Context "Transaction..." {
@@ -113,27 +134,27 @@ Describe "PostGre" {
             Start-SqlTransaction -ConnectionName bcp
             Invoke-SqlUpdate -Query "SELECT * INTO tmpTable3 FROM tmpTable WHERE 1=2" -ConnectionName bcp
             { Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable3 -Notify |
-                Should -Be 65536} | Should -Not -Throw
+                Should -Be 65536 } | Should -Not -Throw
             Undo-SqlTransaction -ConnectionName bcp
 
-            { Invoke-SqlScalar -ConnectionName bcp -Query "SELECT COUNT(1) FROM tmpTable3" -ea Stop} | Should -Throw
+            { Invoke-SqlScalar -ConnectionName bcp -Query "SELECT COUNT(1) FROM tmpTable3" -ea Stop } | Should -Throw
         }
 
         It "Invoke-SqlScalar" {
             Start-SqlTransaction
-            { Invoke-SqlScalar "SELECT 1" -ea Stop} | Should -Not -Throw
+            { Invoke-SqlScalar "SELECT 1" -ea Stop } | Should -Not -Throw
             Undo-SqlTransaction
         }
 
         It "Invoke-SqlQuery" {
             Start-SqlTransaction
-            { Invoke-SqlScalar "SELECT 1" -ea Stop} | Should -Not -Throw
+            { Invoke-SqlScalar "SELECT 1" -ea Stop } | Should -Not -Throw
             Undo-SqlTransaction
         }
 
         It "Invoke-SqlUpdate" {
             Start-SqlTransaction
-            { Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)" -ea Stop} | Should -Not -Throw
+            { Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)" -ea Stop } | Should -Not -Throw
             Undo-SqlTransaction
             { Invoke-SqlScalar "SELECT 1 FROM transactionTest" -ea Stop } | Should -Throw
         }
@@ -142,14 +163,14 @@ Describe "PostGre" {
     Context "PipelineInput..." {
         It "Invoke-SqlScalar" {
             {
-                [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
+                [PSCustomObject]@{Name = "test" } | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
                 Get-ChildItem | Invoke-SqlScalar "SELECT @Name " -ErrorAction Stop
             } | Should -Not -Throw
         }
 
         It "Invoke-SqlQuery" {
             {
-                [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
+                [PSCustomObject]@{Name = "test" } | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
                 Get-ChildItem | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
             } | Should -Not -Throw
         }
@@ -157,7 +178,7 @@ Describe "PostGre" {
         It "Invoke-SqlScalar" {
             {
                 Invoke-SqlUpdate "CREATE TABLE t(x varchar(255))" -ErrorAction Stop
-                [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "INSERT INTO t SELECT @Name" -ErrorAction Stop
+                [PSCustomObject]@{Name = "test" } | Invoke-SqlUpdate "INSERT INTO t SELECT @Name" -ErrorAction Stop
                 Get-ChildItem | Invoke-SqlScalar "INSERT INTO t SELECT @Name"-ErrorAction Stop
                 Invoke-SqlUpdate "DROP TABLE t" -ErrorAction Stop
             } | Should -Not -Throw
@@ -166,7 +187,7 @@ Describe "PostGre" {
 
     Context "Validations..." {
         It "Handles JSON as PSObject" {
-            Invoke-SqlScalar "SELECT @json" -Parameters @{json = (1..5 | ConvertTo-Json -Compress)} | Should -Be "[1,2,3,4,5]"
+            Invoke-SqlScalar "SELECT @json" -Parameters @{json = (1..5 | ConvertTo-Json -Compress) } | Should -Be "[1,2,3,4,5]"
         }
     }
 }

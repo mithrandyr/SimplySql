@@ -59,26 +59,27 @@ Describe "MySql" {
         Invoke-SqlScalar -Query "SELECT Now()" | Should -BeOfType System.DateTime
     }
 
-    It "Invoke-SqlQuery (No ResultSet Warning)" {
-        Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
-        Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
-        Invoke-SqlUpdate -Query "DROP TABLE temp"
-        $w | Should -BeLike "Query returned no resultset.*"
-    }
-
     It "Invoke-SqlUpdate" {
         Invoke-SqlUpdate -Query "
-            CREATE TABLE $db.tmpTable (colDec REAL, colInt Int, colText varchar(36));
-            INSERT INTO $db.tmpTable
-                SELECT rand() AS colDec
-                    , CAST(rand() * 1000000000 AS SIGNED) AS colInt
-                    , uuid() AS colText
-                FROM $db.generator_64k" | Should -Be 65536
-        
+        CREATE TABLE $db.tmpTable (colDec REAL, colInt Int, colText varchar(36));
+        INSERT INTO $db.tmpTable
+            SELECT rand() AS colDec
+                , CAST(rand() * 1000000000 AS SIGNED) AS colInt
+                , uuid() AS colText
+            FROM $db.generator_64k" | Should -Be 65536
+    
     }
 
-    It "Invoke-SqlQuery" {
-        Invoke-SqlQuery -Query "
+    Context "Invoke-SqlQuery" {
+        It "No ResultSet Warning" {
+            Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
+            Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
+            Invoke-SqlUpdate -Query "DROP TABLE temp"
+            $w | Should -BeLike "Query returned no resultset.*"
+        }
+
+        It "Normal" {
+            Invoke-SqlQuery -Query "
             SELECT rand() AS colDec
                 , CAST(rand() * 1000000000 AS SIGNED) AS colInt
                 , uuid() AS colText
@@ -87,36 +88,36 @@ Describe "MySql" {
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 1000
-    }
+        }
 
-    It "Invoke-SqlQuery (with Primary Key)" {
-        Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2));" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 2" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'B', 3" | Out-Null
+        It "With Primary Key" {
+            Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2));" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 2" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'B', 3" | Out-Null
 
-        Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
+            Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 3
-    }
+        }
     
-    It "Invoke-SqlQuery (multiple columns of same name)" {
-        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a"
-        $val.a | Should -Be 1
-        $val.a1 | Should -Be 2
-        $val.a2 | Should -Be 3
-    }
+        It "Multiple columns of same name" {
+            $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a"
+            $val.a | Should -Be 1
+            $val.a1 | Should -Be 2
+            $val.a2 | Should -Be 3
+        }
 
-    It "Invoke-SqlQuery (multiple columns of same name) -stream" {
-        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a" -Stream
-        $val.a | Should -Be 1
-        $val.a1 | Should -Be 2
-        $val.a2 | Should -Be 3
-    }
+        It "Multiple columns of same name With -stream" {
+            $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a" -Stream
+            $val.a | Should -Be 1
+            $val.a1 | Should -Be 2
+            $val.a2 | Should -Be 3
+        }
 
-    It "Invoke-SqlQuery -stream" {
-        Invoke-SqlQuery -Query "
+        It "With -stream" {
+            Invoke-SqlQuery -Query "
             SELECT rand() AS colDec
                 , CAST(rand() * 1000000000 AS SIGNED) AS colInt
                 , uuid() AS colText
@@ -125,46 +126,49 @@ Describe "MySql" {
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 1000
+        }
     }
 
-    It "Invoke-SqlBulkCopy" {
-        $query = "SELECT rand() AS colDec
+    Context "Invoke-SqlBulkCopy" {
+        It "Normal" {
+            $query = "SELECT rand() AS colDec
                 , CAST(rand() * 1000000000 AS SIGNED) AS colInt
                 , uuid() AS colText
             FROM $db.generator_64k"
         
-        Open-MySqlConnection -ConnectionName bcp -Server $srvName -Database mysql -Credential $c
-        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable2 (colDec REAL, colInt INTEGER, colText TEXT)"
+            Open-MySqlConnection -ConnectionName bcp -Server $srvName -Database mysql -Credential $c
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable2 (colDec REAL, colInt INTEGER, colText TEXT)"
 
-        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable2" |
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable2" |
             Should -Be 65536
-    }
+        }
 
-    It "Invoke-SqlBulkCopy (with -Notify)" {
-        $query = "SELECT rand() AS colDec
+        It "With -Notify" {
+            $query = "SELECT rand() AS colDec
                 , CAST(rand() * 1000000000 AS SIGNED) AS colInt
                 , uuid() AS colText
             FROM $db.generator_64k"
         
-        Open-MySqlConnection -ConnectionName bcp -Server $srvName -Database mysql -Credential $c
-        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable20 (colDec REAL, colInt INTEGER, colText TEXT)"
+            Open-MySqlConnection -ConnectionName bcp -Server $srvName -Database mysql -Credential $c
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable20 (colDec REAL, colInt INTEGER, colText TEXT)"
 
-        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable20" -Notify |
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable20" -Notify |
             Should -Be 65536
-    }
+        }
 
-    It "Invoke-SqlBulkCopy (with -NotifyAction)" {
-        $query = "SELECT rand() AS colDec
+        It "With -NotifyAction" {
+            $query = "SELECT rand() AS colDec
                 , CAST(rand() * 1000000000 AS SIGNED) AS colInt
                 , uuid() AS colText
             FROM $db.generator_64k"
         
-        Open-MySqlConnection -ConnectionName bcp -Server $srvName -Database mysql -Credential $c
-        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable21 (colDec REAL, colInt INTEGER, colText TEXT)"
+            Open-MySqlConnection -ConnectionName bcp -Server $srvName -Database mysql -Credential $c
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable21 (colDec REAL, colInt INTEGER, colText TEXT)"
 
-        $result = @{val = 0}
-        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable21" -NotifyAction {param($rows) $result.val = $rows }
-        $result.val | Should -Be 65536
+            $result = @{val = 0 }
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable21" -NotifyAction { param($rows) $result.val = $rows }
+            $result.val | Should -Be 65536
+        }
     }
 
     Context "Transaction..." {
@@ -194,14 +198,14 @@ Describe "MySql" {
 
         It "Invoke-SqlQuery" {
             Start-SqlTransaction
-            { Invoke-SqlScalar "SELECT 1" -ea Stop} | Should -Not -Throw
+            { Invoke-SqlScalar "SELECT 1" -ea Stop } | Should -Not -Throw
             Undo-SqlTransaction
         }
 
         It "Invoke-SqlUpdate" {
             Invoke-SqlUpdate "CREATE TABLE transactionTest (id int)"
             Start-SqlTransaction
-            { Invoke-SqlUpdate "INSERT INTO transactionTest VALUES (1)" -ea Stop} | Should -Not -Throw
+            { Invoke-SqlUpdate "INSERT INTO transactionTest VALUES (1)" -ea Stop } | Should -Not -Throw
             Undo-SqlTransaction
             Invoke-SqlScalar "SELECT Count(1) FROM transactionTest" | Should -Be 0
             Invoke-SqlUpdate "DROP TABLE transactionTest"
@@ -211,14 +215,14 @@ Describe "MySql" {
     Context "PipelineInput..." {
         It "Invoke-SqlScalar" {
             {
-                [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
+                [PSCustomObject]@{Name = "test" } | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
                 Get-ChildItem | Invoke-SqlScalar "SELECT @Name" -ErrorAction Stop
             } | Should -Not -Throw
         }
 
         It "Invoke-SqlQuery" {
             {
-                [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
+                [PSCustomObject]@{Name = "test" } | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
                 Get-ChildItem | Invoke-SqlQuery "SELECT @Name" -ErrorAction Stop
             } | Should -Not -Throw
         }
@@ -226,7 +230,7 @@ Describe "MySql" {
         It "Invoke-SqlScalar" {
             {
                 Invoke-SqlUpdate "CREATE TABLE t(x varchar(255))" -ErrorAction Stop
-                [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "INSERT INTO t SELECT @Name" -ErrorAction Stop
+                [PSCustomObject]@{Name = "test" } | Invoke-SqlUpdate "INSERT INTO t SELECT @Name" -ErrorAction Stop
                 Get-ChildItem | Invoke-SqlScalar "INSERT INTO t SELECT @Name"-ErrorAction Stop
                 Invoke-SqlUpdate "DROP TABLE t" -ErrorAction Stop
             } | Should -Not -Throw
@@ -235,7 +239,7 @@ Describe "MySql" {
     
     Context "Validations..." {
         It "Handles JSON as PSObject" {
-            Invoke-SqlScalar "SELECT @json" -Parameters @{json = (1..5 | ConvertTo-Json -Compress)} | Should -Be "[1,2,3,4,5]"
+            Invoke-SqlScalar "SELECT @json" -Parameters @{json = (1..5 | ConvertTo-Json -Compress) } | Should -Be "[1,2,3,4,5]"
         }
     }
 }
