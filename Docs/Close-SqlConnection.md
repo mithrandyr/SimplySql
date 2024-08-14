@@ -23,10 +23,10 @@ Closes the connection and disposes of the underlying object.  This will also rol
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Close-SqlConnection
 ```
 
-{{ Add example description here }}
+Closes the sql connection.
 
 ## PARAMETERS
 

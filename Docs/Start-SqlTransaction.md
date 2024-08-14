@@ -8,7 +8,7 @@ schema: 2.0.0
 # Start-SqlTransaction
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Start a sql transaction.
 
 ## SYNTAX
 
@@ -17,7 +17,7 @@ Start-SqlTransaction [-ConnectionName <String>] [-WhatIf] [-Confirm] [<CommonPar
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Start (BEGIN) a sql transaction.
 
 ## EXAMPLES
 

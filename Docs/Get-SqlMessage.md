@@ -26,10 +26,10 @@ SQL Server, if you use Print or Raiserror without the "NoWait", then messages wi
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Get-SqlMessage
 ```
 
-{{ Add example description here }}
+Returns all the messages in the queue.
 
 ## PARAMETERS
 

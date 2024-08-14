@@ -23,10 +23,10 @@ Gets the underlying provider connection object for the current connection or for
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Get-SqlConnection
 ```
 
-{{ Add example description here }}
+Returns the provider-specific Connection object.
 
 ## PARAMETERS
 

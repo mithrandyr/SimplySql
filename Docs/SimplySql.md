@@ -57,16 +57,16 @@ Open a connection to a SQL Server.
 Open a connection to a SQLite database file.
 
 ### [Set-SqlConnection](Set-SqlConnection.md)
-{{ Fill in the Synopsis }}
+Set options on the SqlConnection.
 
 ### [Show-SqlConnection](Show-SqlConnection.md)
-{{ Fill in the Synopsis }}
+Lists the current SqlConnection.
 
 ### [Start-SqlTransaction](Start-SqlTransaction.md)
-{{ Fill in the Synopsis }}
+Start a sql transaction.
 
 ### [Test-SqlConnection](Test-SqlConnection.md)
-{{ Fill in the Synopsis }}
+Tests to see if there is a connection.
 
 ### [Undo-SqlTransaction](Undo-SqlTransaction.md)
 Undo a SQL transaction.

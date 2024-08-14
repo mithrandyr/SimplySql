@@ -12,14 +12,7 @@ Executes a bulk copy between two connections.
 
 ## SYNTAX
 
-### hashtable (Default)
-```
-Invoke-SqlBulkCopy [-SourceConnectionName <String>] [-DestinationConnectionName <String>]
- [-ColumnMap <Hashtable>] [-BatchSize <Int32>] [-BatchTimeout <Int32>] [-Notify]
- [-NotifyAction <System.Action`1[System.Int64]>] [-WhatIf] [-Confirm] [<CommonParameters>]
-```
-
-### table
+### table (Default)
 ```
 Invoke-SqlBulkCopy [-SourceConnectionName <String>] [-DestinationConnectionName <String>]
  [-DestinationTable <String>] -SourceTable <String> [-ColumnMap <Hashtable>] [-BatchSize <Int32>]
@@ -48,13 +41,6 @@ CONSIDERATIONS
 Returns number of rows copied.
 
 ## EXAMPLES
-
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
-```
-
-{{ Add example description here }}
 
 ## PARAMETERS
 

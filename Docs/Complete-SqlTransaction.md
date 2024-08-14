@@ -23,10 +23,10 @@ Complete (COMMIT) a SQL transaction.
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Complete-SqlTransaction
 ```
 
-{{ Add example description here }}
+Commits the SQL transaction
 
 ## PARAMETERS
 

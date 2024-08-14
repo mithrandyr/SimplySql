@@ -8,7 +8,7 @@ schema: 2.0.0
 # Set-SqlConnection
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Set options on the SqlConnection.
 
 ## SYNTAX
 
@@ -18,7 +18,7 @@ Set-SqlConnection [-ConnectionName <String>] [[-Database] <String>] [-CommandTim
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Set Database and/or Command Timeout for the SqlConnection. Changing the database may not be valid for all providers.
 
 ## EXAMPLES
 
@@ -62,7 +62,7 @@ Accept wildcard characters: False
 ```
 
 ### -Database
-{{ Fill Database Description }}
+The database to connect to.
 
 ```yaml
 Type: String

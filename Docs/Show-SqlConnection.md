@@ -8,7 +8,7 @@ schema: 2.0.0
 # Show-SqlConnection
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Lists the current SqlConnection.
 
 ## SYNTAX
 
@@ -23,7 +23,7 @@ Show-SqlConnection [-All] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Lists the current SqlConnection information or outputs a list of all SqlConnections currently active.
 
 ## EXAMPLES
 
@@ -37,7 +37,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -All
-{{ Fill All Description }}
+If present, will return list of all connection names.
 
 ```yaml
 Type: SwitchParameter
