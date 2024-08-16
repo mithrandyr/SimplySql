@@ -34,7 +34,22 @@ Executes a Scalar query against the targeted connection.  If the sql statement g
 PS C:\> Invoke-SqlScalar -Query "SELECT Count(1) FROM TABLE"
 ```
 
-{{ Add example description here }}
+Simple Scalar query
+
+### Example 2
+```powershell
+PS C:\> Invoke-SqlQuery -Query "SELECT Count(1) FROM TABLE WHERE colb > @someDate" -Parameters @{someDate = (Get-Date)}
+```
+
+Simple Scalar query with parameters
+
+### Example 3
+```powershell
+PS C:\> $obj = [PSCustomObject]@{sd = (Get-date)}
+PS C:\> $obj | Invoke-SqlScalar -Query "SELECT Count(1) FROM TABLE WHERE colb> @sd"
+```
+
+Simple Scalar query with parameters populated by object
 
 ## PARAMETERS
 

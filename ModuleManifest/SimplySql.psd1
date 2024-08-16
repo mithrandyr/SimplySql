@@ -12,7 +12,7 @@
 RootModule = 'SimplySql.Cmdlets.dll'
 
 # Version number of this module.
-ModuleVersion = '2.0.5.81'
+ModuleVersion = '2.0.5.82'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()

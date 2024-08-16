@@ -49,6 +49,14 @@ PS C:\> Invoke-SqlQuery -Query "SELECT * FROM TABLE WHERE col1=@id' AND colb > @
 
 Runs a simple query with parameters
 
+### Example 3
+```powershell
+PS C:\> $obj = [PSCustomObject]@{id = 1; sd = (Get-date)}
+PS C:\> $obj | Invoke-SqlQuery -Query "SELECT * FROM TABLE WHERE col1=@id' AND colb > @someDate"
+```
+
+Runs a simple query, passing in parameters via object
+
 ## PARAMETERS
 
 ### -AsDataTable

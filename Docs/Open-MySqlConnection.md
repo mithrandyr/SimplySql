@@ -35,10 +35,10 @@ MySqlConnector: High Performance .NET MySQL Driver @ https://mysqlconnector.net/
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Open-MySqlConnection -server 'localhost' -database 'DBname' -Credential (Get-Credential)
 ```
 
-{{ Add example description here }}
+Opens a connection to localhost using a credential retrieved from the user.
 
 ## PARAMETERS
 

@@ -42,6 +42,14 @@ PS C:\> Invoke-SqlUpdate -Query "UPDATE employees SET salary = @val WHERE manage
 
 Updates the employee table setting the salary to 999999 for all rows with managerid of 549
 
+### Example 2
+```powershell
+PS C:\> $obj = [PSCustomObject]@{id = 549; val = 999999}
+PS C:\> $obj | Invoke-SqlUpdate -Query "UPDATE employees SET salary = @val WHERE manager = @id"
+```
+
+Updates the employee table setting the salary to 999999 for all rows with managerid of 549 using an object
+
 ## PARAMETERS
 
 ### -Command
