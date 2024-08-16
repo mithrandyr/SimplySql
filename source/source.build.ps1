@@ -18,8 +18,15 @@ task Build {
 
     if(-not $DebugOnly) { $Script:envList += @("win-x86", "linux-x64", "osx-x64")}
     foreach($env in $Script:envList) {
-        exec { dotnet publish "SimplySql.Cmdlets" -c $Configuration -r $env -o "output\bin\$env"} | HV "Building PlatformSpecific Dependencies $env" "."
-        Remove-Item "output\bin\$env" -Include "SimplySql.*" -Recurse
+        #exec { dotnet publish "SimplySql.Cmdlets" -c $Configuration -r $env -o "output\bin\$env"} | HV "Building PlatformSpecific Dependencies $env" "."
+        exec {
+            dotnet publish "SimplySql.Cmdlets" -c $Configuration -r $env -f "net47" -o "output\bin\$env\net47"
+        } | HV "Building PlatformSpecific Dependencies $env" "."
+        exec {
+            dotnet publish "SimplySql.Cmdlets" -c $Configuration -r $env -f "net6.0" -o "output\bin\$env\net6.0"
+        } | HV "Building PlatformSpecific Dependencies $env" "."
+        #exec { dotnet publish "SimplySql.Cmdlets" -c $Configuration -r $env } | HV "Building PlatformSpecific Dependencies $env" "."
+        #Remove-Item "output\bin\$env" -Include "SimplySql.*" -Recurse
     }
 }
 

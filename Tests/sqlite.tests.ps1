@@ -1,3 +1,4 @@
+$ErrorActionPreference = "Stop"
 Describe "SQLite" {
     BeforeEach { Open-SQLiteConnection }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }

@@ -131,7 +131,7 @@ Public Class OracleProvider
         Me.Messages.Enqueue(New SqlMessage(e.Message))
     End Sub
 #Region "Shared"
-    Private Function MapOracleType(netType As String) As OracleDbType
+    Private Shared Function MapOracleType(netType As String) As OracleDbType
         'FROM: https://docs.oracle.com/en/database/oracle///oracle-database/23/odpnt/featOraCommand.html#GUID-BBEF52D9-E4E3-4A9C-93F5-3E408A83FC04
         Select Case netType.ToLower
             Case "system.boolean"

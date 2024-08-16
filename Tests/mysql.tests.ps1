@@ -1,6 +1,8 @@
+$ErrorActionPreference = "Stop"
 Describe "MySql" {
     BeforeAll {
         $srvName = $env:COMPUTERNAME
+        if([string]::IsNullOrWhiteSpace($srvName)) { $srvName = $env:NAME }  #pscore on non-windows
         $u = "root"
         $p = "root"
         $db = "mysql"

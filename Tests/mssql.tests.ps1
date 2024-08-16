@@ -1,13 +1,14 @@
-$ErrorActionPreference
+$ErrorActionPreference = "Stop"
+
 Describe "MSSQL" {
     BeforeAll {
         $srvName = "$($env:COMPUTERNAME)\SQLEXPRESS"
+        if($srvName -eq "\SQLEXPRESS") { $srvName = "$($env:NAME)\SQLEXPRESS" }  #pscore on non-windows
         $c = [pscredential]::new("simplysql", (ConvertTo-SecureString -Force -AsPlainText "simplysql"))
         $connHT = @{
             DataSource = $srvName
             Credential = $c
         }
-        
         Open-SqlConnection @connHT
         Invoke-SqlUpdate "IF EXISTS (SELECT * FROM sys.databases WHERE name = 'test') DROP DATABASE test; CREATE DATABASE test" | Should -Be -1
         Close-SqlConnection

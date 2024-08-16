@@ -1,9 +1,11 @@
+$ErrorActionPreference = "Stop"
 Describe "PostGre" {
     BeforeEach { Open-PostGreConnection -Server $srvName -Database $db -Credential $c }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
     BeforeAll {
         #warm up connection
-        $srvName = $env:COMPUTERNAME
+        $srvName = $env:COMPUTERNAME  #pscore on non-windows
+        if([string]::IsNullOrWhiteSpace($srvName)) { $srvName = $env:NAME }
         $u = "postgres"
         $p = "postgres"
         $db = "postgres"
