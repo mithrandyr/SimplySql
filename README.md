@@ -44,6 +44,13 @@ This module requires PowerShell Version 5.0 or greater
 - PostgreSQL : [Npgsql (8.0.3)](https://www.nuget.org/packages/Npgsql/8.0.3)
 
 ## Latest Version
+## 2.1.0
+* Updated some packages that vulnerabilities
+* Added `-NotifyAction` back in and updated tests to test for this
+* Changed how the `/bin/` folder is built, this should create .NET Framework or .NET Core dlls and hopefully fix the MySqlConnector issue with .NET Standard packages.
+
+## 2.0.4
+* Fixing issue with incorrect query results when querying only some columns of a primary key table
 
 ## 2.0.3
 * Providers updated.
