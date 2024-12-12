@@ -63,6 +63,8 @@ Public Class MySqlProvider
 
             Dim result = bcp.WriteToServer(dataReader)
             result.Warnings.ToList.ForEach(Sub(w) Messages.Enqueue(New SqlMessage(w.Message)))
+
+            If notify IsNot Nothing Then notify.Invoke(result.RowsInserted)
             Return result.RowsInserted
         End Using
     End Function

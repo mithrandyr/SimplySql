@@ -1,3 +1,4 @@
+$ErrorActionPreference = "Stop"
 Describe "SQLite" {
     BeforeEach { Open-SQLiteConnection }
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
@@ -14,13 +15,6 @@ Describe "SQLite" {
     
     It "Invoke-SqlScalar" {
         Invoke-SqlScalar -Query "SELECT 1" | Should -BeOfType System.Int64
-    }
-
-    It "Invoke-SqlQuery (No ResultSet Warning)" {
-        Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
-        Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
-        Invoke-SqlUpdate -Query "DROP TABLE temp"
-        $w | Should -BeLike "Query returned no resultset.*"
     }
 
     It "Invoke-SqlUpdate" {
@@ -40,9 +34,16 @@ Describe "SQLite" {
         
         Invoke-SqlUpdate -Query "DROP TABLE tmpTable" | Out-Null
     }
-
-    It "Invoke-SqlQuery" {
-        Invoke-SqlQuery -Query "WITH a(n) AS (SELECT 1 UNION ALL SELECT 1)
+    
+    Context "Invoke-SqlQuery" {
+        It "No ResultSet Warning" {
+            Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
+            Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
+            Invoke-SqlUpdate -Query "DROP TABLE temp"
+            $w | Should -BeLike "Query returned no resultset.*"
+        }
+        It "Normal" {
+            Invoke-SqlQuery -Query "WITH a(n) AS (SELECT 1 UNION ALL SELECT 1)
                 , b(n) AS (SELECT 1 FROM a CROSS JOIN a AS x)
                 , c(n) AS (SELECT 1 FROM b CROSS JOIN b AS x)
                 , d(n) AS (SELECT 1 FROM c CROSS JOIN c AS x)
@@ -53,39 +54,39 @@ Describe "SQLite" {
                 , hex(randomblob(20)) AS colText
             FROM f
             LIMIT 1000" |
-        Measure-Object |
-        Select-Object -ExpandProperty Count |
-        Should -Be 1000
-    }
+            Measure-Object |
+            Select-Object -ExpandProperty Count |
+            Should -Be 1000
+        }
     
-    It "Invoke-SqlQuery (with Primary Key)" {
-        Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2));" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 2" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'B', 3" | Out-Null
+        It "With Primary Key" {
+            Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2));" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 2" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'B', 3" | Out-Null
 
-        Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
+            Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 3
-    }
+        }
 
-    It "Invoke-SqlQuery (multiple columns of same name)" {
-        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a"
-        $val.a | Should -Be 1
-        $val.a1 | Should -Be 2
-        $val.a2 | Should -Be 3
-    }
+        It "Multiple columns of same name" {
+            $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a"
+            $val.a | Should -Be 1
+            $val.a1 | Should -Be 2
+            $val.a2 | Should -Be 3
+        }
 
-    It "Invoke-SqlQuery (multiple columns of same name) -stream" {
-        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a" -Stream
-        $val.a | Should -Be 1
-        $val.a1 | Should -Be 2
-        $val.a2 | Should -Be 3
-    }
+        It "Multiple columns of same name With -stream" {
+            $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a" -Stream
+            $val.a | Should -Be 1
+            $val.a1 | Should -Be 2
+            $val.a2 | Should -Be 3
+        }
 
-    It "Invoke-SqlQuery -stream" {
-        Invoke-SqlQuery -Query "WITH a(n) AS (SELECT 1 UNION ALL SELECT 1)
+        It "With -stream" {
+            Invoke-SqlQuery -Query "WITH a(n) AS (SELECT 1 UNION ALL SELECT 1)
                 , b(n) AS (SELECT 1 FROM a CROSS JOIN a AS x)
                 , c(n) AS (SELECT 1 FROM b CROSS JOIN b AS x)
                 , d(n) AS (SELECT 1 FROM c CROSS JOIN c AS x)
@@ -96,13 +97,14 @@ Describe "SQLite" {
                 , hex(randomblob(20)) AS colText
             FROM f
             LIMIT 1000" -Stream |
-        Measure-Object |
-        Select-Object -ExpandProperty Count |
-        Should -Be 1000
+            Measure-Object |
+            Select-Object -ExpandProperty Count |
+            Should -Be 1000
+        }
     }
-
-    It "Invoke-SqlBulkCopy" {
-        $query = "WITH a(n) AS (SELECT 1 UNION ALL SELECT 1)
+    Context "Invoke-SqlBulkCopy" {
+        It "Normal" {
+            $query = "WITH a(n) AS (SELECT 1 UNION ALL SELECT 1)
                 , b(n) AS (SELECT 1 FROM a CROSS JOIN a AS x)
                 , c(n) AS (SELECT 1 FROM b CROSS JOIN b AS x)
                 , d(n) AS (SELECT 1 FROM c CROSS JOIN c AS x)
@@ -113,13 +115,57 @@ Describe "SQLite" {
                 , hex(randomblob(20)) AS colText
             FROM f"
         
-        Open-SQLiteConnection -ConnectionName bcp -DataSource "$home\temp.db"
-        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable (colDec REAL, colInt INTEGER, colText TEXT)"
+            Open-SQLiteConnection -ConnectionName bcp -DataSource "$home\temp.db"
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable (colDec REAL, colInt INTEGER, colText TEXT)"
 
-        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable -Notify |
-        Should -Be 65536
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable |
+            Should -Be 65536
         
-        Close-SqlConnection -ConnectionName bcp
+            Close-SqlConnection -ConnectionName bcp
+        }
+
+        It "With -Notify" {
+            $query = "WITH a(n) AS (SELECT 1 UNION ALL SELECT 1)
+                , b(n) AS (SELECT 1 FROM a CROSS JOIN a AS x)
+                , c(n) AS (SELECT 1 FROM b CROSS JOIN b AS x)
+                , d(n) AS (SELECT 1 FROM c CROSS JOIN c AS x)
+                , e(n) AS (SELECT 1 FROM d CROSS JOIN d AS x)
+                , f(n) AS (SELECT 1 FROM d CROSS JOIN d AS x)
+            SELECT random()/1000000000000. AS colDec
+                , random() AS colInt
+                , hex(randomblob(20)) AS colText
+            FROM f"
+        
+            Open-SQLiteConnection -ConnectionName bcp -DataSource "$home\temp.db"
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable21 (colDec REAL, colInt INTEGER, colText TEXT)"
+
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable21 -Notify |
+            Should -Be 65536
+        
+            Close-SqlConnection -ConnectionName bcp
+        }
+
+        It "With -NotifyAction" {
+            $query = "WITH a(n) AS (SELECT 1 UNION ALL SELECT 1)
+                , b(n) AS (SELECT 1 FROM a CROSS JOIN a AS x)
+                , c(n) AS (SELECT 1 FROM b CROSS JOIN b AS x)
+                , d(n) AS (SELECT 1 FROM c CROSS JOIN c AS x)
+                , e(n) AS (SELECT 1 FROM d CROSS JOIN d AS x)
+                , f(n) AS (SELECT 1 FROM d CROSS JOIN d AS x)
+            SELECT random()/1000000000000. AS colDec
+                , random() AS colInt
+                , hex(randomblob(20)) AS colText
+            FROM f"
+        
+            Open-SQLiteConnection -ConnectionName bcp -DataSource "$home\temp.db"
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable22 (colDec REAL, colInt INTEGER, colText TEXT)"
+
+            $result = @{val = 0 }
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable22 -NotifyAction { param($rows) $result.val = $rows }
+            $result.val | Should -Be 65536
+        
+            Close-SqlConnection -ConnectionName bcp
+        }
     }
     
     Context "PipelineInput..." {
@@ -194,7 +240,7 @@ Describe "SQLite" {
 
     Context "Validations..." {
         It "Handles JSON as PSObject" {
-            Invoke-SqlScalar "SELECT @json" -Parameters @{json = (1..5 | ConvertTo-Json -Compress)} | Should -Be "[1,2,3,4,5]"
+            Invoke-SqlScalar "SELECT @json" -Parameters @{json = (1..5 | ConvertTo-Json -Compress) } | Should -Be "[1,2,3,4,5]"
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿<Cmdlet(VerbsLifecycle.Invoke, "SqlBulkCopy", SupportsShouldProcess:=True, DefaultParameterSetName:="hashtable")>
+﻿<Cmdlet(VerbsLifecycle.Invoke, "SqlBulkCopy", SupportsShouldProcess:=True, DefaultParameterSetName:="table")>
 Public Class InvokeSqlBulkCopy
     Inherits PSCmdlet
 #Region "Parameters"
@@ -39,6 +39,8 @@ Public Class InvokeSqlBulkCopy
 
     <Parameter()>
     Public Property Notify As SwitchParameter
+    <Parameter()>
+    Public Property NotifyAction As Action(Of Long)
 #End Region
 
     Protected Overrides Sub EndProcessing()
@@ -62,8 +64,10 @@ Public Class InvokeSqlBulkCopy
 
                     Try
                         Dim srcReader = Engine.GetConnection(SourceConnectionName).GetDataReader(singleQuery, SourceParameters)
-                        Dim notifyAction As Action(Of Long) = Nothing
-                        If Notify Then notifyAction = Sub(x) WriteProgress(New ProgressRecord(0, "SimplySql BulkCopy", DestinationTable) With {.CurrentOperation = $"Insert {x} rows."})
+
+                        If NotifyAction Is Nothing AndAlso Notify.IsPresent Then
+                            NotifyAction = Sub(x) WriteProgress(New ProgressRecord(0, "SimplySql BulkCopy", DestinationTable) With {.CurrentOperation = $"Insert {x} rows."})
+                        End If
                         WriteObject(Engine.GetConnection(DestinationConnectionName).BulkLoad(srcReader, DestinationTable, ColumnMap, BatchSize, BatchTimeout, notifyAction))
                     Catch ex As Exception
                         ErrorOperationFailed(ex, DestinationConnectionName)

@@ -37,13 +37,21 @@ This module requires PowerShell Version 5.0 or greater
 
 ## Database Providers
 
-- Microsoft Sql Server : [Microsoft.Data.SqlClient 5.1.5](https://www.nuget.org/packages/Microsoft.Data.SqlClient/5.1.5)
-- MySQL : [MySqlConnector 2.3.7](https://www.nuget.org/packages/MySqlConnector/2.3.7)
-- Oracle : [Oracle.ManagedDataAccess.Core 2.19.230](https://www.nuget.org/packages/Oracle.ManagedDataAccess.Core/2.19.230) (this is the latest version supporting .NET Standard 2.0)
-- SQLite : [System.Data.SQLite.Core 1.0.118](https://www.nuget.org/packages/System.Data.SQLite.Core/1.0.118)
-- PostgreSQL : [Npgsql (8.0.3)](https://www.nuget.org/packages/Npgsql/8.0.3)
+- Microsoft Sql Server : [Microsoft.Data.SqlClient 5.2.2](https://www.nuget.org/packages/Microsoft.Data.SqlClient/5.2.2)
+- MySQL : [MySqlConnector 2.4.0](https://www.nuget.org/packages/MySqlConnector/2.4.0)
+- Oracle : [Oracle.ManagedDataAccess.Core 2.19.250](https://www.nuget.org/packages/Oracle.ManagedDataAccess.Core/2.19.250) (this is the latest version supporting .NET Standard 2.0)
+- SQLite : [System.Data.SQLite.Core 1.0.119](https://www.nuget.org/packages/System.Data.SQLite.Core/1.0.119)
+- PostgreSQL : [Npgsql (8.0.6)](https://www.nuget.org/packages/Npgsql/8.0.6)
 
 ## Latest Version
+## 2.1.0
+* Updated some packages that had vulnerabilities
+* Updated Provider Packages
+* Added `-NotifyAction` back in and updated tests to test for this
+* Changed how the `/bin/` folder is built, this should create .NET Framework or .NET Core dlls and hopefully fix the MySqlConnector issue with .NET Standard packages.
+
+## 2.0.4
+* Fixing issue with incorrect query results when querying only some columns of a primary key table
 
 ## 2.0.3
 * Providers updated.

@@ -8,16 +8,16 @@ schema: 2.0.0
 # Start-SqlTransaction
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Start a sql transaction.
 
 ## SYNTAX
 
 ```
-Start-SqlTransaction [-ConnectionName <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Start-SqlTransaction [[-ConnectionName] <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Start (BEGIN) a sql transaction.
 
 ## EXAMPLES
 
@@ -39,7 +39,7 @@ Parameter Sets: (All)
 Aliases: cn
 
 Required: False
-Position: Named
+Position: 0
 Default value: default
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False

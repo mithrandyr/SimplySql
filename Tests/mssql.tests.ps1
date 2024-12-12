@@ -1,13 +1,14 @@
-$ErrorActionPreference
+$ErrorActionPreference = "Stop"
+
 Describe "MSSQL" {
     BeforeAll {
-        $srvName = "xbags\SQLEXPRESS"
+        $srvName = "$($env:COMPUTERNAME)\SQLEXPRESS"
+        if($srvName -eq "\SQLEXPRESS") { $srvName = "$($env:NAME)\SQLEXPRESS" }  #pscore on non-windows
         $c = [pscredential]::new("simplysql", (ConvertTo-SecureString -Force -AsPlainText "simplysql"))
         $connHT = @{
             DataSource = $srvName
             Credential = $c
         }
-        
         Open-SqlConnection @connHT
         Invoke-SqlUpdate "IF EXISTS (SELECT * FROM sys.databases WHERE name = 'test') DROP DATABASE test; CREATE DATABASE test" | Should -Be -1
         Close-SqlConnection
@@ -52,13 +53,6 @@ Describe "MSSQL" {
         Invoke-SqlScalar -Query "SELECT GETDATE()" | Should -BeOfType System.DateTime
     }
 
-    It "Invoke-SqlQuery (No ResultSet Warning)" {
-        Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
-        Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
-        Invoke-SqlUpdate -Query "DROP TABLE temp"
-        $w | Should -BeLike "Query returned no resultset.*"
-    }
-
     It "Invoke-SqlUpdate" {
         Invoke-SqlUpdate -Query ";WITH a(n) AS (SELECT 1 UNION ALL SELECT 1)
             , b(n) AS (SELECT 1 FROM a CROSS JOIN a AS x)
@@ -74,53 +68,82 @@ Describe "MSSQL" {
             FROM tally" | Should -Be 65536
     }
 
-    It "Invoke-SqlQuery" {
-        Invoke-SqlQuery -Query "SELECT TOP 1000 * FROM tmpTable" |
-        Measure-Object |
-        Select-Object -ExpandProperty Count |
-        Should -Be 1000
-    }
-    
-    It "Invoke-SqlQuery (with Primary Key)" {
-        Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2));" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 2" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'B', 3" | Out-Null
+    Context "Invoke-SqlQuery" {
+        It "No ResultSet Warning" {
+            Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
+            Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
+            Invoke-SqlUpdate -Query "DROP TABLE temp"
+            $w | Should -BeLike "Query returned no resultset.*"
+        }
 
-        Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
+        It "Normal" {
+            Invoke-SqlQuery -Query "SELECT TOP 1000 * FROM tmpTable" |
+            Measure-Object |
+            Select-Object -ExpandProperty Count |
+            Should -Be 1000
+        }
+    
+        It "With Primary Key" {
+            Invoke-SqlUpdate -Query "CREATE TABLE #tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2));" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO #tmpPK SELECT 'A', 1" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO #tmpPK SELECT 'A', 2" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO #tmpPK SELECT 'B', 3" | Out-Null
+
+            Invoke-SqlQuery -Query "SELECT col1 FROM #tmpPK" |
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 3
-    }
+        }
 
-    It "Invoke-SqlQuery (multiple columns of same name)" {
-        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a"
-        $val.a | Should -Be 1
-        $val.a1 | Should -Be 2
-        $val.a2 | Should -Be 3
-    }
+        It "Multiple columns of same name" {
+            $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a"
+            $val.a | Should -Be 1
+            $val.a1 | Should -Be 2
+            $val.a2 | Should -Be 3
+        }
 
-    It "Invoke-SqlQuery (multiple columns of same name) -stream" {
-        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a" -Stream
-        $val.a | Should -Be 1
-        $val.a1 | Should -Be 2
-        $val.a2 | Should -Be 3
-    }
+        It "Multiple columns of same name with -stream" {
+            $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a" -Stream
+            $val.a | Should -Be 1
+            $val.a1 | Should -Be 2
+            $val.a2 | Should -Be 3
+        }
 
-    It "Invoke-SqlQuery -stream" {
-        Invoke-SqlQuery -Query "SELECT TOP 1000 * FROM tmpTable" -Stream |
-        Measure-Object |
-        Select-Object -ExpandProperty Count |
-        Should -Be 1000
+        It "With -stream" {
+            Invoke-SqlQuery -Query "SELECT TOP 1000 * FROM tmpTable" -Stream |
+            Measure-Object |
+            Select-Object -ExpandProperty Count |
+            Should -Be 1000
+        }
     }
-
-    It "Invoke-SqlBulkCopy" {
-        Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
-        Open-SqlConnection @connHT -ConnectionName bcp 
-        Set-SqlConnection -Database test -ConnectionName bcp
+    Context "Invoke-SqlBulkCopy" {
+        It "Normal" {
+            Invoke-SqlUpdate -Query "SELECT * INTO tmpTable2 FROM tmpTable WHERE 1=2"
+            Open-SqlConnection @connHT -ConnectionName bcp 
+            Set-SqlConnection -Database test -ConnectionName bcp
         
-        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |
-        Should -Be 65536
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 |
+            Should -Be 65536
+        }
+
+        It "With -Notify" {
+            Invoke-SqlUpdate -Query "SELECT * INTO tmpTable20 FROM tmpTable WHERE 1=2"
+            Open-SqlConnection @connHT -ConnectionName bcp 
+            Set-SqlConnection -Database test -ConnectionName bcp
+        
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -Notify |
+            Should -Be 65536
+        }
+    
+        It "With -NotifyAction" {
+            Invoke-SqlUpdate -Query "SELECT * INTO tmpTable10 FROM tmpTable WHERE 1=2"
+            Open-SqlConnection @connHT -ConnectionName bcp 
+            Set-SqlConnection -Database test -ConnectionName bcp
+        
+            $result = @{val = 0 }
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -NotifyAction { param($rows) $result.val = $rows }
+            $result.val | Should -Be 65536
+        }
     }
 
     Context "Transaction..." {
@@ -183,7 +206,7 @@ Describe "MSSQL" {
 
     Context "Validations..." {
         It "Handles JSON as PSObject" {
-            Invoke-SqlScalar "SELECT @json" -Parameters @{json = (1..5 | ConvertTo-Json -Compress)} | Should -Be "[1,2,3,4,5]"
+            Invoke-SqlScalar "SELECT @json" -Parameters @{json = (1..5 | ConvertTo-Json -Compress) } | Should -Be "[1,2,3,4,5]"
         }
     }
 }

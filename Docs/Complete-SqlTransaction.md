@@ -13,7 +13,7 @@ Complete a SQL transaction.
 ## SYNTAX
 
 ```
-Complete-SqlTransaction [-ConnectionName <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Complete-SqlTransaction [[-ConnectionName] <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -23,10 +23,10 @@ Complete (COMMIT) a SQL transaction.
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Complete-SqlTransaction
 ```
 
-{{ Add example description here }}
+Commits the SQL transaction
 
 ## PARAMETERS
 
@@ -39,7 +39,7 @@ Parameter Sets: (All)
 Aliases: cn
 
 Required: False
-Position: Named
+Position: 0
 Default value: default
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False

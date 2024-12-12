@@ -1,6 +1,8 @@
+$ErrorActionPreference = "Stop"
 Describe "Oracle" {
     BeforeAll {
-        $srvName = "xbags"
+        $srvName = $env:COMPUTERNAME
+        if([string]::IsNullOrWhiteSpace($srvName)) { $srvName = $env:NAME }  #pscore on non-windows
         $u = "hr"
         $p = "hr"
         $c = [pscredential]::new($u, (ConvertTo-SecureString -Force -AsPlainText $p))        
@@ -9,7 +11,7 @@ Describe "Oracle" {
     AfterEach { Show-SqlConnection -all | Close-SqlConnection }
     AfterAll {
         Open-OracleConnection -DataSource $srvName -ServiceName xe -Credential $c
-        foreach($tbl in @("transactionTest", "tmpTable", "tmpTable2","t", "tmpPK")) {
+        foreach ($tbl in @("transactionTest", "tmpTable", "tmpTable2", "t", "tmpPK")) {
             $query = "BEGIN
                     EXECUTE IMMEDIATE 'DROP TABLE $tbl';
                 EXCEPTION
@@ -43,17 +45,10 @@ Describe "Oracle" {
     }
 
     It "Positional Binding" {
-        $result = Invoke-SqlQuery "SELECT :a AS First, :b AS Second, :c AS Third FROM dual" -Parameters @{c="Third";a="First";b="Second"}
+        $result = Invoke-SqlQuery "SELECT :a AS First, :b AS Second, :c AS Third FROM dual" -Parameters @{c = "Third"; a = "First"; b = "Second" }
         $result.First | Should -Be "First"
         $result.Second | Should -Be "Second"
         $result.Third | Should -Be "Third"
-    }
-
-    It "Invoke-SqlQuery (No ResultSet Warning)" {
-        Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
-        Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
-        Invoke-SqlUpdate -Query "DROP TABLE temp"
-        $w | Should -BeLike "Query returned no resultset.*"
     }
 
     It "Invoke-SqlUpdate" {
@@ -68,8 +63,16 @@ Describe "Oracle" {
         Invoke-SqlUpdate -Query "DROP TABLE tmpTable"            
     }
 
-    It "Invoke-SqlQuery" {
-        Invoke-SqlQuery -Query "SELECT dbms_random.random /1000000000000. AS colDec
+    Context "Invoke-SqlQuery" {
+        It "No ResultSet Warning" {
+            Invoke-SqlUpdate -Query "CREATE TABLE temp (cola int)"
+            Invoke-SqlQuery -Query "INSERT INTO temp VALUES (1)" -WarningAction SilentlyContinue -WarningVariable w
+            Invoke-SqlUpdate -Query "DROP TABLE temp"
+            $w | Should -BeLike "Query returned no resultset.*"
+        }
+
+        It "Normal" {
+            Invoke-SqlQuery -Query "SELECT dbms_random.random /1000000000000. AS colDec
                 , dbms_random.random AS colInt
                 , dbms_random.string('x',20) AS colText
             FROM dual
@@ -77,36 +80,36 @@ Describe "Oracle" {
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 1000
-    }
+        }
 
-    It "Invoke-SqlQuery (with Primary Key)" {
-        Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2))" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1 FROM dual" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 2 FROM dual" | Out-Null
-        Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'B', 3 FROM dual" | Out-Null
+        It "With Primary Key" {
+            Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2))" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1 FROM dual" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 2 FROM dual" | Out-Null
+            Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'B', 3 FROM dual" | Out-Null
 
-        Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
+            Invoke-SqlQuery -Query "SELECT col1 FROM tmpPK" |
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 3
-    }
+        }
 
-    It "Invoke-SqlQuery (multiple columns of same name)" {
-        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a FROM dual"
-        $val.a | Should -Be 1
-        $val.a1 | Should -Be 2
-        $val.a2 | Should -Be 3
-    }
+        It "Multiple columns of same name" {
+            $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a FROM dual"
+            $val.a | Should -Be 1
+            $val.a1 | Should -Be 2
+            $val.a2 | Should -Be 3
+        }
 
-    It "Invoke-SqlQuery (multiple columns of same name) -stream" {
-        $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a FROM dual" -Stream
-        $val.a | Should -Be 1
-        $val.a1 | Should -Be 2
-        $val.a2 | Should -Be 3
-    }
+        It "Multiple columns of same name With -stream" {
+            $val = Invoke-SqlQuery "SELECT 1 AS a, 2 AS a, 3 AS a FROM dual" -Stream
+            $val.a | Should -Be 1
+            $val.a1 | Should -Be 2
+            $val.a2 | Should -Be 3
+        }
 
-    It "Invoke-SqlQuery -stream" {
-        Invoke-SqlQuery -Stream -Query "SELECT dbms_random.random /1000000000000. AS colDec
+        It "With -stream" {
+            Invoke-SqlQuery -Stream -Query "SELECT dbms_random.random /1000000000000. AS colDec
                 , dbms_random.random AS colInt
                 , dbms_random.string('x',20) AS colText
             FROM dual
@@ -114,22 +117,57 @@ Describe "Oracle" {
             Measure-Object |
             Select-Object -ExpandProperty Count |
             Should -Be 1000
+        }
     }
 
-    It "Invoke-SqlBulkCopy" -Tag bulkcopy {
-        $query = "SELECT dbms_random.random /1000000000000. AS colDec
+    Context "Invoke-SqlBulkCopy" {
+        It "Normal" -Tag bulkcopy {
+            $query = "SELECT dbms_random.random /1000000000000. AS colDec
                 , dbms_random.random AS colInt
                 , dbms_random.string('x',20) AS colText
             FROM dual
             CONNECT BY ROWNUM <= 65536"
         
-        Open-OracleConnection -ConnectionName bcp -DataSource $srvName -ServiceName xe -Credential $c
-        Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
+            Open-OracleConnection -ConnectionName bcp -DataSource $srvName -ServiceName xe -Credential $c
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
 
-        Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 |
             Should -Be 65536
         
-        Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"
+            Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"
+        }
+
+        It "With -Notify" -Tag bulkcopy {
+            $query = "SELECT dbms_random.random /1000000000000. AS colDec
+                , dbms_random.random AS colInt
+                , dbms_random.string('x',20) AS colText
+            FROM dual
+            CONNECT BY ROWNUM <= 65536"
+        
+            Open-OracleConnection -ConnectionName bcp -DataSource $srvName -ServiceName xe -Credential $c
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
+
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
+            Should -Be 65536
+        
+            Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"
+        }
+        
+        It "With -NotifyAction" -Tag bulkcopy {
+            $query = "SELECT dbms_random.random /1000000000000. AS colDec
+                , dbms_random.random AS colInt
+                , dbms_random.string('x',20) AS colText
+            FROM dual
+            CONNECT BY ROWNUM <= 65536"
+        
+            Open-OracleConnection -ConnectionName bcp -DataSource $srvName -ServiceName xe -Credential $c
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
+
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
+            Should -Be 65536
+        
+            Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"
+        }
     }
 
     Context "Transaction..." {
@@ -145,7 +183,7 @@ Describe "Oracle" {
             
             Start-SqlTransaction -ConnectionName bcp        
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
-                Should -Be 65536
+            Should -Be 65536
             Invoke-SqlScalar -ConnectionName bcp -Query "SELECT COUNT(1) FROM tmpTable2" | Should -Be 65536
             Undo-SqlTransaction -ConnectionName bcp
             Invoke-SqlScalar -ConnectionName bcp -Query "SELECT COUNT(1) FROM tmpTable2" | Should -Be 0
@@ -154,13 +192,13 @@ Describe "Oracle" {
 
         It "Invoke-SqlScalar" {
             Start-SqlTransaction
-            { Invoke-SqlScalar "SELECT 1 FROM dual" -ea Stop} | Should -Not -Throw
+            { Invoke-SqlScalar "SELECT 1 FROM dual" -ea Stop } | Should -Not -Throw
             Undo-SqlTransaction
         }
 
         It "Invoke-SqlQuery" {
             Start-SqlTransaction
-            { Invoke-SqlScalar "SELECT 1 FROM dual" -ea Stop} | Should -Not -Throw
+            { Invoke-SqlScalar "SELECT 1 FROM dual" -ea Stop } | Should -Not -Throw
             Undo-SqlTransaction
         }
 
@@ -177,14 +215,14 @@ Describe "Oracle" {
     Context "PipelineInput..." {
         It "Invoke-SqlScalar" {
             {
-                [PSCustomObject]@{Name="test"} | Invoke-SqlScalar "SELECT :Name FROM dual" -ErrorAction Stop
+                [PSCustomObject]@{Name = "test" } | Invoke-SqlScalar "SELECT :Name FROM dual" -ErrorAction Stop
                 Get-ChildItem | Invoke-SqlScalar "SELECT :Name FROM dual" -ErrorAction Stop
             } | Should -Not -Throw
         }
 
         It "Invoke-SqlQuery" {
             {
-                [PSCustomObject]@{Name="test"} | Invoke-SqlQuery "SELECT :Name FROM dual" -ErrorAction Stop
+                [PSCustomObject]@{Name = "test" } | Invoke-SqlQuery "SELECT :Name FROM dual" -ErrorAction Stop
                 Get-ChildItem | Invoke-SqlQuery "SELECT :Name FROM dual" -ErrorAction Stop
             } | Should -Not -Throw
         }
@@ -192,7 +230,7 @@ Describe "Oracle" {
         It "Invoke-SqlScalar" {
             {
                 Invoke-SqlUpdate "CREATE TABLE t(x varchar(255))" -ErrorAction Stop
-                [PSCustomObject]@{Name="test"} | Invoke-SqlUpdate "INSERT INTO t SELECT :Name FROM dual" -ErrorAction Stop
+                [PSCustomObject]@{Name = "test" } | Invoke-SqlUpdate "INSERT INTO t SELECT :Name FROM dual" -ErrorAction Stop
                 Get-ChildItem | Invoke-SqlScalar "INSERT INTO t SELECT :Name FROM dual"-ErrorAction Stop
                 Invoke-SqlUpdate "DROP TABLE t" -ErrorAction Stop
             } | Should -Not -Throw
@@ -201,7 +239,7 @@ Describe "Oracle" {
 
     Context "Validations..." {
         It "Handles JSON as PSObject" {
-            Invoke-SqlScalar "SELECT :json FROM dual" -Parameters @{json = (1..5 | ConvertTo-Json -Compress)} | Should -Be "[1,2,3,4,5]"
+            Invoke-SqlScalar "SELECT :json FROM dual" -Parameters @{json = (1..5 | ConvertTo-Json -Compress) } | Should -Be "[1,2,3,4,5]"
         }
     }
 }

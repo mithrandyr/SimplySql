@@ -76,7 +76,7 @@ Public Class OracleProvider
                 Dim rowsCopied As Long = 0
                 AddHandler bcp.OracleRowsCopied, Sub(sender As Object, e As OracleRowsCopiedEventArgs)
                                                      rowsCopied += 1
-                                                     If rowsCopied Mod batchSize = 0 Then
+                                                     If rowsCopied Mod batchSize = 0 AndAlso notify IsNot Nothing Then
                                                          notify.Invoke(rowsCopied)
                                                      End If
                                                  End Sub
@@ -131,7 +131,7 @@ Public Class OracleProvider
         Me.Messages.Enqueue(New SqlMessage(e.Message))
     End Sub
 #Region "Shared"
-    Private Function MapOracleType(netType As String) As OracleDbType
+    Private Shared Function MapOracleType(netType As String) As OracleDbType
         'FROM: https://docs.oracle.com/en/database/oracle///oracle-database/23/odpnt/featOraCommand.html#GUID-BBEF52D9-E4E3-4A9C-93F5-3E408A83FC04
         Select Case netType.ToLower
             Case "system.boolean"

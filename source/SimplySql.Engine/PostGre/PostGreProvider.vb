@@ -75,12 +75,11 @@ Public Class PostGreProvider
                         End If
                     Next
 
-                    If notify IsNot Nothing Then
-                        If iteration Mod batchSize = 0 Then
-                            notify.Invoke(iteration)
-                        End If
+                    If iteration Mod batchSize = 0 AndAlso notify IsNot Nothing Then
+                        notify.Invoke(iteration)
                     End If
                 End While
+                If notify IsNot Nothing Then notify.Invoke(iteration)
                 Return bulk.Complete()
             End Using
         End Using

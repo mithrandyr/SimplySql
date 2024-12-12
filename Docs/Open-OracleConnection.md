@@ -145,7 +145,7 @@ Determines the elevated privileges the connection has: SYSDBA, SYSOPER, SYSASM. 
 Type: String
 Parameter Sets: (All)
 Aliases:
-Accepted values: None, SYSDBA, SYSOPER, SYSASM
+Accepted values: None, SYSASM, SYSDBA, SYSOPER
 
 Required: False
 Position: Named
@@ -206,7 +206,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ### System.String
 ### System.Int32
-### SimplySql.Common.ConnectionOracle+OraclePrivilege
 ### System.Management.Automation.PSCredential
 ### System.Collections.Hashtable
 ## OUTPUTS

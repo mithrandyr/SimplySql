@@ -23,10 +23,10 @@ Gets the underlying provider transaction object for the current connection or fo
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Get-SqlTransaction
 ```
 
-{{ Add example description here }}
+Returns the provider specific transaction object.
 
 ## PARAMETERS
 

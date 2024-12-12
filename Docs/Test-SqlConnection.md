@@ -8,7 +8,7 @@ schema: 2.0.0
 # Test-SqlConnection
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Tests to see if there is a connection.
 
 ## SYNTAX
 
@@ -23,7 +23,7 @@ Test-SqlConnection [-All] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Tests to see if there is a connection, use the -All switch to determine if there are any connections.
 
 ## EXAMPLES
 
@@ -37,7 +37,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -All
-{{ Fill All Description }}
+Returns true if there are any connections, otherwise false.
 
 ```yaml
 Type: SwitchParameter
@@ -67,7 +67,7 @@ Accept wildcard characters: False
 ```
 
 ### -Detailed
-{{ Fill Detailed Description }}
+If present, will only return return if connection is found and in an Open state.
 
 ```yaml
 Type: SwitchParameter
