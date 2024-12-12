@@ -70,7 +70,7 @@ task Build {
     $configuration = "Release"
     if($DebugOnly) { $configuration = "debug"}
     
-    exec { dotnet publish "SimplySql.Cmdlets" -c $Configuration -o "output\bin" -p:Version=$Version -p:AssemblyVersion=$version} | HV "Building SimplySql.Cmdlets ($version)" "."
+    exec { dotnet publish "SimplySql.Cmdlets" -c $configuration -o "output\bin" -p:Version=$Version -p:AssemblyVersion=$version} | HV "Building SimplySql.Cmdlets ($version)" "."
     
     Move-Item "output\bin\SimplySql.Cmdlets.*" -Destination "output"
     Remove-Item "output\bin\*" #-Exclude "SimplySql.*" -Recurse
@@ -79,7 +79,7 @@ task Build {
     foreach($env in $Script:envList) {
         #exec { dotnet publish "SimplySql.Cmdlets" -c $Configuration -r $env -o "output\bin\$env"} | HV "Building PlatformSpecific Dependencies $env" "."
         exec {
-            dotnet publish "SimplySql.Engine" -c $Configuration -r $env.env -f $env.framework -o $env.output
+            dotnet publish "SimplySql.Engine" -c $configuration -r $env.env -f $env.framework -o $env.output
         } | HV "Building PlatformSpecific Dependencies $($env.env) ($($env.framework))" "."
  
         Get-ChildItem -Path $env.output -Directory | Remove-Item -Recurse
@@ -91,16 +91,14 @@ task Build {
     Get-ChildItem -Path .\output\* -Include "*.pdb", "*.json" -Recurse | Remove-Item
 
     #get SQLite Interops...
-    exec { dotnet build "SimplySql.Engine" -c test } | HV "SQLite Interop" "."
+    exec { dotnet build "SimplySql.Engine" -c $configuration } | HV "SQLite Interop" "."
     if (Test-Path ".\output\bin\PS5\win-x86\" -PathType Container) {
-        Copy-Item ".\SimplySql.Engine\bin\test\net47\x86\SQLite.Interop.dll" -Destination ".\output\bin\PS5\win-x86"
+        Copy-Item ".\SimplySql.Engine\bin\$configuration\net47\x86\SQLite.Interop.dll" -Destination ".\output\bin\PS5\win-x86"
     }
     if (Test-Path ".\output\bin\PS5\win-x64\" -PathType Container) {
-        Copy-Item ".\SimplySql.Engine\bin\test\net47\x64\SQLite.Interop.dll" -Destination ".\output\bin\PS5\win-x64"
+        Copy-Item ".\SimplySql.Engine\bin\$configuration\net47\x64\SQLite.Interop.dll" -Destination ".\output\bin\PS5\win-x64"
     }
-    
-    Remove-Item ".\SimplySql.Engine\bin\" -Recurse
-
+    Get-ChildItem -Path ".\SimplySql.Engine\bin" -Directory | Remove-Item -Recurse
 }
 
 Task DeDup {

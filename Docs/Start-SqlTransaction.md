@@ -13,7 +13,7 @@ Start a sql transaction.
 ## SYNTAX
 
 ```
-Start-SqlTransaction [-ConnectionName <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Start-SqlTransaction [[-ConnectionName] <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -39,7 +39,7 @@ Parameter Sets: (All)
 Aliases: cn
 
 Required: False
-Position: Named
+Position: 0
 Default value: default
 Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False

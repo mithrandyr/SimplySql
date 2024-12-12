@@ -192,7 +192,7 @@ VerifyFull: Always use SSL. Validates CA and hostname.
 Type: String
 Parameter Sets: default
 Aliases:
-Accepted values: Disabled, Preferred, Required, VerifyCA, VerifyFull
+Accepted values: Disable, Prefer, Require, VerifyCA, VerifyFull
 
 Required: False
 Position: Named
@@ -208,8 +208,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ### System.String
 ### System.Int32
-### SimplySql.Common.SslMode
-### System.Management.Automation.SwitchParameter
 ### System.Management.Automation.PSCredential
 ### System.Collections.Hashtable
 ## OUTPUTS
