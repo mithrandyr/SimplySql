@@ -57,7 +57,7 @@ Public Class PostGreProvider
         End If
     End Function
 
-    Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
+    Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Dictionary(Of String, String), batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
         Dim iteration As Long = 0
         Using dataReader
             Dim schemaMap = GenerateSchemaMap(dataReader, columnMap)

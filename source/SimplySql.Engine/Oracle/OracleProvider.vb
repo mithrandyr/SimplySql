@@ -58,7 +58,7 @@ Public Class OracleProvider
         Return MyBase.HandleParamValue(x)
     End Function
 
-    Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
+    Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Dictionary(Of String, String), batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
         If batchTimeout < 0 Then batchTimeout = CommandTimeout
         If Me.HasTransaction Then
             Return OracleArrayParam(dataReader, destinationTable, columnMap, batchSize, batchTimeout, notify)
@@ -67,7 +67,7 @@ Public Class OracleProvider
         End If
     End Function
 
-    Private Function OracleBulkCopy(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
+    Private Function OracleBulkCopy(dataReader As IDataReader, destinationTable As String, columnMap As Dictionary(Of String, String), batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
         Using dataReader
             Using bcp As New OracleBulkCopy(Me.Connection) With {.BatchSize = batchSize, .BulkCopyTimeout = batchTimeout, .DestinationTableName = destinationTable}
                 GenerateSchemaMap(dataReader, columnMap).ForEach(Sub(x) bcp.ColumnMappings.Add(x.SourceName, x.DestinationName))
@@ -85,7 +85,7 @@ Public Class OracleProvider
             End Using
         End Using
     End Function
-    Private Function OracleArrayParam(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
+    Private Function OracleArrayParam(dataReader As IDataReader, destinationTable As String, columnMap As Dictionary(Of String, String), batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
         Dim batchIteration As Long = 0
         Dim schemaMap = GenerateSchemaMap(dataReader, columnMap)
         Dim destColNames = """" + String.Join(""", """, schemaMap.Select(Function(x) x.DestinationName)) + """"

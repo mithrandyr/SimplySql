@@ -76,4 +76,4 @@ task revisionCommit {
 } -If $CommitRevision
 
 
-task . Build, ComposeModule, revisionCommit
+task . Clean, Build, ComposeModule, revisionCommit

@@ -31,9 +31,9 @@ Public Class ContextHandling
     Private Shared Function HandleResolveEvent(ByVal sender As Object, ByVal args As ResolveEventArgs) As Assembly
         Dim asmName = New AssemblyName(args.Name)
 
-#If DEBUG Then
-        Console.WriteLine($"{Environment.NewLine}ASSEMBLY LOAD: '{asmName}' BECAUSE '{args.RequestingAssembly}'{Environment.NewLine}")
-#End If
+        '#If DEBUG Then
+        'Console.WriteLine($"{Environment.NewLine}ASSEMBLY LOAD: '{asmName}' BECAUSE '{args.RequestingAssembly}'{Environment.NewLine}")
+        '#End If
 
         If asmName.Name.Equals("SimplySql.Engine", StringComparison.OrdinalIgnoreCase) Then
             Dim asmPath = FindFile(asmName.Name)
@@ -77,7 +77,8 @@ Public Class ContextHandling
                         Dim filePath = Path.Combine(BinPath, "PS7", "linux-x64", $"{asmName}.dll")
                         If IO.File.Exists(filePath) Then Return filePath
                     ElseIf RuntimeInformation.IsOSPlatform(OSPlatform.OSX) Then
-                        Dim filePath = Path.Combine(BinPath, "PS7", "osx-x64", $"{asmName}.dll")
+                        Dim arch As String = RuntimeInformation.OSArchitecture.ToString().ToLower()
+                        Dim filePath = Path.Combine(BinPath, "PS7", $"osx-{arch}", $"{asmName}.dll")
                         If IO.File.Exists(filePath) Then Return filePath
                     Else
                         Dim filePath = Path.Combine(BinPath, "PS7", "win-x64", $"{asmName}.dll")

@@ -50,7 +50,7 @@ Public Class MySqlProvider
         Connection.ChangeDatabase(databaseName)
     End Sub
 
-    Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
+    Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Dictionary(Of String, String), batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
         If batchTimeout < 0 Then batchTimeout = CommandTimeout
         Using dataReader
             Dim bcp As New MySqlBulkCopy(Connection, Transaction) With {.BulkCopyTimeout = batchTimeout, .DestinationTableName = destinationTable}
