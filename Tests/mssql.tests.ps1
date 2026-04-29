@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 Describe "MSSQL" {
     BeforeAll {
         $srvName = "$($env:COMPUTERNAME)\SQLEXPRESS"
-        if($srvName -eq "\SQLEXPRESS") { $srvName = "$($env:NAME)\SQLEXPRESS" }  #pscore on non-windows
+        if($srvName -eq "\SQLEXPRESS") { $srvName = "$($env:NAME).\SQLEXPRESS" }  #pscore on non-windows
         $c = [pscredential]::new("simplysql", (ConvertTo-SecureString -Force -AsPlainText "simplysql"))
         $connHT = @{
             DataSource = $srvName
@@ -143,6 +143,16 @@ Describe "MSSQL" {
             $result = @{val = 0 }
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -NotifyAction { param($rows) $result.val = $rows }
             $result.val | Should -Be 65536
+        }
+        
+        It "With -ColumnMap" {
+            Invoke-SqlUpdate -Query "SELECT * INTO tmpTable11 FROM tmpTable WHERE 1=2"
+            Open-SqlConnection @connHT -ConnectionName bcp 
+            Set-SqlConnection -Database test -ConnectionName bcp
+        
+            $columns = @{colDec = "colDec"; colInt = "colInt"; colText = "colText"}
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable2 -ColumnMap $columns |
+            Should -Be 65536
         }
     }
 

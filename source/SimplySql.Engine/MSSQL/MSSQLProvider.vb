@@ -52,7 +52,7 @@ Public Class MSSQLProvider
         End If
     End Function
 
-    Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Hashtable, batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
+    Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Dictionary(Of String, String), batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long
         If batchTimeout < 0 Then batchTimeout = CommandTimeout
         Dim bcpOption = SqlBulkCopyOptions.KeepIdentity + SqlBulkCopyOptions.CheckConstraints + SqlBulkCopyOptions.FireTriggers
         Using dataReader

@@ -50,11 +50,20 @@ Public Class InvokeSqlBulkCopy
         Else
             If ValidateConnection(SourceConnectionName) And ValidateConnection(DestinationConnectionName) Then
                 If Me.ShouldProcess(DestinationConnectionName, $"Execute bulkloading into '{DestinationTable}'") Then
-                    Dim singleQuery As String
+                    Dim singleQuery As String, columnDict As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
+                    If ColumnMap IsNot Nothing Then
+                        For Each de As DictionaryEntry In ColumnMap
+                            columnDict.Add(de.Key.ToString, de.Value.ToString)
+                        Next
+                    Else
+                        columnDict = Nothing
+                    End If
 
                     If ParameterSetName = "table" Then
                         Dim queryColumns As String = "*"
-                        If ColumnMap IsNot Nothing Then queryColumns = String.Join(", ", ColumnMap.Keys)
+                        If columnDict IsNot Nothing Then
+                            queryColumns = String.Join(", ", columnDict.Keys.ToArray)
+                        End If
                         singleQuery = $"SELECT {queryColumns} FROM {SourceTable}"
 
                         If String.IsNullOrWhiteSpace(DestinationTable) Then DestinationTable = SourceTable
@@ -68,7 +77,7 @@ Public Class InvokeSqlBulkCopy
                         If NotifyAction Is Nothing AndAlso Notify.IsPresent Then
                             NotifyAction = Sub(x) WriteProgress(New ProgressRecord(0, "SimplySql BulkCopy", DestinationTable) With {.CurrentOperation = $"Insert {x} rows."})
                         End If
-                        WriteObject(Engine.GetConnection(DestinationConnectionName).BulkLoad(srcReader, DestinationTable, ColumnMap, BatchSize, BatchTimeout, notifyAction))
+                        WriteObject(Engine.GetConnection(DestinationConnectionName).BulkLoad(srcReader, DestinationTable, columnDict, BatchSize, BatchTimeout, NotifyAction))
                     Catch ex As Exception
                         ErrorOperationFailed(ex, DestinationConnectionName)
                     Finally

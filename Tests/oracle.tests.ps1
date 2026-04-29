@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 Describe "Oracle" {
     BeforeAll {
         $srvName = $env:COMPUTERNAME
-        if([string]::IsNullOrWhiteSpace($srvName)) { $srvName = $env:NAME }  #pscore on non-windows
+        if([string]::IsNullOrWhiteSpace($srvName)) { $srvName = "{0}." -f $env:NAME }  #pscore on non-windows
         $u = "hr"
         $p = "hr"
         $c = [pscredential]::new($u, (ConvertTo-SecureString -Force -AsPlainText $p))        
@@ -164,6 +164,23 @@ Describe "Oracle" {
             Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
 
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -Notify |
+            Should -Be 65536
+        
+            Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"
+        }
+
+        It "With -ColumnMap" -Tag bulkcopy {
+            $query = "SELECT dbms_random.random /1000000000000. AS colDec
+                , dbms_random.random AS colInt
+                , dbms_random.string('x',20) AS colText
+            FROM dual
+            CONNECT BY ROWNUM <= 65536"
+        
+            Open-OracleConnection -ConnectionName bcp -DataSource $srvName -ServiceName xe -Credential $c
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable2 (colDec NUMBER(38,10), colInt INTEGER, colText varchar(20))"
+
+            $columns = @{colDec = "colDec"; colInt = "colInt"; colText = "colText"}
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable2 -ColumnMap $columns |
             Should -Be 65536
         
             Invoke-SqlUpdate -ConnectionName bcp -Query "DROP TABLE tmpTable2"

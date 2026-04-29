@@ -166,6 +166,28 @@ Describe "SQLite" {
         
             Close-SqlConnection -ConnectionName bcp
         }
+
+        It "With -ColumnMap" {
+            $query = "WITH a(n) AS (SELECT 1 UNION ALL SELECT 1)
+                , b(n) AS (SELECT 1 FROM a CROSS JOIN a AS x)
+                , c(n) AS (SELECT 1 FROM b CROSS JOIN b AS x)
+                , d(n) AS (SELECT 1 FROM c CROSS JOIN c AS x)
+                , e(n) AS (SELECT 1 FROM d CROSS JOIN d AS x)
+                , f(n) AS (SELECT 1 FROM d CROSS JOIN d AS x)
+            SELECT random()/1000000000000. AS colDec
+                , random() AS colInt
+                , hex(randomblob(20)) AS colText
+            FROM f"
+        
+            Open-SQLiteConnection -ConnectionName bcp -DataSource "$home\temp.db"
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE tmpTable23 (colDec REAL, colInt INTEGER, colText TEXT)"
+
+            $columns = @{colDec = "colDec"; colInt = "colInt"; colText = "colText"}
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable tmpTable -ColumnMap $columns |
+            Should -Be 65536
+        
+            Close-SqlConnection -ConnectionName bcp        
+        }
     }
     
     Context "PipelineInput..." {

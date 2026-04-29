@@ -5,7 +5,7 @@ Describe "PostGre" {
     BeforeAll {
         #warm up connection
         $srvName = $env:COMPUTERNAME  #pscore on non-windows
-        if([string]::IsNullOrWhiteSpace($srvName)) { $srvName = $env:NAME }
+        if([string]::IsNullOrWhiteSpace($srvName)) { $srvName = "{0}." -f $env:NAME }
         $u = "postgres"
         $p = "postgres"
         $db = "postgres"
@@ -15,7 +15,7 @@ Describe "PostGre" {
     }
     AfterAll {
         Open-PostGreConnection -Server $srvName -Database $db -Credential $c
-        Invoke-SqlUpdate "DROP TABLE IF EXISTS transactionTest, tmpTable, tmpTable2, tmpTable21, tmpTable22, t, tmpPK;"
+        Invoke-SqlUpdate "DROP TABLE IF EXISTS transactionTest, tmpTable, tmpTable2, tmpTable21, tmpTable22, tmpTable23, t, tmpPK;"
         Close-SqlConnection
     }
 
@@ -125,6 +125,17 @@ Describe "PostGre" {
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable22 -NotifyAction { param($rows) $result.val = $rows }
             $result.val | Should -Be 65536
 
+            Close-SqlConnection -ConnectionName bcp
+        }
+
+        It "With -ColumnMap" {
+            Invoke-SqlUpdate -Query "SELECT * INTO tmpTable23 FROM tmpTable WHERE 1=2"
+            Open-PostGreConnection -Server $srvName -Database $db -ConnectionName bcp -Credential $c
+            
+            $columns = @{colDec = "colDec"; colInt = "colInt"; colText = "colText"}
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceTable tmpTable -DestinationTable tmpTable23 -ColumnMap $columns |
+            Should -Be 65536
+            
             Close-SqlConnection -ConnectionName bcp
         }
     }

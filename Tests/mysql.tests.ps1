@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 Describe "MySql" {
     BeforeAll {
         $srvName = $env:COMPUTERNAME
-        if([string]::IsNullOrWhiteSpace($srvName)) { $srvName = $env:NAME }  #pscore on non-windows
+        if([string]::IsNullOrWhiteSpace($srvName)) { $srvName = "{0}." -f $env:NAME }  #pscore on non-windows
         $u = "root"
         $p = "root"
         $db = "mysql"
@@ -33,6 +33,7 @@ Describe "MySql" {
                         DROP TABLE IF EXISTS $db.tmpTable2;
                         DROP TABLE IF EXISTS $db.tmpTable20;
                         DROP TABLE IF EXISTS $db.tmpTable21;
+                        DROP TABLE IF EXISTS $db.tmpTable22;
                         DROP TABLE IF EXISTS $db.tmpTable3;
                         DROP TABLE IF EXISTS $db.tmpPK;
                         DROP VIEW IF EXISTS $db.generator_64k;
@@ -170,6 +171,20 @@ Describe "MySql" {
             $result = @{val = 0 }
             Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable21" -NotifyAction { param($rows) $result.val = $rows }
             $result.val | Should -Be 65536
+        }
+
+        It "With -ColumnMap" {
+            $query = "SELECT rand() AS colDec
+                , CAST(rand() * 1000000000 AS SIGNED) AS colInt
+                , uuid() AS colText
+            FROM $db.generator_64k"
+        
+            Open-MySqlConnection -ConnectionName bcp -Server $srvName -Database mysql -Credential $c
+            Invoke-SqlUpdate -ConnectionName bcp -Query "CREATE TABLE $db.tmpTable22 (colDec REAL, colInt INTEGER, colText TEXT)"
+
+            $columns = @{colDec = "colDec"; colInt = "colInt"; colText = "colText"}
+            Invoke-SqlBulkCopy -DestinationConnectionName bcp -SourceQuery $query -DestinationTable "$db.tmpTable22" -ColumnMap $columns |
+            Should -Be 65536
         }
     }
 
