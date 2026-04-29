@@ -1,4 +1,4 @@
-param([version]$Version, [switch]$CommitRevision, [ValidateSet("Major", "Minor", "Build")][string]$Increment)
+param([version]$Version, [switch]$CommitRevision, [ValidateSet("Major", "Minor", "Build", "None")][string]$Increment)
 New-Alias -Name HV -Value (Resolve-Path HandleVerbose.ps1) -Force
 
 if(-not $version) {
@@ -13,6 +13,7 @@ if(-not $version) {
     "Build" {
       $Script:Version = [version]::new($version.Major, $version.Minor, $version.Build + 1, $version.Revision + 1)
     }
+    "None" {  }
     default {
       $Script:Version = [version]::new($version.Major, $version.Minor, $version.Build, $version.Revision + 1)
     }
