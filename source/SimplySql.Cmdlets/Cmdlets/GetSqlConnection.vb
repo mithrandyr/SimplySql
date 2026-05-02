@@ -10,7 +10,7 @@ Public Class GetSqlConnection
 #End Region
 
     Protected Overrides Sub ProcessRecord()
-        If ValidateConnection(ConnectionName) Then
+        If ValidateConnection(ConnectionName, False) Then
             If Me.ShouldProcess(ConnectionName, "Get Sql Connection") Then
                 Try
                     WriteObject(Engine.Logic.GetConnection(ConnectionName).Connection)

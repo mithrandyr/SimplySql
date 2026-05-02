@@ -10,7 +10,7 @@ Public Class GetSqlMessage
 #End Region
 
     Protected Overrides Sub ProcessRecord()
-        If ValidateConnection(ConnectionName) Then
+        If ValidateConnection(ConnectionName, False) Then
             If Me.ShouldProcess(ConnectionName, "Get Sql Messages") Then
                 Dim conn = Engine.Logic.GetConnection(ConnectionName)
                 Try
