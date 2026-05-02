@@ -275,7 +275,9 @@ Public MustInherit Class ProviderBase
     Sub RollbackTransaction() Implements ISimplySqlProvider.RollbackTransaction
         If Me.HasTransaction Then
             Try
-                Me.Transaction.Rollback()
+                If Me.Transaction.Connection.State = ConnectionState.Open Then
+                    Me.Transaction.Rollback()
+                End If
             Finally
                 Me.Transaction.Dispose()
                 Me.Transaction = Nothing
@@ -288,7 +290,9 @@ Public MustInherit Class ProviderBase
     Sub CommitTransaction() Implements ISimplySqlProvider.CommitTransaction
         If Me.HasTransaction Then
             Try
-                Me.Transaction.Commit()
+                If Me.Transaction.Connection.State = ConnectionState.Open Then
+                    Me.Transaction.Commit()
+                End If
             Finally
                 Me.Transaction.Dispose()
                 Me.Transaction = Nothing
