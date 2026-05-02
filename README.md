@@ -44,6 +44,10 @@ This module requires PowerShell Version 5.0 or greater
 - PostgreSQL : [Npgsql (8.0.6)](https://www.nuget.org/packages/Npgsql/8.0.6)
 
 ## Latest Version
+## 2.2.1
+* Update to Clear-SqlMessage, Close-SqlConnection, Get-SqlConnection, Get-SqlMessage, Get-SqlTransaction, and Show-SqlConnection to function even if the connection is in a closed state.
+* Update to Undo-SqlTransaction and Complete-SqlTransaction to function even if the connection is in a closed state (will dispose the transaction if present).
+
 ## 2.2.0
 * Added support for OSX-ARM64 thanks to @johnnygtech
 * Fixed an issue with -ColumnMap on Invoke-SqlBulkCopy
