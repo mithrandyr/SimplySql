@@ -34,23 +34,19 @@ Public Class OracleProvider
     End Sub
 
     Public Overrides Function GetDataset(query As String, cmdTimeout As Integer, params As Hashtable, useProviderTypes As Boolean) As DataSet
-        If Not useProviderTypes Then
-            Return MyBase.GetDataset(query, cmdTimeout, params, False)
-        Else
-            Using cmd As OracleCommand = GetCommand(query, cmdTimeout, params)
-                Using da As New OracleDataAdapter(cmd)
-                    Dim ds As New Data.DataSet
-                    da.ReturnProviderSpecificTypes = True
-                    Try
-                        da.Fill(ds)
-                        Return ds
-                    Catch ex As Exception
-                        ex.AddQueryDetails(query, params)
-                        Throw
-                    End Try
-                End Using
+        Using cmd As OracleCommand = GetCommand(query, cmdTimeout, params)
+            Using da As New OracleDataAdapter(cmd)
+                Dim ds As New Data.DataSet
+                da.ReturnProviderSpecificTypes = useProviderTypes
+                Try
+                    da.Fill(ds)
+                    Return ds
+                Catch ex As Exception
+                    ex.AddQueryDetails(query, params)
+                    Throw
+                End Try
             End Using
-        End If
+        End Using
     End Function
 
     Public Overrides Function HandleParamValue(x As Object) As Object

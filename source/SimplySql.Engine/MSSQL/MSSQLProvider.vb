@@ -33,23 +33,19 @@ Public Class MSSQLProvider
     End Sub
 
     Public Overrides Function GetDataset(query As String, cmdTimeout As Integer, params As Hashtable, useProviderTypes As Boolean) As DataSet
-        If Not useProviderTypes Then
-            Return MyBase.GetDataset(query, cmdTimeout, params, False)
-        Else
-            Using cmd As SqlCommand = GetCommand(query, cmdTimeout, params)
-                Using da As New SqlDataAdapter(cmd)
-                    Dim ds As New Data.DataSet
-                    da.ReturnProviderSpecificTypes = True
-                    Try
-                        da.Fill(ds)
-                        Return ds
-                    Catch ex As Exception
-                        ex.AddQueryDetails(query, params)
-                        Throw
-                    End Try
-                End Using
+        Using cmd As SqlCommand = GetCommand(query, cmdTimeout, params)
+            Using da As New SqlDataAdapter(cmd)
+                Dim ds As New Data.DataSet
+                da.ReturnProviderSpecificTypes = useProviderTypes
+                Try
+                    da.Fill(ds)
+                    Return ds
+                Catch ex As Exception
+                    ex.AddQueryDetails(query, params)
+                    Throw
+                End Try
             End Using
-        End If
+        End Using
     End Function
 
     Public Overrides Function BulkLoad(dataReader As IDataReader, destinationTable As String, columnMap As Dictionary(Of String, String), batchSize As Integer, batchTimeout As Integer, notify As Action(Of Long)) As Long

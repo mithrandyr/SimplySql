@@ -21,23 +21,19 @@ Public Class SQLiteProvider
     End Function
 
     Public Overrides Function GetDataSet(query As String, cmdTimeout As Integer, params As Hashtable, useProviderTypes As Boolean) As Data.DataSet
-        If Not useProviderTypes Then
-            Return MyBase.GetDataset(query, cmdTimeout, params, False)
-        Else
-            Using cmd As SQLiteCommand = GetCommand(query, cmdTimeout, params)
-                Using da As New SQLiteDataAdapter(cmd)
-                    Dim ds As New Data.DataSet
-                    da.ReturnProviderSpecificTypes = True
-                    Try
-                        da.Fill(ds)
-                        Return ds
-                    Catch ex As Exception
-                        ex.AddQueryDetails(query, params)
-                        Throw
-                    End Try
-                End Using
+        Using cmd As SQLiteCommand = GetCommand(query, cmdTimeout, params)
+            Using da As New SQLiteDataAdapter(cmd)
+                Dim ds As New Data.DataSet
+                da.ReturnProviderSpecificTypes = useProviderTypes
+                Try
+                    da.Fill(ds)
+                    Return ds
+                Catch ex As Exception
+                    ex.AddQueryDetails(query, params)
+                    Throw
+                End Try
             End Using
-        End If
+        End Using
     End Function
 
 #Region "Not Supported"
