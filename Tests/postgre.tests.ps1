@@ -66,6 +66,18 @@ Describe "PostGre" {
             Should -Be 1000
         }
 
+        It "Empty ResultSet With -AsDataTable" {
+            $w = $null
+            $val = Invoke-SqlQuery -Query "SELECT 1 AS a, 2 AS b WHERE 1 = 0" -AsDataTable -WarningVariable w
+
+            $w | Should -BeNullOrEmpty
+            Should -BeOfType System.Data.DataTable -ActualValue $val
+            $val.Rows.Count | Should -Be 0
+            $val.Columns.Count | Should -Be 2
+            $val.Columns[0].ColumnName | Should -Be "a"
+            $val.Columns[1].ColumnName | Should -Be "b"
+        }
+
         It "With Primary Key" {
             Invoke-SqlUpdate -Query "CREATE TABLE tmpPK (col1 varchar(25), col2 int, PRIMARY KEY (col1, col2));" | Out-Null
             Invoke-SqlUpdate -Query "INSERT INTO tmpPK SELECT 'A', 1" | Out-Null
