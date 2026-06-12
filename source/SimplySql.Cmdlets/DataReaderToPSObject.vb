@@ -10,10 +10,6 @@ Public Class DataReaderToPSObject
                 Dim pso As New PSObject
                 Dim nameList As New Dictionary(Of String, Integer)
                 For Each col In columns
-
-
-
-
                     If theDataReader.IsDBNull(col.Ordinal) Then
                         pso.Properties.Add(New PSNoteProperty(col.Name, Nothing), True)
                     Else
