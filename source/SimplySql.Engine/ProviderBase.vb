@@ -120,7 +120,7 @@ Public MustInherit Class ProviderBase
                             Next
                             dt.Rows.Add(row)
                         End While
-                        If dt.Rows.Count > 0 Then ds.Tables.Add(dt)
+                        ds.Tables.Add(dt)
                     Loop While Not dr.IsClosed AndAlso dr.NextResult()
                 End Using
                 Return ds

@@ -27,23 +27,19 @@ Public Class MySqlProvider
     End Function
 
     Public Overrides Function GetDataSet(query As String, cmdTimeout As Integer, params As Hashtable, useProviderTypes As Boolean) As Data.DataSet
-        If Not useProviderTypes Then
-            Return MyBase.GetDataset(query, cmdTimeout, params, False)
-        Else
-            Using cmd As MySqlCommand = GetCommand(query, cmdTimeout, params)
-                Using da As New MySqlDataAdapter(cmd)
-                    Dim ds As New Data.DataSet
-                    da.ReturnProviderSpecificTypes = True
-                    Try
-                        da.Fill(ds)
-                        Return ds
-                    Catch ex As Exception
-                        ex.AddQueryDetails(query, params)
-                        Throw
-                    End Try
-                End Using
+        Using cmd As MySqlCommand = GetCommand(query, cmdTimeout, params)
+            Using da As New MySqlDataAdapter(cmd)
+                Dim ds As New Data.DataSet
+                da.ReturnProviderSpecificTypes = useProviderTypes
+                Try
+                    da.Fill(ds)
+                    Return ds
+                Catch ex As Exception
+                    ex.AddQueryDetails(query, params)
+                    Throw
+                End Try
             End Using
-        End If
+        End Using
     End Function
 
     Public Overrides Sub ChangeDatabase(databaseName As String)

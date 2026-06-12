@@ -38,12 +38,17 @@ This module requires PowerShell Version 5.0 or greater
 ## Database Providers
 
 - Microsoft Sql Server : [Microsoft.Data.SqlClient 5.2.2](https://www.nuget.org/packages/Microsoft.Data.SqlClient/5.2.2)
-- MySQL : [MySqlConnector 2.4.0](https://www.nuget.org/packages/MySqlConnector/2.4.0)
-- Oracle : [Oracle.ManagedDataAccess.Core 2.19.250](https://www.nuget.org/packages/Oracle.ManagedDataAccess.Core/2.19.250) (this is the latest version supporting .NET Standard 2.0)
+- MySQL : [MySqlConnector 2.6.0](https://www.nuget.org/packages/MySqlConnector/2.6.0)
+- Oracle : [Oracle.ManagedDataAccess.Core 2.19.300](https://www.nuget.org/packages/Oracle.ManagedDataAccess.Core/2.19.300) (this is the latest version supporting .NET Standard 2.0)
 - SQLite : [System.Data.SQLite.Core 1.0.119](https://www.nuget.org/packages/System.Data.SQLite.Core/1.0.119)
 - PostgreSQL : [Npgsql (8.0.6)](https://www.nuget.org/packages/Npgsql/8.0.6)
 
 ## Latest Version
+## 2.3.0
+* Fixed an issue where queries with no rows (but a resultset) incorrectly generated a warning - thanks to @ili101
+* Upgrade MySql to 2.6.0 from 2.4.0
+* Upgrade Oracle to 2.19.300 from 2.19.250
+
 ## 2.2.0
 * Added support for OSX-ARM64 thanks to @johnnygtech
 * Fixed an issue with -ColumnMap on Invoke-SqlBulkCopy
